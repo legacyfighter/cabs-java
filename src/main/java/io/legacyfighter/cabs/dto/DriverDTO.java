@@ -21,7 +21,7 @@ public class DriverDTO {
         this.id = driver.getId();
         firstName = driver.getFirstName();
         lastName = driver.getLastName();
-        driverLicense = driver.getDriverLicense();
+        driverLicense = driver.getDriverLicense().asString();
         photo = driver.getPhoto();
         status = driver.getStatus();
         type = driver.getType();

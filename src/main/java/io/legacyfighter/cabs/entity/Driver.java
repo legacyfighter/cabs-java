@@ -2,10 +2,7 @@ package io.legacyfighter.cabs.entity;
 
 import io.legacyfighter.cabs.common.BaseEntity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
@@ -37,8 +34,8 @@ public class Driver extends BaseEntity {
 
     private String photo;
 
-    @Column(nullable = false)
-    private String driverLicense;
+    @Embedded
+    private DriverLicense driverLicense;
 
     @OneToOne
     private DriverFee fee;
@@ -105,11 +102,11 @@ public class Driver extends BaseEntity {
         this.photo = photo;
     }
 
-    public String getDriverLicense() {
+    public DriverLicense getDriverLicense() {
         return driverLicense;
     }
 
-    public void setDriverLicense(String driverLicense) {
+    public void setDriverLicense(DriverLicense driverLicense) {
         this.driverLicense = driverLicense;
     }
 
