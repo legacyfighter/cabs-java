@@ -4,6 +4,7 @@ import io.legacyfighter.cabs.dto.AddressDTO;
 import io.legacyfighter.cabs.dto.DriverPositionDTOV2;
 import io.legacyfighter.cabs.dto.TransitDTO;
 import io.legacyfighter.cabs.entity.*;
+import io.legacyfighter.cabs.money.Money;
 import io.legacyfighter.cabs.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -475,12 +476,12 @@ public class TransitService {
             transit.calculateFinalCosts();
             driver.setOccupied(false);
             transit.completeAt(Instant.now(clock));
-            Integer driverFee = driverFeeService.calculateDriverFee(transitId);
+            Money driverFee = driverFeeService.calculateDriverFee(transitId);
             transit.setDriversFee(driverFee);
             driverRepository.save(driver);
             awardsService.registerMiles(transit.getClient().getId(), transitId);
             transitRepository.save(transit);
-            invoiceGenerator.generate(transit.getPrice(), transit.getClient().getName() + " " + transit.getClient().getLastName());
+            invoiceGenerator.generate(transit.getPrice().toInt(), transit.getClient().getName() + " " + transit.getClient().getLastName());
         } else {
             throw new IllegalArgumentException("Cannot complete Transit, id = " + transitId);
         }

@@ -1,12 +1,17 @@
 package io.legacyfighter.cabs.money;
 
+import javax.persistence.Embeddable;
 import java.util.Locale;
 import java.util.Objects;
 
+@Embeddable
 public class Money {
 
     public static final Money ZERO = new Money(0);
     private Integer value;
+
+    public Money() {
+    }
 
     public Money(Integer value) {
         this.value = value;

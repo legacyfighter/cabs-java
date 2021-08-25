@@ -5,6 +5,7 @@ import io.legacyfighter.cabs.entity.Driver;
 import io.legacyfighter.cabs.entity.DriverAttribute;
 import io.legacyfighter.cabs.entity.DriverLicense;
 import io.legacyfighter.cabs.entity.Transit;
+import io.legacyfighter.cabs.money.Money;
 import io.legacyfighter.cabs.repository.DriverAttributeRepository;
 import io.legacyfighter.cabs.repository.DriverRepository;
 import io.legacyfighter.cabs.repository.TransitRepository;
@@ -109,7 +110,7 @@ public class DriverService {
         driverRepository.save(driver);
     }
 
-    public Integer calculateDriverMonthlyPayment(Long driverId, int year, int month) {
+    public Money calculateDriverMonthlyPayment(Long driverId, int year, int month) {
         Driver driver = driverRepository.getOne(driverId);
         if (driver == null)
             throw new IllegalArgumentException("Driver does not exists, id = " + driverId);
@@ -125,14 +126,14 @@ public class DriverService {
 
         List<Transit> transitsList = transitRepository.findAllByDriverAndDateTimeBetween(driver, from, to);
 
-        Integer sum = transitsList.stream()
-                .map(t -> driverFeeService.calculateDriverFee(t.getId())).reduce(0, Integer::sum);
+        Money sum = transitsList.stream()
+                .map(t -> driverFeeService.calculateDriverFee(t.getId())).reduce(Money.ZERO, Money::add);
 
         return sum;
     }
 
-    public Map<Month, Integer> calculateDriverYearlyPayment(Long driverId, int year) {
-        Map<Month, Integer> payments = new HashMap<>();
+    public Map<Month, Money> calculateDriverYearlyPayment(Long driverId, int year) {
+        Map<Month, Money> payments = new HashMap<>();
         for (Month m : Month.values()) {
             payments.put(m, calculateDriverMonthlyPayment(driverId, year, m.getValue()));
         }

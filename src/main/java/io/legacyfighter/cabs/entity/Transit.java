@@ -1,6 +1,7 @@
 package io.legacyfighter.cabs.entity;
 
 import io.legacyfighter.cabs.common.BaseEntity;
+import io.legacyfighter.cabs.money.Money;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -71,12 +72,23 @@ public class Transit extends BaseEntity {
 
     private float km;
 
-    // https://stackoverflow.com/questions/37107123/sould-i-store-price-as-decimal-or-integer-in-mysql
-    private Integer price;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name="value", column=@Column(name="price")),
+    })
+    private Money price;
 
-    private Integer estimatedPrice;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name="value", column=@Column(name="estimatedPrice")),
+    })
+    private Money estimatedPrice;
 
-    private Integer driversFee;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name="value", column=@Column(name="driversFee")),
+    })
+    private Money driversFee;
 
     private Instant dateTime;
 
@@ -103,12 +115,12 @@ public class Transit extends BaseEntity {
     }
 
 
-    public Integer getPrice() {
+    public Money getPrice() {
         return price;
     }
 
     //just for testing
-    public void setPrice(Integer price) {
+    public void setPrice(Money price) {
         this.price = price;
     }
 
@@ -126,12 +138,12 @@ public class Transit extends BaseEntity {
 
     private Instant completeAt;
 
-    public Integer estimateCost() {
+    public Money estimateCost() {
         if (status.equals(Status.COMPLETED)) {
             throw new IllegalStateException("Estimating cost for completed transit is forbidden, id = " + this.getId());
         }
 
-        Integer estimated = calculateCost();
+        Money estimated = calculateCost();
 
         this.estimatedPrice = estimated;
         this.price = null;
@@ -147,7 +159,7 @@ public class Transit extends BaseEntity {
         this.client = client;
     }
 
-    public Integer calculateFinalCosts() {
+    public Money calculateFinalCosts() {
         if (status.equals(Status.COMPLETED)) {
             return calculateCost();
         } else {
@@ -155,7 +167,7 @@ public class Transit extends BaseEntity {
         }
     }
 
-    private Integer calculateCost() {
+    private Money calculateCost() {
         Integer baseFee = BASE_FEE;
         Integer factorToCalculate = factor;
         if (factorToCalculate == null) {
@@ -194,7 +206,7 @@ public class Transit extends BaseEntity {
             }
         }
         BigDecimal priceBigDecimal = new BigDecimal(km * kmRate * factorToCalculate + baseFee).setScale(2, RoundingMode.HALF_UP);
-        int finalPrice = Integer.parseInt(String.valueOf(priceBigDecimal).replaceAll("\\.", ""));
+        Money finalPrice = new Money(Integer.parseInt(String.valueOf(priceBigDecimal).replaceAll("\\.", "")));
         this.price = finalPrice;
         return this.price;
     }
@@ -309,20 +321,17 @@ public class Transit extends BaseEntity {
         this.completeAt = when;
     }
 
-    public Integer getDriversFee() {
+    public Money getDriversFee() {
         return driversFee;
     }
 
-    public void setDriversFee(Integer driversFee) {
+    public void setDriversFee(Money driversFee) {
         this.driversFee = driversFee;
     }
 
-    public Integer getEstimatedPrice() {
+    public Money getEstimatedPrice() {
         return estimatedPrice;
     }
 
-    public void setEstimatedPrice(Integer estimatedPrice) {
-        this.estimatedPrice = estimatedPrice;
-    }
 
 }

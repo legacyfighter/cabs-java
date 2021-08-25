@@ -1,10 +1,9 @@
 package io.legacyfighter.cabs.entity;
 
 import io.legacyfighter.cabs.common.BaseEntity;
+import io.legacyfighter.cabs.money.Money;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 
 @Entity
 public class DriverFee extends BaseEntity {
@@ -21,7 +20,7 @@ public class DriverFee extends BaseEntity {
         this.feeType = feeType;
         this.driver = driver;
         this.amount = amount;
-        this.min = min;
+        this.min = new Money(min);
     }
 
     @Column(nullable = false)
@@ -33,7 +32,11 @@ public class DriverFee extends BaseEntity {
     @Column(nullable = false)
     private Integer amount;
 
-    private Integer min;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name="value", column=@Column(name="min")),
+    })
+    private Money min;
 
     public FeeType getFeeType() {
         return feeType;
@@ -59,11 +62,11 @@ public class DriverFee extends BaseEntity {
         this.amount = amount;
     }
 
-    public Integer getMin() {
+    public Money getMin() {
         return min;
     }
 
-    public void setMin(Integer min) {
+    public void setMin(Money min) {
         this.min = min;
     }
 

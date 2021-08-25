@@ -108,7 +108,7 @@ public class ClaimService {
             return claim;
         }
         if (claim.getOwner().getType().equals(Client.Type.VIP)) {
-            if (claim.getTransit().getPrice() < appProperties.getAutomaticRefundForVipThreshold()) {
+            if (claim.getTransit().getPrice().toInt() < appProperties.getAutomaticRefundForVipThreshold()) {
                 claim.setStatus(REFUNDED);
                 claim.setCompletionDate(Instant.now());
                 claim.setChangeDate(Instant.now());
@@ -124,7 +124,7 @@ public class ClaimService {
             }
         } else {
             if (transitRepository.findByClient(claim.getOwner()).size() >= appProperties.getNoOfTransitsForClaimAutomaticRefund()) {
-                if (claim.getTransit().getPrice() < appProperties.getAutomaticRefundForVipThreshold()) {
+                if (claim.getTransit().getPrice().toInt() < appProperties.getAutomaticRefundForVipThreshold()) {
                     claim.setStatus(REFUNDED);
                     claim.setCompletionDate(Instant.now());
                     claim.setChangeDate(Instant.now());

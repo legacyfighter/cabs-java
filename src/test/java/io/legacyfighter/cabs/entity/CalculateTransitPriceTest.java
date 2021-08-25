@@ -1,5 +1,6 @@
 package io.legacyfighter.cabs.entity;
 
+import io.legacyfighter.cabs.money.Money;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
@@ -40,10 +41,10 @@ class CalculateTransitPriceTest {
         //friday
         transitWasOnDoneOnFriday(transit);
         //when
-        Integer price = transit.calculateFinalCosts();
+        Money price = transit.calculateFinalCosts();
 
         //then
-        assertEquals(2900, price); //29.00
+        assertEquals( new Money(2900), price); //29.00
     }
 
     @Test
@@ -54,10 +55,10 @@ class CalculateTransitPriceTest {
         //friday
         transitWasOnDoneOnFriday(transit);
         //when
-        Integer price = transit.estimateCost();
+        Money price = transit.estimateCost();
 
         //then
-        assertEquals(2900, price); //29.00
+        assertEquals(new Money(2900), price); //29.00
     }
 
 

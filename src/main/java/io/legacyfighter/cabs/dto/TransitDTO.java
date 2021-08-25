@@ -71,7 +71,7 @@ public class TransitDTO {
         distance = transit.getKm();
         factor = transit.factor;
         if (transit.getPrice() != null) {
-            price = new BigDecimal(transit.getPrice());
+            price = new BigDecimal(transit.getPrice().toInt());
         }
         date = transit.getDateTime();
         status = transit.getStatus();
@@ -84,10 +84,10 @@ public class TransitDTO {
         carClass = transit.getCarType();
         clientDTO = new ClientDTO(transit.getClient());
         if (transit.getDriversFee() != null) {
-            driverFee = new BigDecimal(transit.getDriversFee());
+            driverFee = new BigDecimal(transit.getDriversFee().toInt());
         }
         if (transit.getEstimatedPrice() != null) {
-            estimatedPrice = new BigDecimal(transit.getEstimatedPrice());
+            estimatedPrice = new BigDecimal(transit.getEstimatedPrice().toInt());
         }
         dateTime = transit.getDateTime();
         published = transit.getPublished();
