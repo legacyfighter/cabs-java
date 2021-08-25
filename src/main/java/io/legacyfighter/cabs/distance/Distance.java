@@ -5,6 +5,8 @@ import java.util.Objects;
 
 public final class Distance {
 
+    public static final Distance ZERO = ofKm(0);
+
     private static final float MILES_TO_KILOMETERS_RATIO = 1.609344f;
 
     private final float km;
