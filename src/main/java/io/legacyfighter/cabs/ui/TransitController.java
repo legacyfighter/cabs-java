@@ -14,7 +14,7 @@ public class TransitController {
     private TransitService transitService;
 
     @GetMapping("/transits/{id}")
-    TransitDTO getTransit(@PathVariable Long id) {
+    public TransitDTO getTransit(@PathVariable Long id) {
         return transitService.loadTransit(id);
     }
 

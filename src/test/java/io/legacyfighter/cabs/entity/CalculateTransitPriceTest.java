@@ -62,6 +62,76 @@ class CalculateTransitPriceTest {
         assertEquals(new Money(2900), price); //29.00
     }
 
+    @Test
+    void calculatePriceOnSunday() {
+        //given
+        Transit transit = transit(COMPLETED, 20);
+        //and
+        transitWasDoneOnSunday(transit);
+
+        //when
+        Money price = transit.calculateFinalCosts();
+
+        //then
+        assertEquals(new Money(3800), price); //38.00
+    }
+
+    @Test
+    void calculatePriceOnNewYearsEve() {
+        //given
+        Transit transit = transit(COMPLETED, 20);
+        //and
+        transitWasDoneOnNewYearsEve(transit);
+
+        //when
+        Money price = transit.calculateFinalCosts();
+
+        //then
+        assertEquals(new Money(8100), price); //81.00
+    }
+
+    @Test
+    void calculatePriceOnSaturday() {
+        //given
+        Transit transit = transit(COMPLETED, 20);
+        //and
+        transitWasDoneOnSaturday(transit);
+
+        //when
+        Money price = transit.calculateFinalCosts();
+
+        //then
+        assertEquals(new Money(3800), price); //38.00
+    }
+
+    @Test
+    void calculatePriceOnSaturdayNight() {
+        //given
+        Transit transit = transit(COMPLETED, 20);
+        //and
+        transitWasDoneOnSaturdayNight(transit);
+
+        //when
+        Money price = transit.calculateFinalCosts();
+
+        //then
+        assertEquals(new Money(6000), price); //60.00
+    }
+
+
+    @Test
+    void shouldUseStandardPriceBefore2019() {
+        //given
+        Transit transit = transit(COMPLETED, 20);
+
+        //2018
+        transitWasDoneIn2018(transit);
+        //when
+        Money price = transit.calculateFinalCosts();
+
+        //then
+        assertEquals(new Money(2900), price); //29.00
+    }
 
     Transit transit(Transit.Status status, int km) {
         Transit transit = new Transit();
@@ -75,5 +145,26 @@ class CalculateTransitPriceTest {
     void transitWasOnDoneOnFriday(Transit transit) {
         transit.setDateTime(LocalDateTime.of(2021, 4, 16, 8, 30).toInstant(ZoneOffset.UTC));
     }
+
+    void transitWasDoneOnNewYearsEve(Transit transit) {
+        transit.setDateTime(LocalDateTime.of(2021, 12, 31, 8, 30).toInstant(ZoneOffset.UTC));
+    }
+
+    void transitWasDoneOnSaturday(Transit transit) {
+        transit.setDateTime(LocalDateTime.of(2021, 4, 17, 8, 30).toInstant(ZoneOffset.UTC));
+    }
+
+    void transitWasDoneOnSunday(Transit transit) {
+        transit.setDateTime(LocalDateTime.of(2021, 4, 18, 8, 30).toInstant(ZoneOffset.UTC));
+    }
+
+    void transitWasDoneOnSaturdayNight(Transit transit) {
+        transit.setDateTime(LocalDateTime.of(2021, 4, 17, 19, 30).toInstant(ZoneOffset.UTC));
+    }
+
+    void transitWasDoneIn2018(Transit transit) {
+        transit.setDateTime(LocalDateTime.of(2018, 1,1, 8, 30).toInstant(ZoneOffset.UTC));
+    }
+
 
 }
