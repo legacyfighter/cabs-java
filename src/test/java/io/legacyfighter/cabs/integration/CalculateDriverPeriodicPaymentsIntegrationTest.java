@@ -1,5 +1,6 @@
 package io.legacyfighter.cabs.integration;
 
+import io.legacyfighter.cabs.common.Fixtures;
 import io.legacyfighter.cabs.entity.*;
 import io.legacyfighter.cabs.money.Money;
 import io.legacyfighter.cabs.repository.AddressRepository;
@@ -26,30 +27,21 @@ class CalculateDriverPeriodicPaymentsIntegrationTest {
     DriverService driverService;
 
     @Autowired
-    TransitRepository transitRepository;
-
-    @Autowired
-    DriverFeeRepository feeRepository;
-
-    @Autowired
-    AddressRepository addressRepository;
-
-    @Autowired
-    ClientRepository clientRepository;
+    Fixtures fixtures;
 
     @Test
     void calculateMonthlyPayment() {
         //given
-        Driver driver = aDriver();
+        Driver driver = fixtures.aDriver();
         //and
-        aTransit(driver, 60, LocalDateTime.of(2000, 10, 1, 6, 30));
-        aTransit(driver, 70, LocalDateTime.of(2000, 10, 10, 2, 30));
-        aTransit(driver, 80, LocalDateTime.of(2000, 10, 30, 6, 30));
-        aTransit(driver, 60, LocalDateTime.of(2000, 11, 10, 1, 30));
-        aTransit(driver, 30, LocalDateTime.of(2000, 11, 10, 1, 30));
-        aTransit(driver, 15, LocalDateTime.of(2000, 12, 10, 2, 30));
+        fixtures.aTransit(driver, 60, LocalDateTime.of(2000, 10, 1, 6, 30));
+        fixtures.aTransit(driver, 70, LocalDateTime.of(2000, 10, 10, 2, 30));
+        fixtures.aTransit(driver, 80, LocalDateTime.of(2000, 10, 30, 6, 30));
+        fixtures.aTransit(driver, 60, LocalDateTime.of(2000, 11, 10, 1, 30));
+        fixtures.aTransit(driver, 30, LocalDateTime.of(2000, 11, 10, 1, 30));
+        fixtures.aTransit(driver, 15, LocalDateTime.of(2000, 12, 10, 2, 30));
         //and
-        driverHasFee(driver, DriverFee.FeeType.FLAT, 10);
+        fixtures.driverHasFee(driver, DriverFee.FeeType.FLAT, 10);
 
         //when
         Money feeOctober = driverService.calculateDriverMonthlyPayment(driver.getId(), 2000, 10);
@@ -70,16 +62,16 @@ class CalculateDriverPeriodicPaymentsIntegrationTest {
     @Test
     void calculateYearlyPayment() {
         //given
-        Driver driver = aDriver();
+        Driver driver = fixtures.aDriver();
         //and
-        aTransit(driver, 60, LocalDateTime.of(2000, 10, 1, 6, 30));
-        aTransit(driver, 70, LocalDateTime.of(2000, 10, 10, 2, 30));
-        aTransit(driver, 80, LocalDateTime.of(2000, 10, 30, 6, 30));
-        aTransit(driver, 60, LocalDateTime.of(2000, 11, 10, 1, 30));
-        aTransit(driver, 30, LocalDateTime.of(2000, 11, 10, 1, 30));
-        aTransit(driver, 15, LocalDateTime.of(2000, 12, 10, 2, 30));
+        fixtures.aTransit(driver, 60, LocalDateTime.of(2000, 10, 1, 6, 30));
+        fixtures.aTransit(driver, 70, LocalDateTime.of(2000, 10, 10, 2, 30));
+        fixtures.aTransit(driver, 80, LocalDateTime.of(2000, 10, 30, 6, 30));
+        fixtures.aTransit(driver, 60, LocalDateTime.of(2000, 11, 10, 1, 30));
+        fixtures.aTransit(driver, 30, LocalDateTime.of(2000, 11, 10, 1, 30));
+        fixtures.aTransit(driver, 15, LocalDateTime.of(2000, 12, 10, 2, 30));
         //and
-        driverHasFee(driver, DriverFee.FeeType.FLAT, 10);
+        fixtures.driverHasFee(driver, DriverFee.FeeType.FLAT, 10);
 
         //when
         Map<Month, Money> payments = driverService.calculateDriverYearlyPayment(driver.getId(), 2000);
@@ -97,31 +89,6 @@ class CalculateDriverPeriodicPaymentsIntegrationTest {
         assertEquals(new Money(180), payments.get(Month.OCTOBER));
         assertEquals(new Money(70), payments.get(Month.NOVEMBER));
         assertEquals(new Money(5), payments.get(Month.DECEMBER));
-    }
-
-    public Transit aTransit(Driver driver, Integer price, LocalDateTime when) {
-        Transit transit = new Transit();
-        transit.setPrice(new Money(price));
-        transit.setDriver(driver);
-        transit.setDateTime(when.toInstant(ZoneOffset.UTC));
-        return transitRepository.save(transit);
-    }
-
-    DriverFee driverHasFee(Driver driver, DriverFee.FeeType feeType, int amount, Integer min) {
-        DriverFee driverFee = new DriverFee();
-        driverFee.setDriver(driver);
-        driverFee.setAmount(amount);
-        driverFee.setFeeType(feeType);
-        driverFee.setMin(new Money(min));
-        return feeRepository.save(driverFee);
-    }
-
-    DriverFee driverHasFee(Driver driver, DriverFee.FeeType feeType , int amount) {
-        return driverHasFee(driver, feeType, amount, 0);
-    }
-
-    Driver aDriver() {
-        return driverService.createDriver("FARME100165AB5EW", "Kowalsi", "Janusz", Driver.Type.REGULAR, Driver.Status.ACTIVE, "");
     }
 
 }
