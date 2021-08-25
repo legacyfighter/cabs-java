@@ -1,0 +1,32 @@
+package io.legacyfighter.cabs.repository;
+
+import io.legacyfighter.cabs.entity.Address;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public class AddressRepository {
+    @Autowired
+    AddressRepositoryInterface addressRepositoryInterface;
+
+    // FIX ME: To replace with getOrCreate method instead of that?
+    // Actual workaround for address uniqueness problem: assign result from repo.save to variable for later usage
+    public Address save(Address address) {
+        address.hash();
+
+        if (address.getId() == null) {
+            Address existingAddress = addressRepositoryInterface.findByHash(address.getHash());
+
+            if (existingAddress != null) {
+                return existingAddress;
+            }
+        }
+
+        return addressRepositoryInterface.save(address);
+    }
+
+    public Address getOne(Long id) {
+        return addressRepositoryInterface.getOne(id);
+    }
+}
