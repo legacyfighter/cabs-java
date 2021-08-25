@@ -11,6 +11,8 @@ import java.time.*;
 import java.util.HashSet;
 import java.util.Set;
 
+import static io.legacyfighter.cabs.distance.Distance.ofKm;
+
 @Entity
 public class Transit extends BaseEntity {
 
@@ -69,7 +71,8 @@ public class Transit extends BaseEntity {
 
     public Integer awaitingDriversResponses = 0;
 
-    public Integer factor;
+    @Embedded
+    private Tariff tariff;
 
     private float km;
 
@@ -94,8 +97,6 @@ public class Transit extends BaseEntity {
     private Instant dateTime;
 
     private Instant published;
-
-    public static final Integer BASE_FEE = 8;
 
     @OneToOne
     public Client client;
@@ -169,50 +170,13 @@ public class Transit extends BaseEntity {
     }
 
     private Money calculateCost() {
-        Integer baseFee = BASE_FEE;
-        Integer factorToCalculate = factor;
-        if (factorToCalculate == null) {
-            factorToCalculate = 1;
-        }
-        float kmRate;
-        LocalDateTime day = dateTime.atZone(ZoneId.systemDefault()).toLocalDateTime();
-        // wprowadzenie nowych cennikow od 1.01.2019
-        if (day.getYear() <= 2018) {
-            kmRate = 1.0f;
-            baseFee++;
-        } else {
-            if ((day.getMonth() == Month.DECEMBER && day.getDayOfMonth() == 31) ||
-                    (day.getMonth() == Month.JANUARY && day.getDayOfMonth() == 1 && day.getHour() <= 6)) {
-                kmRate = 3.50f;
-                baseFee += 3;
-            } else {
-                // piątek i sobota po 17 do 6 następnego dnia
-                if ((day.getDayOfWeek() == DayOfWeek.FRIDAY && day.getHour() >= 17) ||
-                        (day.getDayOfWeek() == DayOfWeek.SATURDAY && day.getHour() <= 6) ||
-                        (day.getDayOfWeek() == DayOfWeek.SATURDAY && day.getHour() >= 17) ||
-                        (day.getDayOfWeek() == DayOfWeek.SUNDAY && day.getHour() <= 6)) {
-                    kmRate = 2.50f;
-                    baseFee += 2;
-                } else {
-                    // pozostałe godziny weekendu
-                    if ((day.getDayOfWeek() == DayOfWeek.SATURDAY && day.getHour() > 6 && day.getHour() < 17) ||
-                            (day.getDayOfWeek() == DayOfWeek.SUNDAY && day.getHour() > 6)) {
-                        kmRate = 1.5f;
-                    } else {
-                        // tydzień roboczy
-                        kmRate = 1.0f;
-                        baseFee++;
-                    }
-                }
-            }
-        }
-        BigDecimal priceBigDecimal = new BigDecimal(km * kmRate * factorToCalculate + baseFee).setScale(2, RoundingMode.HALF_UP);
-        Money finalPrice = new Money(Integer.parseInt(String.valueOf(priceBigDecimal).replaceAll("\\.", "")));
-        this.price = finalPrice;
-        return this.price;
+        Money money = this.tariff.calculateCost(ofKm(km));
+        this.price = money;
+        return money;
     }
 
     public void setDateTime(Instant dateTime) {
+        this.tariff = Tariff.ofTime(dateTime.atZone(ZoneId.systemDefault()).toLocalDateTime());
         this.dateTime = dateTime;
     }
 
@@ -334,5 +298,8 @@ public class Transit extends BaseEntity {
         return estimatedPrice;
     }
 
+    public Tariff getTariff() {
+        return tariff;
+    }
 
 }

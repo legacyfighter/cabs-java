@@ -3,13 +3,13 @@ import io.legacyfighter.cabs.distance.Distance;
 import io.legacyfighter.cabs.money.Money;
 
 import javax.persistence.Embeddable;
-import javax.persistence.Embedded;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.Month;
 
+@Embeddable
 public class Tariff {
 
     private static final Integer BASE_FEE = 8;
@@ -19,6 +19,9 @@ public class Tariff {
     private String name;
 
     private Integer baseFee;
+
+    public Tariff() {
+    }
 
     private Tariff(float kmRate, String name, Integer baseFee) {
         this.kmRate = kmRate;

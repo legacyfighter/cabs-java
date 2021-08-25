@@ -118,21 +118,6 @@ class CalculateTransitPriceTest {
         assertEquals(new Money(6000), price); //60.00
     }
 
-
-    @Test
-    void shouldUseStandardPriceBefore2019() {
-        //given
-        Transit transit = transit(COMPLETED, 20);
-
-        //2018
-        transitWasDoneIn2018(transit);
-        //when
-        Money price = transit.calculateFinalCosts();
-
-        //then
-        assertEquals(new Money(2900), price); //29.00
-    }
-
     Transit transit(Transit.Status status, int km) {
         Transit transit = new Transit();
         transit.setDateTime(Instant.now());

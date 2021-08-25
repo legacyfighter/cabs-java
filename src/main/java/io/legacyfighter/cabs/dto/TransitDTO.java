@@ -69,7 +69,7 @@ public class TransitDTO {
     public TransitDTO(Transit transit) {
         id = transit.getId();
         distance = transit.getKm();
-        factor = transit.factor;
+        factor = 1;
         if (transit.getPrice() != null) {
             price = new BigDecimal(transit.getPrice().toInt());
         }
@@ -105,56 +105,9 @@ public class TransitDTO {
         LocalDateTime day = date.atZone(ZoneId.systemDefault()).toLocalDateTime();
 
         // wprowadzenie nowych cennikow od 1.01.2019
-        if (day.getYear() <= 2018) {
-            this.kmRate = 1.0f;
-            this.tariff = "Standard";
-            return;
-        }
-
-        Integer year = day.getYear();
-        boolean leap = ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
-
-        if (((leap && day.getDayOfYear() == 366) || (!leap && day.getDayOfYear() == 365)) || (day.getDayOfYear() == 1 && day.getHour() <= 6)) {
-            this.tariff = "Sylwester";
-            this.kmRate = 3.50f;
-        } else {
-            switch (day.getDayOfWeek()) {
-                case MONDAY:
-                case TUESDAY:
-                case WEDNESDAY:
-                case THURSDAY:
-                    this.kmRate = 1.0f;
-                    this.tariff = "Standard";
-                    break;
-                case FRIDAY:
-                    if (day.getHour() < 17) {
-                        this.tariff = "Standard";
-                        this.kmRate = 1.0f;
-                    } else {
-                        this.tariff = "Weekend+";
-                        this.kmRate = 2.50f;
-                    }
-                    break;
-                case SATURDAY:
-                    if (day.getHour() < 6 || day.getHour() >= 17) {
-                        this.kmRate = 2.50f;
-                        this.tariff = "Weekend+";
-                    } else if (day.getHour() < 17) {
-                        this.kmRate = 1.5f;
-                        this.tariff = "Weekend";
-                    }
-                    break;
-                case SUNDAY:
-                    if (day.getHour() < 6) {
-                        this.kmRate = 2.50f;
-                        this.tariff = "Weekend+";
-                    } else {
-                        this.kmRate = 1.5f;
-                        this.tariff = "Weekend";
-                    }
-                    break;
-            }
-        }
+        this.tariff = transit.getTariff().getName();
+        this.kmRate = transit.getTariff().getKmRate();
+        this.baseFee = new BigDecimal(transit.getTariff().getBaseFee());
 
     }
 

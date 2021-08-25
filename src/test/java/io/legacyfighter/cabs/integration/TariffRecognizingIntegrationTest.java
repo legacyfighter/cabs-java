@@ -75,19 +75,4 @@ class TariffRecognizingIntegrationTest {
         assertEquals(1.0f, transitDTO.getKmRate());
     }
 
-    @Test
-    void standardTariffShouldBeDisplayedBefore2019() {
-        //given
-        Transit transit = fixtures.aCompletedTransitAt(60, LocalDateTime.of(2018, 12, 31, 8, 30).toInstant(ZoneOffset.UTC));
-
-        //when
-        TransitDTO transitDTO = transitController.getTransit(transit.getId());
-
-        //then
-        assertEquals("Standard", transitDTO.getTariff());
-        assertEquals(1.0f, transitDTO.getKmRate());
-
-    }
-
-
 }
