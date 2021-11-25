@@ -132,16 +132,8 @@ public class TransitService {
         // calculate the result
         double distanceInKMeters = c * r;
 
-        if (!(transit.getStatus().equals(Transit.Status.DRAFT) ||
-                (transit.getStatus().equals(Transit.Status.WAITING_FOR_DRIVER_ASSIGNMENT))) ||
-                (transit.getPickupAddressChangeCounter() > 2) ||
-                (distanceInKMeters > 0.25)) {
-            throw new IllegalStateException("Address 'from' cannot be changed, id = " + transitId);
-        }
-
-        transit.setFrom(newAddress);
-        transit.setKm(Distance.ofKm((float) distanceCalculator.calculateByMap(geoFromNew[0], geoFromNew[1], geoFromOld[0], geoFromOld[1])));
-        transit.setPickupAddressChangeCounter(transit.getPickupAddressChangeCounter() + 1);
+        Distance newDistance = Distance.ofKm((float) distanceCalculator.calculateByMap(geoFromNew[0], geoFromNew[1], geoFromOld[0], geoFromOld[1]));
+        transit.changePickupTo(newAddress, newDistance, distanceInKMeters);
         transitRepository.save(transit);
 
         for (Driver driver : transit.getProposedDrivers()) {

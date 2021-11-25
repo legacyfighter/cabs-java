@@ -29,6 +29,21 @@ public class Transit extends BaseEntity {
         this.km = distance.toKmInFloat();
     }
 
+    public void changePickupTo(Address newAddress, Distance newDistance, double distanceFromPreviousPickup) {
+        if (distanceFromPreviousPickup > 0.25) {
+            throw new IllegalStateException("Address 'from' cannot be changed, id = " + getId());
+        } else if (pickupAddressChangeCounter > 2) {
+            throw new IllegalStateException("Address 'from' cannot be changed, id = " + getId());
+        } else if (!(status.equals(Status.DRAFT) ||
+                (status.equals(Status.WAITING_FOR_DRIVER_ASSIGNMENT)))) {
+            throw new IllegalStateException("Address 'from' cannot be changed, id = " + getId());
+        }
+
+        this.from = newAddress;
+        this.km = newDistance.toKmInFloat();
+        this.pickupAddressChangeCounter++;
+    }
+
     public enum Status {
         DRAFT,
         CANCELLED,
@@ -117,10 +132,6 @@ public class Transit extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private CarType.CarClass carType;
 
-    public void setCarType(CarType.CarClass carType) {
-        this.carType = carType;
-    }
-
     public Driver getDriver() {
         return driver;
     }
@@ -164,10 +175,6 @@ public class Transit extends BaseEntity {
 
     public Client getClient() {
         return client;
-    }
-
-    public void setClient(Client client) {
-        this.client = client;
     }
 
     public Money calculateFinalCosts() {
@@ -226,16 +233,8 @@ public class Transit extends BaseEntity {
         return driversRejections;
     }
 
-    public void setDriversRejections(Set<Driver> driversRejections) {
-        this.driversRejections = driversRejections;
-    }
-
     public Set<Driver> getProposedDrivers() {
         return proposedDrivers;
-    }
-
-    public void setProposedDrivers(Set<Driver> proposedDrivers) {
-        this.proposedDrivers = proposedDrivers;
     }
 
     public Instant getAcceptedAt() {
