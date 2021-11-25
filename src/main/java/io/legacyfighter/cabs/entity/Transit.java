@@ -6,6 +6,7 @@ import io.legacyfighter.cabs.money.Money;
 
 import javax.persistence.*;
 import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -42,6 +43,27 @@ public class Transit extends BaseEntity {
         this.from = newAddress;
         this.km = newDistance.toKmInFloat();
         this.pickupAddressChangeCounter++;
+    }
+
+    public void changeDestinationTo(Address newAddress, Distance newDistance) {
+        if (this.getStatus().equals(Transit.Status.COMPLETED)) {
+            throw new IllegalStateException("Address 'to' cannot be changed, id = " + getId());
+        }
+        this.to = newAddress;
+        this.km = newDistance.toKmInFloat();
+        estimateCost();
+    }
+
+    public boolean shouldNowWaitForDriverAnyMore(Instant date) {
+        return this.published.plus(300, ChronoUnit.SECONDS).isBefore(date) || (this.status.equals(Transit.Status.CANCELLED);
+    }
+
+    public void failDriverAssignment() {
+        this.status = Status.DRIVER_ASSIGNMENT_FAILED;
+        this.driver = null;
+        this.km = Distance.ZERO.toKmInFloat();
+        estimateCost();
+        this.awaitingDriversResponses = 0;
     }
 
     public enum Status {

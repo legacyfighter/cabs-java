@@ -160,16 +160,13 @@ public class TransitService {
             throw new IllegalArgumentException("Transit does not exist, id = " + transitId);
         }
 
-        if (transit.getStatus().equals(Transit.Status.COMPLETED)) {
-            throw new IllegalStateException("Address 'to' cannot be changed, id = " + transitId);
-        }
 
         // FIXME later: add some exceptions handling
         double[] geoFrom = geocodingService.geocodeAddress(transit.getFrom());
         double[] geoTo = geocodingService.geocodeAddress(newAddress);
 
-        transit.setTo(newAddress);
-        transit.setKm(Distance.ofKm((float) distanceCalculator.calculateByMap(geoFrom[0], geoFrom[1], geoTo[0], geoTo[1])));
+        Distance newDistance = Distance.ofKm((float) distanceCalculator.calculateByMap(geoFrom[0], geoFrom[1], geoTo[0], geoTo[1]));
+        transit.changeDestinationTo(newAddress, newDistance);
 
         if (transit.getDriver() != null) {
             notificationService.notifyAboutChangedTransitAddress(transit.getDriver().getId(), transitId);
@@ -238,17 +235,9 @@ public class TransitService {
                     distanceToCheck++;
 
                     // FIXME: to refactor when the final business logic will be determined
-                    if ((transit.getPublished().plus(300, ChronoUnit.SECONDS).isBefore(Instant.now(clock)))
-                            ||
-                            (distanceToCheck >= 20)
-                            ||
-                            // Should it be here? How is it even possible due to previous status check above loop?
-                            (transit.getStatus().equals(Transit.Status.CANCELLED))
-                    ) {
-                        transit.setStatus(Transit.Status.DRIVER_ASSIGNMENT_FAILED);
-                        transit.setDriver(null);
-                        transit.setKm(Distance.ZERO);
-                        transit.setAwaitingDriversResponses(0);
+                    if (transit.shouldNowWaitForDriverAnyMore(Instant.now(clock)) || (distanceToCheck >= 20))
+                            // Should it be here? How is it even possible due to previous status check above loop?{
+                        transit.failDriverAssignment();
                         transitRepository.save(transit);
                         return transit;
                     }
