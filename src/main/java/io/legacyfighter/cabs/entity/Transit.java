@@ -5,8 +5,6 @@ import io.legacyfighter.cabs.distance.Distance;
 import io.legacyfighter.cabs.money.Money;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -18,6 +16,17 @@ public class Transit extends BaseEntity {
 
 
     public Transit() {
+    }
+
+    public Transit(Address from, Address to, Client client, CarType.CarClass carClass, Instant date, Distance distance) {
+        this.client = client;
+        this.from = from;
+        this.to = to;
+        this.carType = carClass;
+        this.status = Status.DRAFT;
+        this.tariff = Tariff.ofTime(date.atZone(ZoneId.systemDefault()).toLocalDateTime());
+        this.dateTime = date;
+        this.km = distance.toKmInFloat();
     }
 
     public enum Status {

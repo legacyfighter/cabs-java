@@ -77,11 +77,14 @@ public class Fixtures {
     }
 
     public Transit aCompletedTransitAt(int price, Instant when) {
-        Transit transit = aTransit(null, price);
-        transit.setDateTime(when);
-        transit.setTo(addressRepository.save(new Address("Polska", "Warszawa", "Zytnia", 20)));
-        transit.setFrom(addressRepository.save(new Address("Polska", "Warszawa", "Młynarska", 20)));
-        transit.setClient(aClient());
+        Transit transit = new Transit(
+                addressRepository.save(new Address("Polska", "Warszawa", "Zytnia", 20)),
+                addressRepository.save(new Address("Polska", "Warszawa", "Młynarska", 20)),
+                aClient(),
+                null,
+                when,
+                Distance.ZERO
+        );
         return transitRepository.save(transit);
     }
 

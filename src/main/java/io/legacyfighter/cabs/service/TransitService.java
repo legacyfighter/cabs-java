@@ -84,20 +84,14 @@ public class TransitService {
             throw new IllegalArgumentException("Client does not exist, id = " + clientId);
         }
 
-        Transit transit = new Transit();
 
         // FIXME later: add some exceptions handling
         double[] geoFrom = geocodingService.geocodeAddress(from);
         double[] geoTo = geocodingService.geocodeAddress(to);
 
-        transit.setClient(client);
-        transit.setFrom(from);
-        transit.setTo(to);
-        transit.setCarType(carClass);
-        transit.setStatus(Transit.Status.DRAFT);
-        transit.setDateTime(Instant.now(clock));
-        transit.setKm(Distance.ofKm((float) distanceCalculator.calculateByMap(geoFrom[0], geoFrom[1], geoTo[0], geoTo[1])));
-
+        Distance km = Distance.ofKm((float) distanceCalculator.calculateByMap(geoFrom[0], geoFrom[1], geoTo[0], geoTo[1]));
+        Transit transit = new Transit(from, to, client, carClass, Instant.now(clock), km);
+        transit.estimateCost();
         return transitRepository.save(transit);
     }
 
