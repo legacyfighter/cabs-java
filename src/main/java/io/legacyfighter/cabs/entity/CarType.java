@@ -30,9 +30,6 @@ public class CarType extends BaseEntity {
     @Column(nullable = false)
     private int minNoOfCarsToActivateClass;
 
-    @Column(nullable = false)
-    private int activeCarsCounter;
-
     public CarType(CarClass carClass, String description, int minNoOfCarsToActivateClass) {
         this.carClass = carClass;
         this.description = description;
@@ -40,16 +37,6 @@ public class CarType extends BaseEntity {
     }
 
     public CarType() {
-    }
-
-    @Deprecated
-    public void registerActiveCar() {
-        activeCarsCounter++;
-    }
-
-    @Deprecated
-    public void unregisterActiveCar() {
-        activeCarsCounter--;
     }
 
     public void registerCar() {
@@ -96,11 +83,6 @@ public class CarType extends BaseEntity {
 
     public int getCarsCounter() {
         return carsCounter;
-    }
-
-    @Deprecated
-    public int getActiveCarsCounter() {
-        return activeCarsCounter;
     }
 
     public int getMinNoOfCarsToActivateClass() {
