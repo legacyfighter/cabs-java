@@ -75,12 +75,14 @@ public class CarTypeService {
 
     @Transactional
     public void unregisterActiveCar(CarClass carClass) {
-        carTypeRepository.decrementCounter(carClass);
+        CarTypeActiveCounter carTypeActiveCounter = carTypeRepository.findActiveCounter(carClass);
+        carTypeActiveCounter.unregisterActiveCar();
     }
 
     @Transactional
     public void registerActiveCar(CarClass carClass) {
-        carTypeRepository.incrementCounter(carClass);
+        CarTypeActiveCounter carTypeActiveCounter = carTypeRepository.findActiveCounter(carClass);
+        carTypeActiveCounter.registerActiveCar();
     }
 
     @Transactional
