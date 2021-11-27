@@ -46,14 +46,8 @@ public class CalculateTransitDistanceTest {
     }
 
     TransitDTO transitForDistance(float km) {
-        Transit t = new Transit();
+        Transit t = new Transit(new Address(), new Address(), new Client(), null, Instant.now(), Distance.ofKm(km));
         t.setPrice(new Money(10));
-        t.setDateTime(Instant.now());
-        t.setTo(new Address());
-        t.setFrom(new Address());
-        t.setStatus(Transit.Status.DRAFT);
-        t.setKm(Distance.ofKm(km));
-        t.setClient(new Client());
         return new TransitDTO(t);
     }
 

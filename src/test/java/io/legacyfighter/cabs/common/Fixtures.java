@@ -48,10 +48,10 @@ public class Fixtures {
     }
 
     public Transit aTransit(Driver driver, Integer price, LocalDateTime when) {
-        Transit transit = new Transit();
+        Transit transit = new Transit(null, null, null, null, when.toInstant(ZoneOffset.UTC), Distance.ZERO);
         transit.setPrice(new Money(price));
-        transit.setDriver(driver);
-        transit.setDateTime(when.toInstant(ZoneOffset.UTC));
+        transit.proposeTo(driver);
+        transit.acceptBy(driver, Instant.now());
         return transitRepository.save(transit);
     }
 
@@ -77,11 +77,15 @@ public class Fixtures {
     }
 
     public Transit aCompletedTransitAt(int price, Instant when) {
-        Transit transit = aTransit(null, price);
-        transit.setDateTime(when);
-        transit.setTo(addressRepository.save(new Address("Polska", "Warszawa", "Zytnia", 20)));
-        transit.setFrom(addressRepository.save(new Address("Polska", "Warszawa", "Młynarska", 20)));
-        transit.setClient(aClient());
+        Transit transit = new Transit(
+                addressRepository.save(new Address("Polska", "Warszawa", "Młynarska", 20)),
+                addressRepository.save(new Address("Polska", "Warszawa", "Zytnia", 20)),
+                aClient(),
+                null,
+                when,
+                Distance.ZERO);
+        transit.publishAt(when);
+        transit.setPrice(new Money(price));
         return transitRepository.save(transit);
     }
 

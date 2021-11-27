@@ -1,6 +1,7 @@
 package io.legacyfighter.cabs.entity;
 
 import io.legacyfighter.cabs.distance.Distance;
+import io.legacyfighter.cabs.entity.Transit.Status;
 import io.legacyfighter.cabs.money.Money;
 import org.junit.jupiter.api.Test;
 
@@ -118,13 +119,8 @@ class CalculateTransitPriceTest {
         assertEquals(new Money(6000), price); //60.00
     }
 
-    Transit transit(Transit.Status status, int km) {
-        Transit transit = new Transit();
-        transit.setDateTime(Instant.now());
-        transit.setStatus(DRAFT);
-        transit.setKm(Distance.ofKm(km));
-        transit.setStatus(status);
-        return transit;
+    Transit transit(Status status, int km) {
+        return new Transit(status, null, null, null, null, Instant.now(), Distance.ofKm(km));
     }
 
     void transitWasOnDoneOnFriday(Transit transit) {
