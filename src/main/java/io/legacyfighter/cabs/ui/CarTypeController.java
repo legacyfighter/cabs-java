@@ -18,7 +18,7 @@ public class CarTypeController {
     @PostMapping("/cartypes")
     ResponseEntity<CarTypeDTO> create(@RequestBody CarTypeDTO carTypeDTO) {
         CarType created = carTypeService.create(carTypeDTO);
-        return ResponseEntity.ok(new CarTypeDTO(created));
+        return ResponseEntity.ok(carTypeService.loadDto(created.getId()));
     }
 
     @PostMapping("/cartypes/{carClass}/registerCar")

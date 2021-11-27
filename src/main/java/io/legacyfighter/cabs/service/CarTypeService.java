@@ -4,6 +4,7 @@ import io.legacyfighter.cabs.config.AppProperties;
 import io.legacyfighter.cabs.dto.CarTypeDTO;
 import io.legacyfighter.cabs.entity.CarType;
 import io.legacyfighter.cabs.entity.CarType.CarClass;
+import io.legacyfighter.cabs.entity.CarTypeActiveCounter;
 import io.legacyfighter.cabs.repository.CarTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,7 +33,8 @@ public class CarTypeService {
 
     @Transactional
     public CarTypeDTO loadDto(Long id) {
-        return new CarTypeDTO(load(id));
+        CarType loaded = load(id);
+        return new CarTypeDTO(loaded, carTypeRepository.findActiveCounter(loaded.getCarClass()).getActiveCarsCounter());
     }
 
     @Transactional
@@ -43,7 +45,7 @@ public class CarTypeService {
             return carTypeRepository.save(type);
         } else {
             byCarClass.setDescription(carTypeDTO.getDescription());
-            return byCarClass;
+            return carTypeRepository.findByCarClass(carTypeDTO.getCarClass());
         }
     }
 
@@ -73,14 +75,12 @@ public class CarTypeService {
 
     @Transactional
     public void unregisterActiveCar(CarClass carClass) {
-        CarType carType = findByCarClass(carClass);
-        carType.unregisterActiveCar();
+        carTypeRepository.decrementCounter(carClass);
     }
 
     @Transactional
     public void registerActiveCar(CarClass carClass) {
-        CarType carType = findByCarClass(carClass);
-        carType.registerActiveCar();
+        carTypeRepository.incrementCounter(carClass);
     }
 
     @Transactional

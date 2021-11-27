@@ -18,13 +18,13 @@ public class CarTypeDTO {
 
     private int minNoOfCarsToActivateClass;
 
-    public CarTypeDTO(CarType carType) {
+    public CarTypeDTO(CarType carType, int activeCarsCounter) {
         this.id = carType.getId();
         this.carClass = carType.getCarClass();
         this.status = carType.getStatus();
         this.carsCounter = carType.getCarsCounter();
         this.description = carType.getDescription();
-        this.activeCarsCounter = carType.getActiveCarsCounter();
+        this.activeCarsCounter = activeCarsCounter;
         this.minNoOfCarsToActivateClass = carType.getMinNoOfCarsToActivateClass();
     }
 
