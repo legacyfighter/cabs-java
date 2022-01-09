@@ -12,12 +12,14 @@ import io.legacyfighter.cabs.repository.TransitRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.comparator.Comparators;
 
 import java.time.Clock;
 import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 
 import static io.legacyfighter.cabs.entity.miles.AwardsAccount.notActiveAccount;
 
@@ -124,9 +126,23 @@ public class AwardsServiceImpl implements AwardsService {
         if (account == null) {
             throw new IllegalArgumentException("Account does not exists, id = " + clientId);
         } else {
-            account.remove(miles, Instant.now(clock), transitRepository.findByClient(client).size(), client.getClaims().size(), client.getType(), isSunday());
+            account.remove(miles, Instant.now(clock), chooseStrategy(transitRepository.findByClient(client).size(), client.getClaims().size(), client.getType(), isSunday()));
         }
 
+    }
+
+    private Comparator<AwardedMiles> chooseStrategy(int transitsCounter, int claimsCounter, Client.Type type, boolean isSunday) {
+        if (claimsCounter >= 3) {
+            return Comparator.comparing(AwardedMiles::getExpirationDate, Comparators.nullsHigh()).reversed().thenComparing(Comparators.nullsHigh());
+        } else if (type.equals(Client.Type.VIP)) {
+            return Comparator.comparing(AwardedMiles::cantExpire).thenComparing(AwardedMiles::getExpirationDate, Comparators.nullsLow());
+        } else if (transitsCounter >= 15 && isSunday) {
+            return Comparator.comparing(AwardedMiles::cantExpire).thenComparing(AwardedMiles::getExpirationDate, Comparators.nullsLow());
+        } else if (transitsCounter >= 15) {
+            return Comparator.comparing(AwardedMiles::cantExpire).thenComparing(AwardedMiles::getDate);
+        } else {
+            return Comparator.comparing(AwardedMiles::getDate);
+        }
     }
 
     @Override

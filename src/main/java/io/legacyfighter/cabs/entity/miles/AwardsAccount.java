@@ -68,20 +68,10 @@ public class AwardsAccount extends BaseEntity {
                 .reduce(0, Integer::sum);
     }
 
-    public void remove(Integer miles, Instant when, int transitsCounter, int claimsCounter, Client.Type type, boolean isSunday) {
+    public void remove(Integer miles, Instant when,  Comparator<AwardedMiles> strategy) {
         if (calculateBalance(when) >= miles && isActive()) {
             List<AwardedMiles> milesList = new ArrayList<>(this.miles);
-            if (claimsCounter >= 3) {
-                milesList.sort(Comparator.comparing(AwardedMiles::getExpirationDate, Comparators.nullsHigh()).reversed().thenComparing(Comparators.nullsHigh()));
-            } else if (type.equals(Client.Type.VIP)) {
-                milesList.sort(Comparator.comparing(AwardedMiles::cantExpire).thenComparing(AwardedMiles::getExpirationDate, Comparators.nullsLow()));
-            } else if (transitsCounter >= 15 && isSunday) {
-                milesList.sort(Comparator.comparing(AwardedMiles::cantExpire).thenComparing(AwardedMiles::getExpirationDate, Comparators.nullsLow()));
-            } else if (transitsCounter >= 15) {
-                milesList.sort(Comparator.comparing(AwardedMiles::cantExpire).thenComparing(AwardedMiles::getDate));
-            } else {
-                milesList.sort(Comparator.comparing(AwardedMiles::getDate));
-            }
+            milesList.sort(strategy);
 
             for (AwardedMiles iter : milesList) {
                 if (miles <= 0) {
@@ -103,6 +93,8 @@ public class AwardsAccount extends BaseEntity {
             throw new IllegalArgumentException("Insufficient miles, id = " + client.getId() + ", miles requested = " + miles);
         }
     }
+
+
 
     public void moveMilesTo(AwardsAccount accountTo, Integer amount, Instant when) {
         if (calculateBalance(when) >= amount && isActive()) {
