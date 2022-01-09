@@ -142,7 +142,7 @@ public class ClaimService {
                 claim.setCompletionDate(Instant.now());
                 claim.setChangeDate(Instant.now());
                 claim.setCompletionMode(MANUAL);
-                driverNotificationService.askDriverForDetailsAboutClaim(claim.getClaimNo(), claim.getOwner().getId());
+                driverNotificationService.askDriverForDetailsAboutClaim(claim.getClaimNo(), claim.getTransit().getDriver().getId());
             }
         }
 
