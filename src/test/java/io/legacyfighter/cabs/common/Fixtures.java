@@ -8,6 +8,7 @@ import io.legacyfighter.cabs.entity.Driver.Status;
 import io.legacyfighter.cabs.money.Money;
 import io.legacyfighter.cabs.repository.*;
 
+import io.legacyfighter.cabs.service.AwardsService;
 import io.legacyfighter.cabs.service.CarTypeService;
 import io.legacyfighter.cabs.service.ClaimService;
 import io.legacyfighter.cabs.service.DriverService;
@@ -46,6 +47,9 @@ public class Fixtures {
     @Autowired
     ClaimService claimService;
 
+    @Autowired
+    AwardsService awardsService;
+
     public Client aClient() {
         return clientRepository.save(new Client());
     }
@@ -62,6 +66,10 @@ public class Fixtures {
         transit.proposeTo(driver);
         transit.acceptBy(driver, Instant.now());
         return transitRepository.save(transit);
+    }
+
+    public Transit aTransit(Money price) {
+        return aTransit(aDriver(), price.toInt());
     }
 
     public Transit aTransit(Driver driver, Integer price, LocalDateTime when) {
@@ -170,5 +178,14 @@ public class Fixtures {
         Client client = aClient(type);
         clientHasDoneClaims(client, howManyClaims);
         return client;
+    }
+
+    public void awardsAccount(Client client) {
+        awardsService.registerToProgram(client.getId());
+    }
+
+    public void activeAwardsAccount(Client client) {
+        awardsAccount(client);
+        awardsService.activateAccount(client.getId());
     }
 }

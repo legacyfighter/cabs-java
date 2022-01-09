@@ -9,12 +9,6 @@ import java.time.Instant;
 
 @Entity
 public class AwardedMiles extends BaseEntity {
-    // Aggregate
-    // 1. mile celowo są osobno, aby się mogło rozjechać na ich wydawaniu -> docelowo: kolekcja VOs w agregacie
-
-    // VO
-    // 1. miles + expirationDate -> VO przykrywające logikę walidacji, czy nie przekroczono daty ważności punktów
-    // 2. wydzielenie interfejsu Miles -> różne VO z różną logiką, np. ExpirableMiles, NonExpirableMiles, LinearExpirableMiles
 
     @ManyToOne
     private Client client;
