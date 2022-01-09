@@ -1,7 +1,7 @@
 package io.legacyfighter.cabs.service;
 
 import io.legacyfighter.cabs.dto.AwardsAccountDTO;
-import io.legacyfighter.cabs.entity.AwardedMiles;
+import io.legacyfighter.cabs.entity.miles.AwardedMiles;
 
 public interface AwardsService {
 

@@ -2,7 +2,7 @@ package io.legacyfighter.cabs.integration;
 
 import io.legacyfighter.cabs.common.Fixtures;
 import io.legacyfighter.cabs.config.AppProperties;
-import io.legacyfighter.cabs.entity.AwardedMiles;
+import io.legacyfighter.cabs.entity.miles.AwardedMiles;
 import io.legacyfighter.cabs.entity.Client;
 import io.legacyfighter.cabs.entity.Transit;
 import io.legacyfighter.cabs.money.Money;
@@ -206,7 +206,7 @@ class RemovingAwardMilesIntegrationTest {
     void assertThatMilesWereReducedTo(AwardedMiles firstToExpire, int milesAfterReduction, List<AwardedMiles> allMiles) {
         Stream<Integer> actual = allMiles
                 .stream()
-                .filter(am -> firstToExpire.getId().equals(am.getId())).map(AwardedMiles::getMiles);
+                .filter(am -> firstToExpire.getId().equals(am.getId())).map(awardedMiles -> awardedMiles.getMilesAmount(Instant.MIN));
         assertThat(actual.findFirst()).contains(milesAfterReduction);
     }
 

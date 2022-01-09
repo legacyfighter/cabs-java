@@ -2,8 +2,8 @@ package io.legacyfighter.cabs.service;
 
 import io.legacyfighter.cabs.config.AppProperties;
 import io.legacyfighter.cabs.dto.AwardsAccountDTO;
-import io.legacyfighter.cabs.entity.AwardedMiles;
-import io.legacyfighter.cabs.entity.AwardsAccount;
+import io.legacyfighter.cabs.entity.miles.AwardedMiles;
+import io.legacyfighter.cabs.entity.miles.AwardsAccount;
 import io.legacyfighter.cabs.entity.Client;
 import io.legacyfighter.cabs.entity.Transit;
 import io.legacyfighter.cabs.repository.AwardedMilesRepository;
@@ -22,6 +22,9 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
+
+import static io.legacyfighter.cabs.entity.miles.ConstantUntil.constantUntil;
+import static io.legacyfighter.cabs.entity.miles.ConstantUntil.constantUntilForever;
 
 @Service
 public class AwardsServiceImpl implements AwardsService {
@@ -105,9 +108,7 @@ public class AwardsServiceImpl implements AwardsService {
             miles.setTransit(transit);
             miles.setDate(Instant.now(clock));
             miles.setClient(account.getClient());
-            miles.setMiles(appProperties.getDefaultMilesBonus());
-            miles.setExpirationDate(now.plus(appProperties.getMilesExpirationInDays(), ChronoUnit.DAYS));
-            miles.setSpecial(false);
+            miles.setMiles(constantUntil(appProperties.getDefaultMilesBonus(), now.plus(appProperties.getMilesExpirationInDays(), ChronoUnit.DAYS)));
             account.increaseTransactions();
 
             milesRepository.save(miles);
@@ -130,9 +131,8 @@ public class AwardsServiceImpl implements AwardsService {
             AwardedMiles _miles = new AwardedMiles();
             _miles.setTransit(null);
             _miles.setClient(account.getClient());
-            _miles.setMiles(miles);
+            _miles.setMiles(constantUntilForever(miles));
             _miles.setDate(Instant.now(clock));
-            _miles.setSpecial(true);
             account.increaseTransactions();
             milesRepository.save(_miles);
             accountRepository.save(account);
@@ -163,16 +163,19 @@ public class AwardsServiceImpl implements AwardsService {
                 } else {
                     milesList.sort(Comparator.comparing(AwardedMiles::getDate));
                 }
+                Instant now = Instant.now(clock);
                 for (AwardedMiles iter : milesList) {
                     if (miles <= 0) {
                         break;
                     }
                     if (iter.cantExpire() || iter.getExpirationDate().isAfter(Instant.now(clock))) {
-                        if (iter.getMiles() <= miles) {
-                            miles -= iter.getMiles();
-                            iter.setMiles(0);
+                        Integer milesAmount = iter.getMilesAmount(Instant.now(clock));
+                        if (milesAmount <= miles) {
+                            miles -= milesAmount;
+                            iter.removeAll(now);
                         } else {
-                            iter.setMiles(iter.getMiles() - miles);
+                            iter.subtract(miles, now);
+
                             miles = 0;
                         }
                         milesRepository.save(iter);
@@ -189,10 +192,10 @@ public class AwardsServiceImpl implements AwardsService {
     public Integer calculateBalance(Long clientId) {
         Client client = clientRepository.getOne(clientId);
         List<AwardedMiles> milesList = milesRepository.findAllByClient(client);
-
+        Instant now = Instant.now(clock);
         Integer sum = milesList.stream()
                 .filter(t -> t.getExpirationDate() != null && t.getExpirationDate().isAfter(Instant.now(clock)) || t.cantExpire())
-                .map(t -> t.getMiles())
+                .map(t -> t.getMilesAmount(now))
                 .reduce(0, Integer::sum);
 
         return sum;
@@ -212,22 +215,22 @@ public class AwardsServiceImpl implements AwardsService {
 
         if (calculateBalance(fromClientId) >= miles && accountFrom.isActive()) {
             List<AwardedMiles> milesList = milesRepository.findAllByClient(fromClient);
+            Instant now = Instant.now(clock);
 
             for (AwardedMiles iter : milesList) {
                 if (iter.cantExpire() || iter.getExpirationDate().isAfter(Instant.now(clock))) {
-                    if (iter.getMiles() <= miles) {
+                    Integer milesAmount = iter.getMilesAmount(now);
+                    if (milesAmount <= miles) {
                         iter.setClient(accountTo.getClient());
-                        miles -= iter.getMiles();
+                        miles -= milesAmount;
                     } else {
-                        iter.setMiles(iter.getMiles() - miles);
+                        iter.subtract(miles, now);
                         AwardedMiles _miles = new AwardedMiles();
 
                         _miles.setClient(accountTo.getClient());
-                        _miles.setSpecial(iter.cantExpire());
-                        _miles.setExpirationDate(iter.getExpirationDate());
-                        _miles.setMiles(miles);
+                        _miles.setMiles(iter.getMiles());
 
-                        miles -= iter.getMiles();
+                        miles -= milesAmount;
 
                         milesRepository.save(_miles);
 

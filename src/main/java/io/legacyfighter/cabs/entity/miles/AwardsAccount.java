@@ -1,6 +1,7 @@
-package io.legacyfighter.cabs.entity;
+package io.legacyfighter.cabs.entity.miles;
 
 import io.legacyfighter.cabs.common.BaseEntity;
+import io.legacyfighter.cabs.entity.Client;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

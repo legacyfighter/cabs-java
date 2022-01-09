@@ -2,7 +2,7 @@ package io.legacyfighter.cabs.integration;
 
 import io.legacyfighter.cabs.common.Fixtures;
 import io.legacyfighter.cabs.dto.AwardsAccountDTO;
-import io.legacyfighter.cabs.entity.AwardedMiles;
+import io.legacyfighter.cabs.entity.miles.AwardedMiles;
 import io.legacyfighter.cabs.entity.Client;
 import io.legacyfighter.cabs.entity.Transit;
 import io.legacyfighter.cabs.money.Money;
@@ -110,7 +110,7 @@ class AwardMilesManagementIntegrationTest {
         assertEquals(1, account.getTransactions());
         List<AwardedMiles> awardedMiles = awardedMilesRepository.findAllByClient(client);
         assertEquals(1, awardedMiles.size());
-        assertEquals(10, awardedMiles.get(0).getMiles());
+        assertEquals(10, awardedMiles.get(0).getMilesAmount(NOW));
         assertFalse(awardedMiles.get(0).cantExpire());
 
     }
@@ -130,7 +130,7 @@ class AwardMilesManagementIntegrationTest {
         assertEquals(1, account.getTransactions());
         List<AwardedMiles> awardedMiles = awardedMilesRepository.findAllByClient(client);
         assertEquals(1, awardedMiles.size());
-        assertEquals(20, awardedMiles.get(0).getMiles());
+        assertEquals(20, awardedMiles.get(0).getMilesAmount(NOW));
         assertTrue(awardedMiles.get(0).cantExpire());
     }
 

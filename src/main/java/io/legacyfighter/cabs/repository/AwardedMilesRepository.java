@@ -1,6 +1,6 @@
 package io.legacyfighter.cabs.repository;
 
-import io.legacyfighter.cabs.entity.AwardedMiles;
+import io.legacyfighter.cabs.entity.miles.AwardedMiles;
 import io.legacyfighter.cabs.entity.Client;
 import org.springframework.data.jpa.repository.JpaRepository;
 
