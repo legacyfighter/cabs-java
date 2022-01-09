@@ -23,15 +23,28 @@ public class AwardedMiles extends BaseEntity {
     @ManyToOne
     private Transit transit;
 
+    @ManyToOne
+    private AwardsAccount account;
+
     public AwardedMiles() {
+    }
+
+    public AwardedMiles(AwardsAccount awardsAccount, Transit transit, Client client, Instant when, Miles constantUntil) {
+        this.account = awardsAccount;
+        this.transit = transit;
+        this.client = client;
+        this.date = when;
+        setMiles(constantUntil);
     }
 
     public Client getClient() {
         return client;
     }
 
-    public void setClient(Client client) {
-        this.client = client;
+    void transferTo(AwardsAccount account) {
+        this.client = account.getClient();
+        this.account = account;
+
     }
 
     public Miles getMiles() {
@@ -42,16 +55,12 @@ public class AwardedMiles extends BaseEntity {
         return getMiles().getAmountFor(when);
     }
 
-    public void setMiles(Miles miles) {
+    private void setMiles(Miles miles) {
         milesJson = MilesJsonMapper.serialize(miles);
     }
 
     public Instant getDate() {
         return date;
-    }
-
-    public void setDate(Instant date) {
-        this.date = date;
     }
 
     public Instant getExpirationDate() {
@@ -60,10 +69,6 @@ public class AwardedMiles extends BaseEntity {
 
     public Boolean cantExpire() {
         return getExpirationDate().equals(Instant.MAX);
-    }
-
-    public void setTransit(Transit transit) {
-        this.transit = transit;
     }
 
     @Override

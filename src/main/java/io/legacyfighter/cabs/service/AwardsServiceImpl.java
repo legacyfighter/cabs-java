@@ -13,18 +13,15 @@ import io.legacyfighter.cabs.repository.TransitRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.comparator.Comparators;
 
 import java.time.Clock;
 import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.Comparator;
-import java.util.List;
 
-import static io.legacyfighter.cabs.entity.miles.ConstantUntil.constantUntil;
-import static io.legacyfighter.cabs.entity.miles.ConstantUntil.constantUntilForever;
+import static io.legacyfighter.cabs.entity.miles.AwardsAccount.notActiveAccount;
+
 
 @Service
 public class AwardsServiceImpl implements AwardsService {
@@ -55,12 +52,7 @@ public class AwardsServiceImpl implements AwardsService {
             throw new IllegalArgumentException("Client does not exists, id = " + clientId);
         }
 
-        AwardsAccount account = new AwardsAccount();
-
-        account.setClient(client);
-        account.setActive(false);
-        account.setDate(Instant.now(clock));
-
+        AwardsAccount account = notActiveAccount(client, Instant.now(clock));
         accountRepository.save(account);
     }
 
@@ -73,7 +65,7 @@ public class AwardsServiceImpl implements AwardsService {
             throw new IllegalArgumentException("Account does not exists, id = " + clientId);
         }
 
-        account.setActive(true);
+        account.activate();
 
         accountRepository.save(account);
     }
@@ -87,7 +79,7 @@ public class AwardsServiceImpl implements AwardsService {
             throw new IllegalArgumentException("Account does not exists, id = " + clientId);
         }
 
-        account.setActive(false);
+        account.deactivate();
 
         accountRepository.save(account);
     }
@@ -100,18 +92,11 @@ public class AwardsServiceImpl implements AwardsService {
             throw new IllegalArgumentException("transit does not exists, id = " + transitId);
         }
 
-        Instant now = Instant.now(clock);
         if (account == null || !account.isActive()) {
             return null;
         } else {
-            AwardedMiles miles = new AwardedMiles();
-            miles.setTransit(transit);
-            miles.setDate(Instant.now(clock));
-            miles.setClient(account.getClient());
-            miles.setMiles(constantUntil(appProperties.getDefaultMilesBonus(), now.plus(appProperties.getMilesExpirationInDays(), ChronoUnit.DAYS)));
-            account.increaseTransactions();
-
-            milesRepository.save(miles);
+            Instant expireAt = Instant.now(clock).plus(appProperties.getMilesExpirationInDays(), ChronoUnit.DAYS);
+            AwardedMiles miles = account.addExpiringMiles(appProperties.getDefaultMilesBonus(), expireAt, transit, Instant.now(clock));
             accountRepository.save(account);
             return miles;
         }
@@ -128,13 +113,7 @@ public class AwardsServiceImpl implements AwardsService {
         if (account == null) {
             throw new IllegalArgumentException("Account does not exists, id = " + clientId);
         } else {
-            AwardedMiles _miles = new AwardedMiles();
-            _miles.setTransit(null);
-            _miles.setClient(account.getClient());
-            _miles.setMiles(constantUntilForever(miles));
-            _miles.setDate(Instant.now(clock));
-            account.increaseTransactions();
-            milesRepository.save(_miles);
+            AwardedMiles _miles = account.addNonExpiringMiles(miles, Instant.now(clock));
             accountRepository.save(account);
             return _miles;
         }
@@ -145,45 +124,10 @@ public class AwardsServiceImpl implements AwardsService {
     public void removeMiles(Long clientId, Integer miles) {
         Client client = clientRepository.getOne(clientId);
         AwardsAccount account = accountRepository.findByClient(client);
-
         if (account == null) {
             throw new IllegalArgumentException("Account does not exists, id = " + clientId);
         } else {
-            if (calculateBalance(clientId) >= miles && account.isActive()) {
-                List<AwardedMiles> milesList = milesRepository.findAllByClient(client);
-                int transitsCounter = transitRepository.findByClient(client).size();
-                if (client.getClaims().size() >= 3) {
-                    milesList.sort(Comparator.comparing(AwardedMiles::getExpirationDate, Comparators.nullsHigh()).reversed().thenComparing(Comparators.nullsHigh()));
-                } else if (client.getType().equals(Client.Type.VIP)) {
-                    milesList.sort(Comparator.comparing(AwardedMiles::cantExpire).thenComparing(AwardedMiles::getExpirationDate, Comparators.nullsLow()));
-                } else if (transitsCounter >= 15 && isSunday()) {
-                    milesList.sort(Comparator.comparing(AwardedMiles::cantExpire).thenComparing(AwardedMiles::getExpirationDate, Comparators.nullsLow()));
-                } else if (transitsCounter >= 15) {
-                    milesList.sort(Comparator.comparing(AwardedMiles::cantExpire).thenComparing(AwardedMiles::getDate));
-                } else {
-                    milesList.sort(Comparator.comparing(AwardedMiles::getDate));
-                }
-                Instant now = Instant.now(clock);
-                for (AwardedMiles iter : milesList) {
-                    if (miles <= 0) {
-                        break;
-                    }
-                    if (iter.cantExpire() || iter.getExpirationDate().isAfter(Instant.now(clock))) {
-                        Integer milesAmount = iter.getMilesAmount(Instant.now(clock));
-                        if (milesAmount <= miles) {
-                            miles -= milesAmount;
-                            iter.removeAll(now);
-                        } else {
-                            iter.subtract(miles, now);
-
-                            miles = 0;
-                        }
-                        milesRepository.save(iter);
-                    }
-                }
-            } else {
-                throw new IllegalArgumentException("Insufficient miles, id = " + clientId + ", miles requested = " + miles);
-            }
+            account.remove(miles, Instant.now(clock), transitRepository.findByClient(client).size(), client.getClaims().size(), client.getType(), isSunday());
         }
 
     }
@@ -191,14 +135,8 @@ public class AwardsServiceImpl implements AwardsService {
     @Override
     public Integer calculateBalance(Long clientId) {
         Client client = clientRepository.getOne(clientId);
-        List<AwardedMiles> milesList = milesRepository.findAllByClient(client);
-        Instant now = Instant.now(clock);
-        Integer sum = milesList.stream()
-                .filter(t -> t.getExpirationDate() != null && t.getExpirationDate().isAfter(Instant.now(clock)) || t.cantExpire())
-                .map(t -> t.getMilesAmount(now))
-                .reduce(0, Integer::sum);
-
-        return sum;
+        AwardsAccount account = accountRepository.findByClient(client);
+        return account.calculateBalance(Instant.now(clock));
     }
 
     @Override
@@ -212,38 +150,9 @@ public class AwardsServiceImpl implements AwardsService {
         if (accountTo == null) {
             throw new IllegalArgumentException("Account does not exists, id = " + toClientId);
         }
+        accountFrom.moveMilesTo(accountTo, miles, Instant.now(clock));
+        accountRepository.save(accountFrom);
+        accountRepository.save(accountTo);
 
-        if (calculateBalance(fromClientId) >= miles && accountFrom.isActive()) {
-            List<AwardedMiles> milesList = milesRepository.findAllByClient(fromClient);
-            Instant now = Instant.now(clock);
-
-            for (AwardedMiles iter : milesList) {
-                if (iter.cantExpire() || iter.getExpirationDate().isAfter(Instant.now(clock))) {
-                    Integer milesAmount = iter.getMilesAmount(now);
-                    if (milesAmount <= miles) {
-                        iter.setClient(accountTo.getClient());
-                        miles -= milesAmount;
-                    } else {
-                        iter.subtract(miles, now);
-                        AwardedMiles _miles = new AwardedMiles();
-
-                        _miles.setClient(accountTo.getClient());
-                        _miles.setMiles(iter.getMiles());
-
-                        miles -= milesAmount;
-
-                        milesRepository.save(_miles);
-
-                    }
-                    milesRepository.save(iter);
-                }
-            }
-
-            accountFrom.increaseTransactions();
-            accountTo.increaseTransactions();
-
-            accountRepository.save(accountFrom);
-            accountRepository.save(accountTo);
-        }
     }
 }

@@ -206,7 +206,7 @@ class RemovingAwardMilesIntegrationTest {
     void assertThatMilesWereReducedTo(AwardedMiles firstToExpire, int milesAfterReduction, List<AwardedMiles> allMiles) {
         Stream<Integer> actual = allMiles
                 .stream()
-                .filter(am -> firstToExpire.getId().equals(am.getId())).map(awardedMiles -> awardedMiles.getMilesAmount(Instant.MIN));
+                .filter(am -> firstToExpire.getDate().equals(am.getDate()) && firstToExpire.getExpirationDate().equals(am.getExpirationDate())).map(awardedMiles -> awardedMiles.getMilesAmount(Instant.MIN));
         assertThat(actual.findFirst()).contains(milesAfterReduction);
     }
 
