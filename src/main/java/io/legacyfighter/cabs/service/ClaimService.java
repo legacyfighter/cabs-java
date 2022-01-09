@@ -4,9 +4,11 @@ package io.legacyfighter.cabs.service;
 import io.legacyfighter.cabs.config.AppProperties;
 import io.legacyfighter.cabs.dto.ClaimDTO;
 import io.legacyfighter.cabs.entity.Claim;
+import io.legacyfighter.cabs.entity.ClaimsResolver;
 import io.legacyfighter.cabs.entity.Client;
 import io.legacyfighter.cabs.entity.Transit;
 import io.legacyfighter.cabs.repository.ClaimRepository;
+import io.legacyfighter.cabs.repository.ClaimsResolverRepository;
 import io.legacyfighter.cabs.repository.ClientRepository;
 import io.legacyfighter.cabs.repository.TransitRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.util.List;
 
-import static io.legacyfighter.cabs.entity.Claim.CompletionMode.AUTOMATIC;
-import static io.legacyfighter.cabs.entity.Claim.CompletionMode.MANUAL;
 import static io.legacyfighter.cabs.entity.Claim.Status.ESCALATED;
 import static io.legacyfighter.cabs.entity.Claim.Status.REFUNDED;
 
@@ -42,7 +43,10 @@ public class ClaimService {
     private ClientNotificationService clientNotificationService;
     @Autowired
     private DriverNotificationService driverNotificationService;
+    @Autowired
+    private ClaimsResolverRepository claimsResolverRepository;
 
+    @Transactional
     public Claim create(ClaimDTO claimDTO) {
         Claim claim = new Claim();
         claim.setCreationDate(Instant.now(clock));
@@ -53,6 +57,7 @@ public class ClaimService {
 
     public Claim find(Long id) {
         Claim claim = claimRepository.getOne(id);
+
         if (claim == null) {
             throw new IllegalStateException("Claim does not exists");
         }
@@ -92,60 +97,35 @@ public class ClaimService {
     @Transactional
     public Claim tryToResolveAutomatically(Long id) {
         Claim claim = find(id);
-        if(claimRepository.findByOwnerAndTransit(claim.getOwner(), claim.getTransit()).size() > 1) {
-            claim.setStatus(ESCALATED);
-            claim.setCompletionDate(Instant.now());
-            claim.setChangeDate(Instant.now());
-            claim.setCompletionMode(MANUAL);
-            return claim;
-        }
-        if (claimRepository.findByOwner(claim.getOwner()).size() <= 3) {
-            claim.setStatus(REFUNDED);
-            claim.setCompletionDate(Instant.now());
-            claim.setChangeDate(Instant.now());
-            claim.setCompletionMode(AUTOMATIC);
-            clientNotificationService.notifyClientAboutRefund(claim.getClaimNo(), claim.getOwner().getId());
-            return claim;
-        }
-        if (claim.getOwner().getType().equals(Client.Type.VIP)) {
-            if (claim.getTransit().getPrice().toInt() < appProperties.getAutomaticRefundForVipThreshold()) {
-                claim.setStatus(REFUNDED);
-                claim.setCompletionDate(Instant.now());
-                claim.setChangeDate(Instant.now());
-                claim.setCompletionMode(AUTOMATIC);
-                clientNotificationService.notifyClientAboutRefund(claim.getClaimNo(), claim.getOwner().getId());
-                awardsService.registerSpecialMiles(claim.getOwner().getId(), 10);
-            } else {
-                claim.setStatus(ESCALATED);
-                claim.setCompletionDate(Instant.now());
-                claim.setChangeDate(Instant.now());
-                claim.setCompletionMode(MANUAL);
-                driverNotificationService.askDriverForDetailsAboutClaim(claim.getClaimNo(), claim.getTransit().getDriver().getId());
-            }
-        } else {
-            if (transitRepository.findByClient(claim.getOwner()).size() >= appProperties.getNoOfTransitsForClaimAutomaticRefund()) {
-                if (claim.getTransit().getPrice().toInt() < appProperties.getAutomaticRefundForVipThreshold()) {
-                    claim.setStatus(REFUNDED);
-                    claim.setCompletionDate(Instant.now());
-                    claim.setChangeDate(Instant.now());
-                    claim.setCompletionMode(AUTOMATIC);
-                    clientNotificationService.notifyClientAboutRefund(claim.getClaimNo(), claim.getOwner().getId());
-                } else {
-                    claim.setStatus(ESCALATED);
-                    claim.setCompletionDate(Instant.now());
-                    claim.setChangeDate(Instant.now());
-                    claim.setCompletionMode(MANUAL);
-                    clientNotificationService.askForMoreInformation(claim.getClaimNo(), claim.getOwner().getId());
-                }
-            } else {
-                claim.setStatus(ESCALATED);
-                claim.setCompletionDate(Instant.now());
-                claim.setChangeDate(Instant.now());
-                claim.setCompletionMode(MANUAL);
-                driverNotificationService.askDriverForDetailsAboutClaim(claim.getClaimNo(), claim.getTransit().getDriver().getId());
-            }
-        }
 
+        ClaimsResolver claimsResolver = findOrCreateResolver(claim.getOwner());
+        List<Transit> transitsDoneByClient = transitRepository.findByClient(claim.getOwner());
+        ClaimsResolver.Result result = claimsResolver.resolve(claim, appProperties.getAutomaticRefundForVipThreshold(), transitsDoneByClient.size(), appProperties.getNoOfTransitsForClaimAutomaticRefund());
+
+        if (result.decision == REFUNDED) {
+            claim.refund();
+            clientNotificationService.notifyClientAboutRefund(claim.getClaimNo(), claim.getOwner().getId());
+            if (claim.getOwner().getType().equals(Client.Type.VIP)) {
+                awardsService.registerSpecialMiles(claim.getOwner().getId(), 10);
+            }
+        }
+        if (result.decision == ESCALATED) {
+            claim.escalate();
+        }
+        if (result.whoToAsk == ClaimsResolver.WhoToAsk.ASK_DRIVER) {
+            driverNotificationService.askDriverForDetailsAboutClaim(claim.getClaimNo(), claim.getTransit().getDriver().getId());
+        }
+        if (result.whoToAsk == ClaimsResolver.WhoToAsk.ASK_CLIENT) {
+            clientNotificationService.askForMoreInformation(claim.getClaimNo(), claim.getOwner().getId());
+        }
         return claim;
+    }
+
+    private ClaimsResolver findOrCreateResolver(Client client) {
+        ClaimsResolver resolver = claimsResolverRepository.findByClientId(client.getId());
+        if (resolver == null) {
+            resolver = claimsResolverRepository.save(new ClaimsResolver(client.getId()));
+        }
+        return resolver;
     }
 }
