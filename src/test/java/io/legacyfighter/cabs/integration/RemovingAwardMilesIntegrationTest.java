@@ -50,7 +50,7 @@ class RemovingAwardMilesIntegrationTest {
     AppProperties appProperties;
 
     @Test
-    void byDefaultRemoveOldestFirstEvenWhenTheyAreSpecial() {
+    void byDefaultRemoveOldestFirstEvenWhenTheyAreNonExpiring() {
         //given
         Client client = clientWithAnActiveMilesProgram(NORMAL);
         //and
@@ -58,14 +58,14 @@ class RemovingAwardMilesIntegrationTest {
         //and
         AwardedMiles middle = grantedMilesThatWillExpireInDays(10, 365, YESTERDAY, client, transit);
         AwardedMiles youngest = grantedMilesThatWillExpireInDays(10, 365, TODAY, client, transit);
-        AwardedMiles oldestSpecialMiles = grantedSpecialMiles(5, DAY_BEFORE_YESTERDAY, client);
+        AwardedMiles oldestNonExpiringMiles = grantedNonExpiringMiles(5, DAY_BEFORE_YESTERDAY, client);
 
         //when
         awardsService.removeMiles(client.getId(), 16);
 
         //then
         List<AwardedMiles> awardedMiles = awardedMilesRepository.findAllByClient(client);
-        assertThatMilesWereReducedTo(oldestSpecialMiles, 0, awardedMiles);
+        assertThatMilesWereReducedTo(oldestNonExpiringMiles, 0, awardedMiles);
         assertThatMilesWereReducedTo(middle, 0, awardedMiles);
         assertThatMilesWereReducedTo(youngest, 9, awardedMiles);
     }
@@ -94,7 +94,7 @@ class RemovingAwardMilesIntegrationTest {
     }
 
     @Test
-    void shouldRemoveSpecialMilesLastWhenManyTransits() {
+    void shouldRemoveNoNExpiringMilesLastWhenManyTransits() {
         //given
         Client client = clientWithAnActiveMilesProgram(NORMAL);
         //and
@@ -103,7 +103,7 @@ class RemovingAwardMilesIntegrationTest {
         Transit transit = fixtures.aTransit(new Money(80));
 
         AwardedMiles regularMiles = grantedMilesThatWillExpireInDays(10, 365, TODAY, client, transit);
-        AwardedMiles oldestSpecialMiles = grantedSpecialMiles(5, DAY_BEFORE_YESTERDAY, client);
+        AwardedMiles oldestNonExpiringMiles = grantedNonExpiringMiles(5, DAY_BEFORE_YESTERDAY, client);
 
         //when
         awardsService.removeMiles(client.getId(), 13);
@@ -111,7 +111,7 @@ class RemovingAwardMilesIntegrationTest {
         //then
         List<AwardedMiles> awardedMiles = awardedMilesRepository.findAllByClient(client);
         assertThatMilesWereReducedTo(regularMiles, 0, awardedMiles);
-        assertThatMilesWereReducedTo(oldestSpecialMiles, 2, awardedMiles);
+        assertThatMilesWereReducedTo(oldestNonExpiringMiles, 2, awardedMiles);
     }
 
 
@@ -125,7 +125,7 @@ class RemovingAwardMilesIntegrationTest {
         AwardedMiles secondToExpire = grantedMilesThatWillExpireInDays(10, 60, YESTERDAY, client, transit);
         AwardedMiles thirdToExpire = grantedMilesThatWillExpireInDays(5, 365, DAY_BEFORE_YESTERDAY, client, transit);
         AwardedMiles firstToExpire = grantedMilesThatWillExpireInDays(15, 30, TODAY, client, transit);
-        AwardedMiles specialMiles = grantedSpecialMiles(1, DAY_BEFORE_YESTERDAY, client);
+        AwardedMiles nonExpiring = grantedNonExpiringMiles(1, DAY_BEFORE_YESTERDAY, client);
 
 
         //when
@@ -133,7 +133,7 @@ class RemovingAwardMilesIntegrationTest {
 
         //then
         List<AwardedMiles> awardedMiles = awardedMilesRepository.findAllByClient(client);
-        assertThatMilesWereReducedTo(specialMiles, 1, awardedMiles);
+        assertThatMilesWereReducedTo(nonExpiring, 1, awardedMiles);
         assertThatMilesWereReducedTo(firstToExpire, 0, awardedMiles);
         assertThatMilesWereReducedTo(secondToExpire, 4, awardedMiles);
         assertThatMilesWereReducedTo(thirdToExpire, 5, awardedMiles);
@@ -151,7 +151,7 @@ class RemovingAwardMilesIntegrationTest {
         AwardedMiles secondToExpire = grantedMilesThatWillExpireInDays(10, 60, YESTERDAY, client, transit);
         AwardedMiles thirdToExpire = grantedMilesThatWillExpireInDays(5, 365, DAY_BEFORE_YESTERDAY, client, transit);
         AwardedMiles firstToExpire = grantedMilesThatWillExpireInDays(15, 10, TODAY, client, transit);
-        AwardedMiles specialMiles = grantedSpecialMiles(100, YESTERDAY, client);
+        AwardedMiles nonExpiring = grantedNonExpiringMiles(100, YESTERDAY, client);
 
 
         //when
@@ -160,7 +160,7 @@ class RemovingAwardMilesIntegrationTest {
 
         //then
         List<AwardedMiles> awardedMiles = awardedMilesRepository.findAllByClient(client);
-        assertThatMilesWereReducedTo(specialMiles, 100, awardedMiles);
+        assertThatMilesWereReducedTo(nonExpiring, 100, awardedMiles);
         assertThatMilesWereReducedTo(firstToExpire, 0, awardedMiles);
         assertThatMilesWereReducedTo(secondToExpire, 4, awardedMiles);
         assertThatMilesWereReducedTo(thirdToExpire, 5, awardedMiles);
@@ -178,14 +178,14 @@ class RemovingAwardMilesIntegrationTest {
         AwardedMiles secondToExpire = grantedMilesThatWillExpireInDays(4, 60, YESTERDAY, client, transit);
         AwardedMiles thirdToExpire = grantedMilesThatWillExpireInDays(10, 365, DAY_BEFORE_YESTERDAY, client, transit);
         AwardedMiles firstToExpire = grantedMilesThatWillExpireInDays(5, 10, YESTERDAY, client, transit);
-        AwardedMiles specialMiles = grantedSpecialMiles(10, YESTERDAY, client);
+        AwardedMiles nonExpiring = grantedNonExpiringMiles(10, YESTERDAY, client);
 
         //when
         awardsService.removeMiles(client.getId(), 21);
 
         //then
         List<AwardedMiles> awardedMiles = awardedMilesRepository.findAllByClient(client);
-        assertThatMilesWereReducedTo(specialMiles, 0, awardedMiles);
+        assertThatMilesWereReducedTo(nonExpiring, 0, awardedMiles);
         assertThatMilesWereReducedTo(thirdToExpire, 0, awardedMiles);
         assertThatMilesWereReducedTo(secondToExpire, 3, awardedMiles);
         assertThatMilesWereReducedTo(firstToExpire, 5, awardedMiles);
@@ -197,10 +197,10 @@ class RemovingAwardMilesIntegrationTest {
         return milesRegisteredAt(when, client, transit);
     }
 
-    AwardedMiles grantedSpecialMiles(int miles, Instant when, Client client) {
+    AwardedMiles grantedNonExpiringMiles(int miles, Instant when, Client client) {
         defaultMilesBonusIs(miles);
         when(clock.instant()).thenReturn(when);
-        return awardsService.registerSpecialMiles(client.getId(), miles);
+        return awardsService.registerNonExpiringMiles(client.getId(), miles);
     }
 
     void assertThatMilesWereReducedTo(AwardedMiles firstToExpire, int milesAfterReduction, List<AwardedMiles> allMiles) {

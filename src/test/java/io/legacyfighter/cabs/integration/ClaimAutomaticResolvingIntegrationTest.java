@@ -95,7 +95,7 @@ class ClaimAutomaticResolvingIntegrationTest {
         assertEquals(REFUNDED, claim.getStatus());
         assertEquals(AUTOMATIC, claim.getCompletionMode());
         verify(clientNotificationService).notifyClientAboutRefund(claim.getClaimNo(), claim.getOwner().getId());
-        verify(awardsService).registerSpecialMiles(claim.getOwner().getId(), 10);
+        verify(awardsService).registerNonExpiringMiles(claim.getOwner().getId(), 10);
     }
 
     @Test

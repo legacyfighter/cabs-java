@@ -121,7 +121,7 @@ public class AwardsServiceImpl implements AwardsService {
     }
 
     @Override
-    public AwardedMiles registerSpecialMiles(Long clientId, Integer miles) {
+    public AwardedMiles registerNonExpiringMiles(Long clientId, Integer miles) {
         AwardsAccount account = accountRepository.findByClient(clientRepository.getOne(clientId));
 
         if (account == null) {
@@ -155,11 +155,11 @@ public class AwardsServiceImpl implements AwardsService {
                 if (client.getClaims().size() >= 3) {
                     milesList.sort(Comparator.comparing(AwardedMiles::getExpirationDate, Comparators.nullsHigh()).reversed().thenComparing(Comparators.nullsHigh()));
                 } else if (client.getType().equals(Client.Type.VIP)) {
-                    milesList.sort(Comparator.comparing(AwardedMiles::isSpecial).thenComparing(AwardedMiles::getExpirationDate, Comparators.nullsLow()));
+                    milesList.sort(Comparator.comparing(AwardedMiles::cantExpire).thenComparing(AwardedMiles::getExpirationDate, Comparators.nullsLow()));
                 } else if (transitsCounter >= 15 && isSunday()) {
-                    milesList.sort(Comparator.comparing(AwardedMiles::isSpecial).thenComparing(AwardedMiles::getExpirationDate, Comparators.nullsLow()));
+                    milesList.sort(Comparator.comparing(AwardedMiles::cantExpire).thenComparing(AwardedMiles::getExpirationDate, Comparators.nullsLow()));
                 } else if (transitsCounter >= 15) {
-                    milesList.sort(Comparator.comparing(AwardedMiles::isSpecial).thenComparing(AwardedMiles::getDate));
+                    milesList.sort(Comparator.comparing(AwardedMiles::cantExpire).thenComparing(AwardedMiles::getDate));
                 } else {
                     milesList.sort(Comparator.comparing(AwardedMiles::getDate));
                 }
@@ -167,7 +167,7 @@ public class AwardsServiceImpl implements AwardsService {
                     if (miles <= 0) {
                         break;
                     }
-                    if (iter.isSpecial() || iter.getExpirationDate().isAfter(Instant.now(clock))) {
+                    if (iter.cantExpire() || iter.getExpirationDate().isAfter(Instant.now(clock))) {
                         if (iter.getMiles() <= miles) {
                             miles -= iter.getMiles();
                             iter.setMiles(0);
@@ -191,7 +191,7 @@ public class AwardsServiceImpl implements AwardsService {
         List<AwardedMiles> milesList = milesRepository.findAllByClient(client);
 
         Integer sum = milesList.stream()
-                .filter(t -> t.getExpirationDate() != null && t.getExpirationDate().isAfter(Instant.now(clock)) || t.isSpecial())
+                .filter(t -> t.getExpirationDate() != null && t.getExpirationDate().isAfter(Instant.now(clock)) || t.cantExpire())
                 .map(t -> t.getMiles())
                 .reduce(0, Integer::sum);
 
@@ -214,7 +214,7 @@ public class AwardsServiceImpl implements AwardsService {
             List<AwardedMiles> milesList = milesRepository.findAllByClient(fromClient);
 
             for (AwardedMiles iter : milesList) {
-                if (iter.isSpecial() || iter.getExpirationDate().isAfter(Instant.now(clock))) {
+                if (iter.cantExpire() || iter.getExpirationDate().isAfter(Instant.now(clock))) {
                     if (iter.getMiles() <= miles) {
                         iter.setClient(accountTo.getClient());
                         miles -= iter.getMiles();
@@ -223,7 +223,7 @@ public class AwardsServiceImpl implements AwardsService {
                         AwardedMiles _miles = new AwardedMiles();
 
                         _miles.setClient(accountTo.getClient());
-                        _miles.setSpecial(iter.isSpecial());
+                        _miles.setSpecial(iter.cantExpire());
                         _miles.setExpirationDate(iter.getExpirationDate());
                         _miles.setMiles(miles);
 

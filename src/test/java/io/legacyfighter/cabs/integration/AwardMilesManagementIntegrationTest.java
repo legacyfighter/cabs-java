@@ -111,19 +111,19 @@ class AwardMilesManagementIntegrationTest {
         List<AwardedMiles> awardedMiles = awardedMilesRepository.findAllByClient(client);
         assertEquals(1, awardedMiles.size());
         assertEquals(10, awardedMiles.get(0).getMiles());
-        assertFalse(awardedMiles.get(0).isSpecial());
+        assertFalse(awardedMiles.get(0).cantExpire());
 
     }
 
     @Test
-    void canRegisterSpecialMiles() {
+    void canRegisterNonExpiringMiles() {
         //given
         Client client = fixtures.aClient();
         //and
         fixtures.activeAwardsAccount(client);
 
         //when
-        awardsService.registerSpecialMiles(client.getId(), 20);
+        awardsService.registerNonExpiringMiles(client.getId(), 20);
 
         //then
         AwardsAccountDTO account = awardsService.findBy(client.getId());
@@ -131,7 +131,7 @@ class AwardMilesManagementIntegrationTest {
         List<AwardedMiles> awardedMiles = awardedMilesRepository.findAllByClient(client);
         assertEquals(1, awardedMiles.size());
         assertEquals(20, awardedMiles.get(0).getMiles());
-        assertTrue(awardedMiles.get(0).isSpecial());
+        assertTrue(awardedMiles.get(0).cantExpire());
     }
 
     @Test
@@ -144,7 +144,7 @@ class AwardMilesManagementIntegrationTest {
         Transit transit = fixtures.aTransit(new Money(80));
 
         //when
-        awardsService.registerSpecialMiles(client.getId(), 20);
+        awardsService.registerNonExpiringMiles(client.getId(), 20);
         awardsService.registerMiles(client.getId(), transit.getId());
         awardsService.registerMiles(client.getId(), transit.getId());
 
@@ -164,7 +164,7 @@ class AwardMilesManagementIntegrationTest {
         fixtures.activeAwardsAccount(client);
         fixtures.activeAwardsAccount(secondClient);
         //and
-        awardsService.registerSpecialMiles(client.getId(),  10);
+        awardsService.registerNonExpiringMiles(client.getId(),  10);
 
         //when
         awardsService.transferMiles(client.getId(), secondClient.getId(), 10);
@@ -185,7 +185,7 @@ class AwardMilesManagementIntegrationTest {
         fixtures.activeAwardsAccount(client);
         fixtures.activeAwardsAccount(secondClient);
         //and
-        awardsService.registerSpecialMiles(client.getId(),  10);
+        awardsService.registerNonExpiringMiles(client.getId(),  10);
         //and
         awardsService.deactivateAccount(client.getId());
 
@@ -205,7 +205,7 @@ class AwardMilesManagementIntegrationTest {
         fixtures.activeAwardsAccount(client);
         fixtures.activeAwardsAccount(secondClient);
         //and
-        awardsService.registerSpecialMiles(client.getId(),  10);
+        awardsService.registerNonExpiringMiles(client.getId(),  10);
 
         //when
         awardsService.transferMiles(client.getId(), secondClient.getId(), 30);
@@ -223,7 +223,7 @@ class AwardMilesManagementIntegrationTest {
         fixtures.activeAwardsAccount(client);
         fixtures.activeAwardsAccount(secondClient);
         //and
-        awardsService.registerSpecialMiles(client.getId(),  10);
+        awardsService.registerNonExpiringMiles(client.getId(),  10);
         //and
         awardsService.deactivateAccount(client.getId());
 
