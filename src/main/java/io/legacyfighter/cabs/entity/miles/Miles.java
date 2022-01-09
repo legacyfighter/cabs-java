@@ -11,7 +11,8 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
 
 @JsonTypeInfo(use = NAME, include = PROPERTY)
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = ConstantUntil.class, name = "Expiring")
+        @JsonSubTypes.Type(value = ConstantUntil.class, name = "Expiring"),
+        @JsonSubTypes.Type(value = TwoStepExpiringMiles.class, name = "TwoStep")
 })
 public interface Miles {
     Integer getAmountFor(Instant moment);
