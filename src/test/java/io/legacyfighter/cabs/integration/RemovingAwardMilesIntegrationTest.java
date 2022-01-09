@@ -6,7 +6,7 @@ import io.legacyfighter.cabs.entity.miles.AwardedMiles;
 import io.legacyfighter.cabs.entity.Client;
 import io.legacyfighter.cabs.entity.Transit;
 import io.legacyfighter.cabs.money.Money;
-import io.legacyfighter.cabs.repository.AwardedMilesRepository;
+import io.legacyfighter.cabs.repository.AwardsAccountRepository;
 import io.legacyfighter.cabs.service.AwardsService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,7 @@ class RemovingAwardMilesIntegrationTest {
     AwardsService awardsService;
 
     @Autowired
-    AwardedMilesRepository awardedMilesRepository;
+    AwardsAccountRepository awardsAccountRepository;
 
     @Autowired
     Fixtures fixtures;
@@ -64,7 +64,7 @@ class RemovingAwardMilesIntegrationTest {
         awardsService.removeMiles(client.getId(), 16);
 
         //then
-        List<AwardedMiles> awardedMiles = awardedMilesRepository.findAllByClient(client);
+        List<AwardedMiles> awardedMiles = awardsAccountRepository.findAllMilesBy(client);
         assertThatMilesWereReducedTo(oldestNonExpiringMiles, 0, awardedMiles);
         assertThatMilesWereReducedTo(middle, 0, awardedMiles);
         assertThatMilesWereReducedTo(youngest, 9, awardedMiles);
@@ -87,7 +87,7 @@ class RemovingAwardMilesIntegrationTest {
         awardsService.removeMiles(client.getId(), 15);
 
         //then
-        List<AwardedMiles> awardedMiles = awardedMilesRepository.findAllByClient(client);
+        List<AwardedMiles> awardedMiles = awardsAccountRepository.findAllMilesBy(client);
         assertThatMilesWereReducedTo(oldest, 0, awardedMiles);
         assertThatMilesWereReducedTo(middle, 5, awardedMiles);
         assertThatMilesWereReducedTo(youngest, 10, awardedMiles);
@@ -109,7 +109,7 @@ class RemovingAwardMilesIntegrationTest {
         awardsService.removeMiles(client.getId(), 13);
 
         //then
-        List<AwardedMiles> awardedMiles = awardedMilesRepository.findAllByClient(client);
+        List<AwardedMiles> awardedMiles = awardsAccountRepository.findAllMilesBy(client);
         assertThatMilesWereReducedTo(regularMiles, 0, awardedMiles);
         assertThatMilesWereReducedTo(oldestNonExpiringMiles, 2, awardedMiles);
     }
@@ -132,7 +132,7 @@ class RemovingAwardMilesIntegrationTest {
         awardsService.removeMiles(client.getId(), 21);
 
         //then
-        List<AwardedMiles> awardedMiles = awardedMilesRepository.findAllByClient(client);
+        List<AwardedMiles> awardedMiles = awardsAccountRepository.findAllMilesBy(client);
         assertThatMilesWereReducedTo(nonExpiring, 1, awardedMiles);
         assertThatMilesWereReducedTo(firstToExpire, 0, awardedMiles);
         assertThatMilesWereReducedTo(secondToExpire, 4, awardedMiles);
@@ -159,7 +159,7 @@ class RemovingAwardMilesIntegrationTest {
         awardsService.removeMiles(client.getId(), 21);
 
         //then
-        List<AwardedMiles> awardedMiles = awardedMilesRepository.findAllByClient(client);
+        List<AwardedMiles> awardedMiles = awardsAccountRepository.findAllMilesBy(client);
         assertThatMilesWereReducedTo(nonExpiring, 100, awardedMiles);
         assertThatMilesWereReducedTo(firstToExpire, 0, awardedMiles);
         assertThatMilesWereReducedTo(secondToExpire, 4, awardedMiles);
@@ -184,7 +184,7 @@ class RemovingAwardMilesIntegrationTest {
         awardsService.removeMiles(client.getId(), 21);
 
         //then
-        List<AwardedMiles> awardedMiles = awardedMilesRepository.findAllByClient(client);
+        List<AwardedMiles> awardedMiles = awardsAccountRepository.findAllMilesBy(client);
         assertThatMilesWereReducedTo(nonExpiring, 0, awardedMiles);
         assertThatMilesWereReducedTo(thirdToExpire, 0, awardedMiles);
         assertThatMilesWereReducedTo(secondToExpire, 3, awardedMiles);

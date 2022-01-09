@@ -160,4 +160,8 @@ public class AwardsAccount extends BaseEntity {
     public Instant getDate() {
         return date;
     }
+
+    public List<AwardedMiles> getMiles() {
+        return Collections.unmodifiableList(new ArrayList<>(miles));
+    }
 }

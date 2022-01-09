@@ -6,7 +6,7 @@ import io.legacyfighter.cabs.entity.miles.AwardedMiles;
 import io.legacyfighter.cabs.entity.Client;
 import io.legacyfighter.cabs.entity.Transit;
 import io.legacyfighter.cabs.money.Money;
-import io.legacyfighter.cabs.repository.AwardedMilesRepository;
+import io.legacyfighter.cabs.repository.AwardsAccountRepository;
 import io.legacyfighter.cabs.service.AwardsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,7 +34,7 @@ class AwardMilesManagementIntegrationTest {
     AwardsService awardsService;
 
     @Autowired
-    AwardedMilesRepository awardedMilesRepository;
+    AwardsAccountRepository awardsAccountRepository;
 
     @Autowired
     Fixtures fixtures;
@@ -108,7 +108,7 @@ class AwardMilesManagementIntegrationTest {
         //then
         AwardsAccountDTO account = awardsService.findBy(client.getId());
         assertEquals(1, account.getTransactions());
-        List<AwardedMiles> awardedMiles = awardedMilesRepository.findAllByClient(client);
+        List<AwardedMiles> awardedMiles = awardsAccountRepository.findAllMilesBy(client);
         assertEquals(1, awardedMiles.size());
         assertEquals(10, awardedMiles.get(0).getMilesAmount(NOW));
         assertFalse(awardedMiles.get(0).cantExpire());
@@ -128,7 +128,7 @@ class AwardMilesManagementIntegrationTest {
         //then
         AwardsAccountDTO account = awardsService.findBy(client.getId());
         assertEquals(1, account.getTransactions());
-        List<AwardedMiles> awardedMiles = awardedMilesRepository.findAllByClient(client);
+        List<AwardedMiles> awardedMiles = awardsAccountRepository.findAllMilesBy(client);
         assertEquals(1, awardedMiles.size());
         assertEquals(20, awardedMiles.get(0).getMilesAmount(NOW));
         assertTrue(awardedMiles.get(0).cantExpire());

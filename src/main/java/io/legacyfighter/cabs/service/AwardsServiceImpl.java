@@ -6,7 +6,6 @@ import io.legacyfighter.cabs.entity.miles.AwardedMiles;
 import io.legacyfighter.cabs.entity.miles.AwardsAccount;
 import io.legacyfighter.cabs.entity.Client;
 import io.legacyfighter.cabs.entity.Transit;
-import io.legacyfighter.cabs.repository.AwardedMilesRepository;
 import io.legacyfighter.cabs.repository.AwardsAccountRepository;
 import io.legacyfighter.cabs.repository.ClientRepository;
 import io.legacyfighter.cabs.repository.TransitRepository;
@@ -28,8 +27,6 @@ public class AwardsServiceImpl implements AwardsService {
 
     @Autowired
     private AwardsAccountRepository accountRepository;
-    @Autowired
-    private AwardedMilesRepository milesRepository;
     @Autowired
     private ClientRepository clientRepository;
     @Autowired
