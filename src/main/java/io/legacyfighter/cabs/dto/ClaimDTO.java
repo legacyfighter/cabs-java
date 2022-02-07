@@ -28,25 +28,27 @@ public class ClaimDTO {
 
     private Claim.Status status;
 
+    public ClaimDTO(Long claimID, Long clientId, Long transitId, String reason, String incidentDescription, Instant creationDate, Instant completionDate, Instant changeDate, Claim.CompletionMode completionMode, Claim.Status status, String claimNo) {
+        this.claimID = claimID;
+        this.clientId = clientId;
+        this.transitId = transitId;
+        this.reason = reason;
+        this.incidentDescription = incidentDescription;
+        this.isDraft = status.equals(Claim.Status.DRAFT);
+        this.creationDate = creationDate;
+        this.completionDate = completionDate;
+        this.changeDate = changeDate;
+        this.completionMode = completionMode;
+        this.status = status;
+        this.claimNo = claimNo;
+    }
+
     private String claimNo;
 
     public ClaimDTO(Claim claim) {
-        if (claim.getStatus().equals(Claim.Status.DRAFT)) {
-            this.setDraft(true);
-        } else {
-            this.setDraft(false);
-        }
-        this.setClaimID(claim.getId());
-        this.setReason(claim.getReason());
-        this.setIncidentDescription(claim.getIncidentDescription());
-        this.setTransitId(claim.getTransit().getId());
-        this.setClientId(claim.getOwner().getId());
-        this.setCompletionDate(claim.getCompletionDate());
-        this.setChangeDate(claim.getChangeDate());
-        this.setClaimNo(claim.getClaimNo());
-        this.setStatus(claim.getStatus());
-        this.setCompletionMode(claim.getCompletionMode());
-        this.setCreationDate(claim.getCreationDate());
+        this(claim.getId(), claim.getOwner().getId(), claim.getTransit().getId(), claim.getReason(),
+                claim.getIncidentDescription(), claim.getCreationDate(),
+                claim.getCompletionDate(), claim.getChangeDate(), claim.getCompletionMode(), claim.getStatus(), claim.getClaimNo());
     }
 
     public ClaimDTO() {

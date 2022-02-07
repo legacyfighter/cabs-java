@@ -7,8 +7,6 @@ import io.legacyfighter.cabs.entity.Transit;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,48 +65,55 @@ public class TransitDTO {
     }
 
     public TransitDTO(Transit transit) {
-        id = transit.getId();
-        distance = transit.getKm();
-        factor = 1;
-        if (transit.getPrice() != null) {
-            price = new BigDecimal(transit.getPrice().toInt());
-        }
-        date = transit.getDateTime();
-        status = transit.getStatus();
-        setTariff(transit);
+        this(transit.getId(), transit.getTariff().getName(),
+                transit.getStatus(), transit.getDriver() == null ? null : new DriverDTO(transit.getDriver()),
+                transit.getKm(), transit.getTariff().getKmRate(),
+                transit.getPrice() != null ? new BigDecimal(transit.getPrice().toInt()) : null,
+                transit.getDriversFee() != null ? new BigDecimal(transit.getDriversFee().toInt()) : null,
+                transit.getEstimatedPrice() != null ? new BigDecimal(transit.getEstimatedPrice().toInt()) : null,
+                new BigDecimal(transit.getTariff().getBaseFee()),
+                transit.getDateTime(), transit.getPublished(),
+                transit.getAcceptedAt(), transit.getStarted(), transit.getCompleteAt(),
+                null, new ArrayList<>(), new AddressDTO(transit.getFrom()),
+                new AddressDTO(transit.getTo()), transit.getCarType(), new ClientDTO(transit.getClient()));
+
         for (Driver d : transit.getProposedDrivers()) {
             proposedDrivers.add(new DriverDTO(d));
         }
-        to = new AddressDTO(transit.getTo());
-        from = new AddressDTO(transit.getFrom());
-        carClass = transit.getCarType();
-        clientDTO = new ClientDTO(transit.getClient());
-        if (transit.getDriversFee() != null) {
-            driverFee = new BigDecimal(transit.getDriversFee().toInt());
-        }
-        if (transit.getEstimatedPrice() != null) {
-            estimatedPrice = new BigDecimal(transit.getEstimatedPrice().toInt());
-        }
-        dateTime = transit.getDateTime();
-        published = transit.getPublished();
-        acceptedAt = transit.getAcceptedAt();
-        started = transit.getStarted();
-        completeAt = transit.getCompleteAt();
+    }
 
+    public TransitDTO(Long id, String tariff, Transit.Status status, DriverDTO driver,
+                      Distance distance, float kmRate, BigDecimal price, BigDecimal driverFee,
+                      BigDecimal estimatedPrice, BigDecimal baseFee, Instant dateTime,
+                      Instant published, Instant acceptedAt, Instant started, Instant completeAt,
+                      ClaimDTO claimDTO, List<DriverDTO> proposedDrivers, AddressDTO from, AddressDTO to,
+                      CarType.CarClass carClass, ClientDTO clientDTO) {
+        this.id = id;
+        this.factor = 1;
+        this.tariff = tariff;
+        this.status = status;
+        this.driver = driver;
+        this.distance = distance;
+        this.kmRate = kmRate;
+        this.price = price;
+        this.driverFee = driverFee;
+        this.estimatedPrice = estimatedPrice;
+        this.baseFee = baseFee;
+        this.dateTime = dateTime;
+        this.published = published;
+        this.acceptedAt = acceptedAt;
+        this.started = started;
+        this.completeAt = completeAt;
+        this.claimDTO = claimDTO;
+        this.proposedDrivers = proposedDrivers;
+        this.to = to;
+        this.from = from;
+        this.carClass = carClass;
+        this.clientDTO = clientDTO;
     }
 
     public float getKmRate() {
         return kmRate;
-    }
-
-    private void setTariff(Transit transit) {
-        LocalDateTime day = date.atZone(ZoneId.systemDefault()).toLocalDateTime();
-
-        // wprowadzenie nowych cennikow od 1.01.2019
-        this.tariff = transit.getTariff().getName();
-        this.kmRate = transit.getTariff().getKmRate();
-        this.baseFee = new BigDecimal(transit.getTariff().getBaseFee());
-
     }
 
     public String getTariff() {
