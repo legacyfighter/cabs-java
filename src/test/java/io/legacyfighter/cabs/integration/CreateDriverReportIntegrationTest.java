@@ -1,6 +1,7 @@
 package io.legacyfighter.cabs.integration;
 
 import io.legacyfighter.cabs.common.Fixtures;
+import io.legacyfighter.cabs.driverreport.DriverReportController;
 import io.legacyfighter.cabs.dto.CarTypeDTO;
 import io.legacyfighter.cabs.dto.DriverAttributeDTO;
 import io.legacyfighter.cabs.dto.DriverReport;
@@ -9,7 +10,6 @@ import io.legacyfighter.cabs.entity.*;
 import io.legacyfighter.cabs.entity.CarType.CarClass;
 import io.legacyfighter.cabs.repository.AddressRepository;
 import io.legacyfighter.cabs.service.*;
-import io.legacyfighter.cabs.ui.DriverReportController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
