@@ -18,6 +18,14 @@ public class DriverSessionDTO {
 
     private String carBrand;
 
+    public DriverSessionDTO(Instant loggedAt, Instant loggedOutAt, String platesNumber, CarType.CarClass carClass, String carBrand) {
+        this.loggedAt = loggedAt;
+        this.loggedOutAt = loggedOutAt;
+        this.platesNumber = platesNumber;
+        this.carClass = carClass;
+        this.carBrand = carBrand;
+    }
+
     public DriverSessionDTO() {
 
     }
