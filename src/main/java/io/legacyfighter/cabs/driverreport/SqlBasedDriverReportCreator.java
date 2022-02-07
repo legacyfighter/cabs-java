@@ -1,4 +1,4 @@
-package io.legacyfighter.cabs.ui;
+package io.legacyfighter.cabs.driverreport;
 
 import io.legacyfighter.cabs.distance.Distance;
 import io.legacyfighter.cabs.dto.*;
@@ -22,16 +22,16 @@ import java.util.stream.Stream;
 import static io.legacyfighter.cabs.entity.DriverAttribute.DriverAttributeName.MEDICAL_EXAMINATION_REMARKS;
 
 @Service
-public class SqlBasedDriverReportCreator {
+class SqlBasedDriverReportCreator {
 
-    public static final String QUERY_FOR_DRIVER_WITH_ATTRS =
+    private static final String QUERY_FOR_DRIVER_WITH_ATTRS =
             "SELECT d.id, d.first_name, d.last_name, d.driver_license, " +
                     "d.photo, d.status, d.type, attr.name, attr.value " +
             "FROM Driver d " +
             "LEFT JOIN driver_attribute attr ON d.id = attr.driver_id " +
             "WHERE d.id = :driverId AND attr.name <> :filteredAttr";
 
-    public static final String QUERY_FOR_SESSIONS = "SELECT ds.logged_at, ds.logged_out_at, ds.plates_number, ds.car_class, ds.car_brand, " +
+    private static final String QUERY_FOR_SESSIONS = "SELECT ds.logged_at, ds.logged_out_at, ds.plates_number, ds.car_class, ds.car_brand, " +
             "t.id as TRANSIT_ID, t.name as TARIFF_NAME, t.status as TRANSIT_STATUS, t.km, t.km_rate, " +
             "t.price, t.drivers_fee, t.estimated_price, t.base_fee, " +
             "t.date_time, t.published, t.accepted_at, t.started, t.complete_at, t.car_type, " +
@@ -53,12 +53,12 @@ public class SqlBasedDriverReportCreator {
 
     private final Clock clock;
 
-    public SqlBasedDriverReportCreator(EntityManager entityManager, Clock clock) {
+    SqlBasedDriverReportCreator(EntityManager entityManager, Clock clock) {
         this.em = entityManager;
         this.clock = clock;
     }
 
-    public DriverReport createReport(Long driverId, int lastDays) {
+    DriverReport createReport(Long driverId, int lastDays) {
         DriverReport driverReport = new DriverReport();
         List<Tuple> driverInfo = em
                 .createNativeQuery(QUERY_FOR_DRIVER_WITH_ATTRS, Tuple.class)
