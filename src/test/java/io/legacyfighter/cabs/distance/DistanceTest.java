@@ -23,6 +23,15 @@ class DistanceTest {
     }
 
     @Test
+    void canConvertToDouble() {
+        //expect
+        assertEquals(2000d, Distance.ofKm(2000).toKmInDouble());
+        assertEquals(0d, Distance.ofKm(0).toKmInDouble());
+        assertEquals(312.22d, Distance.ofKm(312.22d).toKmInDouble());
+        assertEquals(2d, Distance.ofKm(2).toKmInDouble());
+    }
+
+    @Test
     void canRepresentDistanceAsMeters() {
         //expect
         assertEquals("2000000m", Distance.ofKm(2000).printIn("m"));
