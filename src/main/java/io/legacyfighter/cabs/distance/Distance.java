@@ -7,20 +7,24 @@ public final class Distance {
 
     public static final Distance ZERO = ofKm(0);
 
-    private static final float MILES_TO_KILOMETERS_RATIO = 1.609344f;
+    private static final double MILES_TO_KILOMETERS_RATIO = 1.609344f;
 
-    private final float km;
+    private final double km;
 
     public static Distance ofKm(float km) {
         return new Distance(km);
     }
 
-    private Distance(float km) {
+    public static Distance ofKm(double km) {
+        return new Distance(km);
+    }
+
+    private Distance(double km) {
         this.km = km;
     }
 
     public float toKmInFloat() {
-        return km;
+        return (float) km;
     }
 
     public String printIn(String unit) {
@@ -32,7 +36,7 @@ public final class Distance {
             return String.format(Locale.US, "%.3f", km) + "km";
         }
         if (unit.equals("miles")) {
-            float km = this.km / MILES_TO_KILOMETERS_RATIO;
+            double km = this.km / MILES_TO_KILOMETERS_RATIO;
             if (km == Math.ceil(km)) {
                 return String.format(Locale.US, "%d", Math.round(km)) + "miles";
             }
@@ -55,6 +59,17 @@ public final class Distance {
     @Override
     public int hashCode() {
         return Objects.hash(km);
+    }
+
+    public double toKmInDouble() {
+        return km;
+    }
+
+    @Override
+    public String toString() {
+        return "Distance{" +
+                "km=" + km +
+                '}';
     }
 }
 
