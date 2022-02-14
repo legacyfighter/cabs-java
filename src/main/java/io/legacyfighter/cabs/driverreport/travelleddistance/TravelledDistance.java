@@ -1,7 +1,6 @@
 package io.legacyfighter.cabs.driverreport.travelleddistance;
 
 import io.legacyfighter.cabs.distance.Distance;
-import io.legacyfighter.cabs.entity.DriverPosition;
 
 import javax.persistence.*;
 import java.time.*;
@@ -34,11 +33,11 @@ class TravelledDistance {
     private TravelledDistance() {
     }
 
-    TravelledDistance(Long driverId, TimeSlot timeSlot, DriverPosition driverPosition) {
+    TravelledDistance(Long driverId, TimeSlot timeSlot, double lastLatitude, double lastLongitude) {
         this.driverId = driverId;
         this.timeSlot = timeSlot;
-        this.lastLatitude = driverPosition.getLatitude();
-        this.lastLongitude = driverPosition.getLongitude();
+        this.lastLatitude = lastLatitude;
+        this.lastLongitude = lastLongitude;
         this.distance = Distance.ZERO;
     }
 

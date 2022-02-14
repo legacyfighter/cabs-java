@@ -4,7 +4,6 @@ import io.legacyfighter.cabs.common.Fixtures;
 import io.legacyfighter.cabs.distance.Distance;
 import io.legacyfighter.cabs.driverreport.travelleddistance.TravelledDistanceService;
 import io.legacyfighter.cabs.entity.Driver;
-import io.legacyfighter.cabs.entity.DriverPosition;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -54,7 +53,7 @@ class CalculateDriverTravelledDistanceIntegrationTest {
         //and
         itIsNoon();
         //and
-        registerPosition(driver, NOON, 53.32055555555556, -1.7297222222222221);
+        travelledDistanceService.addPosition(driver.getId(), 53.32055555555556, -1.7297222222222221, NOON);
 
         //when
         Distance distance = travelledDistanceService.calculateDistance(driver.getId(), NOON, NOON_FIVE);
@@ -70,9 +69,9 @@ class CalculateDriverTravelledDistanceIntegrationTest {
         //and
         itIsNoon();
         //and
-        registerPosition(driver, NOON, 53.32055555555556, -1.7297222222222221);
-        registerPosition(driver, NOON, 53.31861111111111, -1.6997222222222223);
-        registerPosition(driver, NOON, 53.32055555555556, -1.7297222222222221);
+        travelledDistanceService.addPosition(driver.getId(), 53.32055555555556, -1.7297222222222221, NOON);
+        travelledDistanceService.addPosition(driver.getId(), 53.31861111111111, -1.6997222222222223, NOON);
+        travelledDistanceService.addPosition(driver.getId(), 53.32055555555556, -1.7297222222222221, NOON);
 
         //when
         Distance distance = travelledDistanceService.calculateDistance(driver.getId(), NOON, NOON_FIVE);
@@ -88,15 +87,15 @@ class CalculateDriverTravelledDistanceIntegrationTest {
         //and
         itIsNoon();
         //and
-        registerPosition(driver, NOON, 53.32055555555556, -1.7297222222222221);
-        registerPosition(driver, NOON, 53.31861111111111, -1.6997222222222223);
-        registerPosition(driver, NOON, 53.32055555555556, -1.7297222222222221);
+        travelledDistanceService.addPosition(driver.getId(), 53.32055555555556, -1.7297222222222221, NOON);
+        travelledDistanceService.addPosition(driver.getId(), 53.31861111111111, -1.6997222222222223, NOON);
+        travelledDistanceService.addPosition(driver.getId(), 53.32055555555556, -1.7297222222222221, NOON);
         //and
         itIsNoonFive();
         //and
-        registerPosition(driver, NOON_FIVE, 53.32055555555556, -1.7297222222222221);
-        registerPosition(driver, NOON_FIVE, 53.31861111111111, -1.6997222222222223);
-        registerPosition(driver, NOON_FIVE, 53.32055555555556, -1.7297222222222221);
+        travelledDistanceService.addPosition(driver.getId(), 53.32055555555556, -1.7297222222222221, NOON_FIVE);
+        travelledDistanceService.addPosition(driver.getId(), 53.31861111111111, -1.6997222222222223, NOON_FIVE);
+        travelledDistanceService.addPosition(driver.getId(), 53.32055555555556, -1.7297222222222221, NOON_FIVE);
 
         //when
         Distance distance = travelledDistanceService.calculateDistance(driver.getId(), NOON, NOON_FIVE);
@@ -112,32 +111,27 @@ class CalculateDriverTravelledDistanceIntegrationTest {
         //and
         itIsNoon();
         //and
-        registerPosition(driver, NOON, 53.32055555555556, -1.7297222222222221);
-        registerPosition(driver, NOON, 53.31861111111111, -1.6997222222222223);
-        registerPosition(driver, NOON, 53.32055555555556, -1.7297222222222221);
+        travelledDistanceService.addPosition(driver.getId(), 53.32055555555556, -1.7297222222222221, NOON);
+        travelledDistanceService.addPosition(driver.getId(), 53.31861111111111, -1.6997222222222223, NOON);
+        travelledDistanceService.addPosition(driver.getId(), 53.32055555555556, -1.7297222222222221, NOON);
         //and
         itIsNoonFive();
         //and
-        registerPosition(driver, NOON_FIVE, 53.32055555555556, -1.7297222222222221);
-        registerPosition(driver, NOON_FIVE, 53.31861111111111, -1.6997222222222223);
-        registerPosition(driver, NOON_FIVE, 53.32055555555556, -1.7297222222222221);
+        travelledDistanceService.addPosition(driver.getId(), 53.32055555555556, -1.7297222222222221, NOON_FIVE);
+        travelledDistanceService.addPosition(driver.getId(), 53.31861111111111, -1.6997222222222223, NOON_FIVE);
+        travelledDistanceService.addPosition(driver.getId(), 53.32055555555556, -1.7297222222222221, NOON_FIVE);
         //and
         itIsNoonTen();
         //and
-        registerPosition(driver, NOON_TEN, 53.32055555555556, -1.7297222222222221);
-        registerPosition(driver, NOON_TEN, 53.31861111111111, -1.6997222222222223);
-        registerPosition(driver, NOON_TEN, 53.32055555555556, -1.7297222222222221);
+        travelledDistanceService.addPosition(driver.getId(), 53.32055555555556, -1.7297222222222221, NOON_TEN);
+        travelledDistanceService.addPosition(driver.getId(), 53.31861111111111, -1.6997222222222223, NOON_TEN);
+        travelledDistanceService.addPosition(driver.getId(), 53.32055555555556, -1.7297222222222221, NOON_TEN);
 
         //when
         Distance distance = travelledDistanceService.calculateDistance(driver.getId(), NOON, NOON_TEN);
 
         //then
         assertEquals("12.026km", distance.printIn("km"));
-    }
-
-    void registerPosition(Driver driver, Instant seenAt, double latitude, double longitude) {
-        DriverPosition driverPosition = new DriverPosition(driver, seenAt, latitude, longitude);
-        travelledDistanceService.addPosition(driverPosition);
     }
 
     void itIsNoon() {

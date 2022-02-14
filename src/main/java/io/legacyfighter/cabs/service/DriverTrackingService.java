@@ -10,10 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Clock;
 import java.time.Instant;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class DriverTrackingService {
@@ -41,7 +38,7 @@ public class DriverTrackingService {
         position.setLatitude(latitude);
         position.setLongitude(longitude);
         position = positionRepository.save(position);
-        travelledDistanceService.addPosition(position);
+        travelledDistanceService.addPosition(driverId, latitude, longitude, seenAt);
         return position;
     }
 
