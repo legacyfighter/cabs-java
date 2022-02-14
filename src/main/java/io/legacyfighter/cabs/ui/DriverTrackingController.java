@@ -22,7 +22,7 @@ public class DriverTrackingController {
 
     @GetMapping("/driverPositions/{id}/total")
     double calculateTravelledDistance(@PathVariable Long id, @RequestParam Instant from, @RequestParam Instant to) {
-        return trackingService.calculateTravelledDistance(id, from, to);
+        return trackingService.calculateTravelledDistance(id, from, to).toKmInDouble();
     }
 
 

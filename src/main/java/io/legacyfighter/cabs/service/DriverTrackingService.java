@@ -1,6 +1,6 @@
 package io.legacyfighter.cabs.service;
 
-import io.legacyfighter.cabs.entity.Address;
+import io.legacyfighter.cabs.distance.Distance;
 import io.legacyfighter.cabs.entity.Driver;
 import io.legacyfighter.cabs.entity.DriverPosition;
 import io.legacyfighter.cabs.repository.DriverPositionRepository;
@@ -39,13 +39,13 @@ public class DriverTrackingService {
         }
         DriverPosition position = new DriverPosition();
         position.setDriver(driver);
-        position.setSeenAt(Instant.now());
+        position.setSeenAt(clock.instant());
         position.setLatitude(latitude);
         position.setLongitude(longitude);
         return positionRepository.save(position);
     }
 
-    public double calculateTravelledDistance(Long driverId, Instant from, Instant to) {
+    public Distance calculateTravelledDistance(Long driverId, Instant from, Instant to) {
         Driver driver = driverRepository.getOne(driverId);
         if (driver == null) {
             throw new IllegalArgumentException("Driver does not exists, id = " + driverId);
@@ -68,6 +68,6 @@ public class DriverTrackingService {
             }
         }
 
-        return distanceTravelled;
+        return Distance.ofKm(distanceTravelled);
     }
 }
