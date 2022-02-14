@@ -23,6 +23,13 @@ public class DriverPosition extends BaseEntity {
     public DriverPosition() {
     }
 
+    public DriverPosition(Driver driver, Instant seenAt, double latitude, double longitude) {
+        this.driver = driver;
+        this.seenAt = seenAt;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+
     public Driver getDriver() {
         return driver;
     }
