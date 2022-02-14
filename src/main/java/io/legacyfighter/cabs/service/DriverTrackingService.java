@@ -1,6 +1,7 @@
 package io.legacyfighter.cabs.service;
 
 import io.legacyfighter.cabs.distance.Distance;
+import io.legacyfighter.cabs.driverreport.travelleddistance.TravelledDistanceService;
 import io.legacyfighter.cabs.entity.Driver;
 import io.legacyfighter.cabs.entity.DriverPosition;
 import io.legacyfighter.cabs.repository.DriverPositionRepository;
@@ -23,7 +24,7 @@ public class DriverTrackingService {
     private DriverRepository driverRepository;
 
     @Autowired
-    private DistanceCalculator distanceCalculator;
+    private TravelledDistanceService travelledDistanceService;
 
     @Transactional
     public DriverPosition registerPosition(Long driverId, double latitude, double longitude, Instant seenAt) {
@@ -39,7 +40,9 @@ public class DriverTrackingService {
         position.setSeenAt(seenAt);
         position.setLatitude(latitude);
         position.setLongitude(longitude);
-        return positionRepository.save(position);
+        position = positionRepository.save(position);
+        travelledDistanceService.addPosition(position);
+        return position;
     }
 
     public Distance calculateTravelledDistance(Long driverId, Instant from, Instant to) {
@@ -47,24 +50,6 @@ public class DriverTrackingService {
         if (driver == null) {
             throw new IllegalArgumentException("Driver does not exists, id = " + driverId);
         }
-        List<DriverPosition> positions = positionRepository.findByDriverAndSeenAtBetweenOrderBySeenAtAsc(driver, from, to);
-        double distanceTravelled = 0;
-
-        if (positions.size() > 1) {
-            DriverPosition previousPosition = positions.get(0);
-
-            for (DriverPosition position : positions.stream().skip(1).collect(Collectors.toList())) {
-                distanceTravelled += distanceCalculator.calculateByGeo(
-                        previousPosition.getLatitude(),
-                        previousPosition.getLongitude(),
-                        position.getLatitude(),
-                        position.getLongitude()
-                );
-
-                previousPosition = position;
-            }
-        }
-
-        return Distance.ofKm(distanceTravelled);
+        return travelledDistanceService.calculateDistance(driverId, from, to);
     }
 }
