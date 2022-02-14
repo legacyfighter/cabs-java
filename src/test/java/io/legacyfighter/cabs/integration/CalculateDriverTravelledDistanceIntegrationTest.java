@@ -31,9 +31,6 @@ class CalculateDriverTravelledDistanceIntegrationTest {
     @Autowired
     Fixtures fixtures;
 
-    @MockBean
-    Clock clock;
-
     @Test
     void distanceIsZeroWhenZeroPositions() {
         //given
@@ -51,9 +48,7 @@ class CalculateDriverTravelledDistanceIntegrationTest {
         //given
         Driver driver = fixtures.aDriver();
         //and
-        itIsNoon();
-        //and
-        driverTrackingService.registerPosition(driver.getId(), 53.32055555555556, -1.7297222222222221);
+        driverTrackingService.registerPosition(driver.getId(), 53.32055555555556, -1.7297222222222221, NOON);
 
         //when
         Distance distance = driverTrackingService.calculateTravelledDistance(driver.getId(), NOON, NOON_FIVE);
@@ -67,10 +62,9 @@ class CalculateDriverTravelledDistanceIntegrationTest {
         //given
         Driver driver = fixtures.aDriver();
         //and
-        itIsNoon();
-        driverTrackingService.registerPosition(driver.getId(), 53.32055555555556, -1.7297222222222221);
-        driverTrackingService.registerPosition(driver.getId(), 53.31861111111111, -1.6997222222222223);
-        driverTrackingService.registerPosition(driver.getId(), 53.32055555555556, -1.7297222222222221);
+        driverTrackingService.registerPosition(driver.getId(), 53.32055555555556, -1.7297222222222221, NOON);
+        driverTrackingService.registerPosition(driver.getId(), 53.31861111111111, -1.6997222222222223, NOON);
+        driverTrackingService.registerPosition(driver.getId(), 53.32055555555556, -1.7297222222222221, NOON);
 
         //when
         Distance distance = driverTrackingService.calculateTravelledDistance(driver.getId(), NOON, NOON_FIVE);
@@ -84,17 +78,13 @@ class CalculateDriverTravelledDistanceIntegrationTest {
         //given
         Driver driver = fixtures.aDriver();
         //and
-        itIsNoon();
+        driverTrackingService.registerPosition(driver.getId(), 53.32055555555556, -1.7297222222222221, NOON);
+        driverTrackingService.registerPosition(driver.getId(), 53.31861111111111, -1.6997222222222223, NOON);
+        driverTrackingService.registerPosition(driver.getId(), 53.32055555555556, -1.7297222222222221, NOON);
         //and
-        driverTrackingService.registerPosition(driver.getId(), 53.32055555555556, -1.7297222222222221);
-        driverTrackingService.registerPosition(driver.getId(), 53.31861111111111, -1.6997222222222223);
-        driverTrackingService.registerPosition(driver.getId(), 53.32055555555556, -1.7297222222222221);
-        //and
-        itIsNoonFive();
-        //and
-        driverTrackingService.registerPosition(driver.getId(), 53.32055555555556, -1.7297222222222221);
-        driverTrackingService.registerPosition(driver.getId(), 53.31861111111111, -1.6997222222222223);
-        driverTrackingService.registerPosition(driver.getId(), 53.32055555555556, -1.7297222222222221);
+        driverTrackingService.registerPosition(driver.getId(), 53.32055555555556, -1.7297222222222221, NOON_FIVE);
+        driverTrackingService.registerPosition(driver.getId(), 53.31861111111111, -1.6997222222222223, NOON_FIVE);
+        driverTrackingService.registerPosition(driver.getId(), 53.32055555555556, -1.7297222222222221, NOON_FIVE);
 
         //when
         Distance distance = driverTrackingService.calculateTravelledDistance(driver.getId(), NOON, NOON_FIVE);
@@ -108,41 +98,23 @@ class CalculateDriverTravelledDistanceIntegrationTest {
         //given
         Driver driver = fixtures.aDriver();
         //and
-        itIsNoon();
+        driverTrackingService.registerPosition(driver.getId(), 53.32055555555556, -1.7297222222222221, NOON);
+        driverTrackingService.registerPosition(driver.getId(), 53.31861111111111, -1.6997222222222223, NOON);
+        driverTrackingService.registerPosition(driver.getId(), 53.32055555555556, -1.7297222222222221, NOON);
         //and
-        driverTrackingService.registerPosition(driver.getId(), 53.32055555555556, -1.7297222222222221);
-        driverTrackingService.registerPosition(driver.getId(), 53.31861111111111, -1.6997222222222223);
-        driverTrackingService.registerPosition(driver.getId(), 53.32055555555556, -1.7297222222222221);
+        driverTrackingService.registerPosition(driver.getId(), 53.32055555555556, -1.7297222222222221, NOON_FIVE);
+        driverTrackingService.registerPosition(driver.getId(), 53.31861111111111, -1.6997222222222223, NOON_FIVE);
+        driverTrackingService.registerPosition(driver.getId(), 53.32055555555556, -1.7297222222222221, NOON_FIVE);
         //and
-        itIsNoonFive();
-        //and
-        driverTrackingService.registerPosition(driver.getId(), 53.32055555555556, -1.7297222222222221);
-        driverTrackingService.registerPosition(driver.getId(), 53.31861111111111, -1.6997222222222223);
-        driverTrackingService.registerPosition(driver.getId(), 53.32055555555556, -1.7297222222222221);
-        //and
-        itIsNoonTen();
-        //and
-        driverTrackingService.registerPosition(driver.getId(), 53.32055555555556, -1.7297222222222221);
-        driverTrackingService.registerPosition(driver.getId(), 53.31861111111111, -1.6997222222222223);
-        driverTrackingService.registerPosition(driver.getId(), 53.32055555555556, -1.7297222222222221);
+        driverTrackingService.registerPosition(driver.getId(), 53.32055555555556, -1.7297222222222221, NOON_TEN);
+        driverTrackingService.registerPosition(driver.getId(), 53.31861111111111, -1.6997222222222223, NOON_TEN);
+        driverTrackingService.registerPosition(driver.getId(), 53.32055555555556, -1.7297222222222221, NOON_TEN);
 
         //when
         Distance distance = driverTrackingService.calculateTravelledDistance(driver.getId(), NOON, NOON_TEN);
 
         //then
         assertEquals("12.026km", distance.printIn("km"));
-    }
-
-    void itIsNoon() {
-        when(clock.instant()).thenReturn(NOON);
-    }
-
-    void itIsNoonFive() {
-        when(clock.instant()).thenReturn(NOON_FIVE);
-    }
-
-    void itIsNoonTen() {
-        when(clock.instant()).thenReturn(NOON_TEN);
     }
 
 }

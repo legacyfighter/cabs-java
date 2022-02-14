@@ -16,7 +16,7 @@ public class DriverTrackingController {
 
     @PostMapping("/driverPositions/")
     ResponseEntity<DriverPositionDTO> create(DriverPositionDTO driverPositionDTO) {
-        DriverPosition driverPosition = trackingService.registerPosition(driverPositionDTO.getDriverId(), driverPositionDTO.getLatitude(), driverPositionDTO.getLongitude());
+        DriverPosition driverPosition = trackingService.registerPosition(driverPositionDTO.getDriverId(), driverPositionDTO.getLatitude(), driverPositionDTO.getLongitude(), driverPositionDTO.getSeenAt());
         return ResponseEntity.ok(toDto(driverPosition));
     }
 

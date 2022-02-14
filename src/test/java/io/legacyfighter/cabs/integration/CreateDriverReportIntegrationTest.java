@@ -150,7 +150,7 @@ class CreateDriverReportIntegrationTest {
         when(clock.instant()).thenReturn(when);
         Long driverId = driver.getId();
         driverSessionService.logIn(driverId, plateNumber, carClass, carBrand);
-        driverTrackingService.registerPosition(driverId, 10, 20);
+        driverTrackingService.registerPosition(driverId, 10, 20, Instant.now());
         Transit transit = transitService.createTransit(client.getId(), address("PL", "MAZ", "WAW", "STREET", 1, 10, 20), address("PL", "MAZ", "WAW", "STREET", 100, 10.01, 20.01), carClass);
         transitService.publishTransit(transit.getId());
         transitService.acceptTransit(driverId, transit.getId());
