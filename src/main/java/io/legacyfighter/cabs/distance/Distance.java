@@ -1,15 +1,17 @@
 package io.legacyfighter.cabs.distance;
 
+import javax.persistence.Embeddable;
 import java.util.Locale;
 import java.util.Objects;
 
+@Embeddable
 public final class Distance {
 
     public static final Distance ZERO = ofKm(0);
 
     private static final double MILES_TO_KILOMETERS_RATIO = 1.609344f;
 
-    private final double km;
+    private double km;
 
     public static Distance ofKm(float km) {
         return new Distance(km);
@@ -25,6 +27,10 @@ public final class Distance {
 
     public float toKmInFloat() {
         return (float) km;
+    }
+
+    private Distance() {
+
     }
 
     public String printIn(String unit) {
@@ -70,6 +76,10 @@ public final class Distance {
         return "Distance{" +
                 "km=" + km +
                 '}';
+    }
+
+    public Distance add(Distance travelled) {
+        return Distance.ofKm(this.km + travelled.km);
     }
 }
 

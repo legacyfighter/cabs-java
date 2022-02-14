@@ -1,5 +1,6 @@
 package io.legacyfighter.cabs.distance;
 
+import io.legacyfighter.cabs.money.Money;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -58,6 +59,15 @@ class DistanceTest {
         assertEquals("194.005miles", Distance.ofKm(312.22f).printIn("miles"));
         assertEquals("194.005miles", Distance.ofKm(312.221111232313f).printIn("miles"));
         assertEquals("1.243miles", Distance.ofKm(2).printIn("miles"));
+    }
+
+    @Test
+    void canAddDistances() {
+        //expect
+        assertEquals(Distance.ofKm(1000f), Distance.ofKm(500f).add(Distance.ofKm(500f)));
+        assertEquals(Distance.ofKm(1042f), Distance.ofKm(1020f).add(Distance.ofKm(22f)));
+        assertEquals(Distance.ofKm(0f), Distance.ofKm(0f).add(Distance.ofKm(0f)));
+        assertEquals(Distance.ofKm(3.7f), Distance.ofKm(1.5f).add(Distance.ofKm(2.2f)));
     }
 
 
