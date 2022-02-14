@@ -25,11 +25,8 @@ public class DriverTrackingService {
     @Autowired
     private DistanceCalculator distanceCalculator;
 
-    @Autowired
-    private Clock clock;
-
     @Transactional
-    public DriverPosition registerPosition(Long driverId, double latitude, double longitude) {
+    public DriverPosition registerPosition(Long driverId, double latitude, double longitude, Instant seenAt) {
         Driver driver = driverRepository.getOne(driverId);
         if (driver == null) {
             throw new IllegalArgumentException("Driver does not exists, id = " + driverId);
@@ -39,7 +36,7 @@ public class DriverTrackingService {
         }
         DriverPosition position = new DriverPosition();
         position.setDriver(driver);
-        position.setSeenAt(clock.instant());
+        position.setSeenAt(seenAt);
         position.setLatitude(latitude);
         position.setLongitude(longitude);
         return positionRepository.save(position);

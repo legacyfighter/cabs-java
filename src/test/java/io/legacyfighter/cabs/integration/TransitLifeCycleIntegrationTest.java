@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.time.Instant;
+
 import static io.legacyfighter.cabs.entity.CarType.CarClass.VAN;
 import static io.legacyfighter.cabs.entity.Transit.Status.*;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -448,7 +450,7 @@ class TransitLifeCycleIntegrationTest {
         Driver driver = fixtures.aDriver();
         fixtures.driverHasFee(driver, DriverFee.FeeType.FLAT, 10);
         driverSessionService.logIn(driver.getId(), plateNumber, VAN, "BRAND");
-        driverTrackingService.registerPosition(driver.getId(), 1, 1);
+        driverTrackingService.registerPosition(driver.getId(), 1, 1, Instant.now());
         return driver.getId();
     }
 
@@ -456,7 +458,7 @@ class TransitLifeCycleIntegrationTest {
         Driver driver = fixtures.aDriver();
         fixtures.driverHasFee(driver, DriverFee.FeeType.FLAT, 10);
         driverSessionService.logIn(driver.getId(), plateNumber, VAN, "BRAND");
-        driverTrackingService.registerPosition(driver.getId(), 1000, 1000);
+        driverTrackingService.registerPosition(driver.getId(), 1000, 1000, Instant.now());
         return driver.getId();
     }
 
