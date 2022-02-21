@@ -4,17 +4,17 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 
 import static io.legacyfighter.cabs.entity.miles.ConstantUntil.constantUntil;
 import static io.legacyfighter.cabs.entity.miles.ConstantUntil.constantUntilForever;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MilesTest {
 
-    static Instant YESTERDAY = LocalDateTime.of(1989, 12, 12, 12, 12).toInstant(ZoneOffset.UTC);
+    static Instant YESTERDAY = LocalDateTime.of(1989, 12, 12, 12, 12).toInstant(OffsetDateTime.now().getOffset());
     static Instant TODAY = YESTERDAY.plus(1, ChronoUnit.DAYS);
     static Instant TOMORROW = TODAY.plus(1, ChronoUnit.DAYS);
 

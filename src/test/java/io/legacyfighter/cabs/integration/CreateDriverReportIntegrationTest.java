@@ -20,7 +20,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.List;
@@ -40,7 +40,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 class CreateDriverReportIntegrationTest {
 
-    static Instant DAY_BEFORE_YESTERDAY = LocalDateTime.of(1989, 12, 12, 12, 12).toInstant(ZoneOffset.UTC);
+    static Instant DAY_BEFORE_YESTERDAY = LocalDateTime.of(1989, 12, 12, 12, 12).toInstant(OffsetDateTime.now().getOffset());
     static Instant YESTERDAY = DAY_BEFORE_YESTERDAY.plus(1, ChronoUnit.DAYS);
     static Instant TODAY = YESTERDAY.plus(1, ChronoUnit.DAYS);
 
@@ -83,7 +83,7 @@ class CreateDriverReportIntegrationTest {
     @Test
     void shouldCreateDriversReport() {
         //given
-        Client client= fixtures.aClient();
+        Client client = fixtures.aClient();
         //and
         Driver driver = aDriver(ACTIVE, "JAN", "NOWAK", "FARME100165AB5EW");
         //and

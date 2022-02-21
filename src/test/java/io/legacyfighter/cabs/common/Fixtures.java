@@ -7,7 +7,6 @@ import io.legacyfighter.cabs.entity.*;
 import io.legacyfighter.cabs.entity.Driver.Status;
 import io.legacyfighter.cabs.money.Money;
 import io.legacyfighter.cabs.repository.*;
-
 import io.legacyfighter.cabs.service.AwardsService;
 import io.legacyfighter.cabs.service.CarTypeService;
 import io.legacyfighter.cabs.service.ClaimService;
@@ -17,7 +16,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.OffsetDateTime;
 import java.util.stream.IntStream;
 
 import static java.util.stream.IntStream.range;
@@ -64,7 +63,7 @@ public class Fixtures {
     }
 
     public Transit aTransit(Driver driver, Integer price, LocalDateTime when, Client client) {
-        Transit transit = new Transit(null, null, client, null, when.toInstant(ZoneOffset.UTC), Distance.ZERO);
+        Transit transit = new Transit(null, null, client, null, when.toInstant(OffsetDateTime.now().getOffset()), Distance.ZERO);
         transit.setPrice(new Money(price));
         transit.proposeTo(driver);
         transit.acceptBy(driver, Instant.now());
@@ -201,6 +200,7 @@ public class Fixtures {
         awardsAccount(client);
         awardsService.activateAccount(client.getId());
     }
+
     public void driverHasAttribute(Driver driver, DriverAttribute.DriverAttributeName name, String value) {
         driverAttributeRepository.save(new DriverAttribute(driver, name, value));
     }

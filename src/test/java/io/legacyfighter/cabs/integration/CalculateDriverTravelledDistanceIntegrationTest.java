@@ -12,7 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 class CalculateDriverTravelledDistanceIntegrationTest {
 
-    static Instant NOON = LocalDateTime.of(1989, 12, 12, 12, 12).toInstant(ZoneOffset.UTC);
+    static Instant NOON = LocalDateTime.of(1989, 12, 12, 12, 12).toInstant(OffsetDateTime.now().getOffset());
     static Instant NOON_FIVE = NOON.plus(5, ChronoUnit.MINUTES);
     static final Instant NOON_TEN = NOON_FIVE.plus(5, ChronoUnit.MINUTES);
 

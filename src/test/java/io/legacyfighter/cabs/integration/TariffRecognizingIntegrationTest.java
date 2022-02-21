@@ -9,7 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.Month;
+import java.time.OffsetDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -25,7 +26,7 @@ class TariffRecognizingIntegrationTest {
     @Test
     void newYearsEveTariffShouldBeDisplayed() {
         //given
-        Transit transit = fixtures.aCompletedTransitAt(60, LocalDateTime.of(2021, 12, 31, 8, 30).toInstant(ZoneOffset.UTC));
+        Transit transit = fixtures.aCompletedTransitAt(60, LocalDateTime.of(2021, 12, 31, 8, 30).toInstant(OffsetDateTime.now().getOffset()));
 
         //when
         TransitDTO transitDTO = transitController.getTransit(transit.getId());
@@ -39,7 +40,7 @@ class TariffRecognizingIntegrationTest {
     @Test
     void weekendTariffShouldBeDisplayed() {
         //given
-        Transit transit = fixtures.aCompletedTransitAt(60, LocalDateTime.of(2021, 4, 17, 8, 30).toInstant(ZoneOffset.UTC));
+        Transit transit = fixtures.aCompletedTransitAt(60, LocalDateTime.of(2021, 4, 17, 8, 30).toInstant(OffsetDateTime.now().getOffset()));
 
         //when
         TransitDTO transitDTO = transitController.getTransit(transit.getId());
@@ -52,7 +53,7 @@ class TariffRecognizingIntegrationTest {
     @Test
     void weekendPlusTariffShouldBeDisplayed() {
         //given
-        Transit transit = fixtures.aCompletedTransitAt(60, LocalDateTime.of(2021, 4, 17, 22, 30).toInstant(ZoneOffset.UTC));
+        Transit transit = fixtures.aCompletedTransitAt(60, LocalDateTime.of(2022, Month.FEBRUARY, 20, 6, 0).toInstant(OffsetDateTime.now().getOffset()));
 
         //when
         TransitDTO transitDTO = transitController.getTransit(transit.getId());
@@ -65,7 +66,7 @@ class TariffRecognizingIntegrationTest {
     @Test
     void standardTariffShouldBeDisplayed() {
         //given
-        Transit transit = fixtures.aCompletedTransitAt(60, LocalDateTime.of(2021, 4, 13, 22, 30).toInstant(ZoneOffset.UTC));
+        Transit transit = fixtures.aCompletedTransitAt(60, LocalDateTime.of(2021, 4, 13, 22, 30).toInstant(OffsetDateTime.now().getOffset()));
 
         //when
         TransitDTO transitDTO = transitController.getTransit(transit.getId());

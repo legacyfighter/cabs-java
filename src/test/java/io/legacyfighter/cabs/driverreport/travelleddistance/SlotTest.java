@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.OffsetDateTime;
 
 import static io.legacyfighter.cabs.driverreport.travelleddistance.TimeSlot.slotThatContains;
 import static java.time.temporal.ChronoUnit.MINUTES;
@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class SlotTest {
 
-    static Instant NOON = LocalDateTime.of(1989, 12, 12, 12, 10).toInstant(ZoneOffset.UTC);
+    static Instant NOON = LocalDateTime.of(1989, 12, 12, 12, 10).toInstant(OffsetDateTime.now().getOffset());
     static Instant NOON_FIVE = NOON.plus(5, MINUTES);
     static final Instant NOON_TEN = NOON_FIVE.plus(5, MINUTES);
 

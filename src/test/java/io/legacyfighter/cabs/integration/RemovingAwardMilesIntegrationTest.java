@@ -2,9 +2,9 @@ package io.legacyfighter.cabs.integration;
 
 import io.legacyfighter.cabs.common.Fixtures;
 import io.legacyfighter.cabs.config.AppProperties;
-import io.legacyfighter.cabs.entity.miles.AwardedMiles;
 import io.legacyfighter.cabs.entity.Client;
 import io.legacyfighter.cabs.entity.Transit;
+import io.legacyfighter.cabs.entity.miles.AwardedMiles;
 import io.legacyfighter.cabs.money.Money;
 import io.legacyfighter.cabs.repository.AwardsAccountRepository;
 import io.legacyfighter.cabs.service.AwardsService;
@@ -16,7 +16,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Stream;
@@ -29,10 +29,10 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 class RemovingAwardMilesIntegrationTest {
 
-    static Instant DAY_BEFORE_YESTERDAY = LocalDateTime.of(1989, 12, 12, 12, 12).toInstant(ZoneOffset.UTC);
+    static Instant DAY_BEFORE_YESTERDAY = LocalDateTime.of(1989, 12, 12, 12, 12).toInstant(OffsetDateTime.now().getOffset());
     static Instant YESTERDAY = DAY_BEFORE_YESTERDAY.plus(1, ChronoUnit.DAYS);
     static Instant TODAY = YESTERDAY.plus(1, ChronoUnit.DAYS);
-    static Instant SUNDAY = LocalDateTime.of(1989, 12, 17, 12, 12).toInstant(ZoneOffset.UTC);
+    static Instant SUNDAY = LocalDateTime.of(1989, 12, 17, 12, 12).toInstant(OffsetDateTime.now().getOffset());
 
     @Autowired
     AwardsService awardsService;

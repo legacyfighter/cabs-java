@@ -14,7 +14,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 class ExpiringMilesIntegrationTest {
 
-    static Instant _1989_12_12 = LocalDateTime.of(1989, 12, 12, 12, 12).toInstant(ZoneOffset.UTC);
+    static Instant _1989_12_12 = LocalDateTime.of(1989, 12, 12, 12, 12).toInstant(OffsetDateTime.now().getOffset());
     static Instant _1989_12_13 = _1989_12_12.plus(1, ChronoUnit.DAYS);
     static Instant _1989_12_14 = _1989_12_13.plus(1, ChronoUnit.DAYS);
 

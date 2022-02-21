@@ -2,9 +2,9 @@ package io.legacyfighter.cabs.integration;
 
 import io.legacyfighter.cabs.common.Fixtures;
 import io.legacyfighter.cabs.dto.AwardsAccountDTO;
-import io.legacyfighter.cabs.entity.miles.AwardedMiles;
 import io.legacyfighter.cabs.entity.Client;
 import io.legacyfighter.cabs.entity.Transit;
+import io.legacyfighter.cabs.entity.miles.AwardedMiles;
 import io.legacyfighter.cabs.money.Money;
 import io.legacyfighter.cabs.repository.AwardsAccountRepository;
 import io.legacyfighter.cabs.service.AwardsService;
@@ -17,11 +17,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import static io.legacyfighter.cabs.entity.Client.Type.NORMAL;
-import static io.legacyfighter.cabs.entity.Client.Type.VIP;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -29,7 +28,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 class AwardMilesManagementIntegrationTest {
 
-    static Instant NOW = LocalDateTime.of(1989, 12, 12, 12, 12).toInstant(ZoneOffset.UTC);
+    static Instant NOW = LocalDateTime.of(1989, 12, 12, 12, 12).toInstant(OffsetDateTime.now().getOffset());
 
     @Autowired
     AwardsService awardsService;
@@ -165,7 +164,7 @@ class AwardMilesManagementIntegrationTest {
         fixtures.activeAwardsAccount(client);
         fixtures.activeAwardsAccount(secondClient);
         //and
-        awardsService.registerNonExpiringMiles(client.getId(),  10);
+        awardsService.registerNonExpiringMiles(client.getId(), 10);
 
         //when
         awardsService.transferMiles(client.getId(), secondClient.getId(), 10);
@@ -186,7 +185,7 @@ class AwardMilesManagementIntegrationTest {
         fixtures.activeAwardsAccount(client);
         fixtures.activeAwardsAccount(secondClient);
         //and
-        awardsService.registerNonExpiringMiles(client.getId(),  10);
+        awardsService.registerNonExpiringMiles(client.getId(), 10);
         //and
         awardsService.deactivateAccount(client.getId());
 
@@ -206,7 +205,7 @@ class AwardMilesManagementIntegrationTest {
         fixtures.activeAwardsAccount(client);
         fixtures.activeAwardsAccount(secondClient);
         //and
-        awardsService.registerNonExpiringMiles(client.getId(),  10);
+        awardsService.registerNonExpiringMiles(client.getId(), 10);
 
         //when
         awardsService.transferMiles(client.getId(), secondClient.getId(), 30);
@@ -224,7 +223,7 @@ class AwardMilesManagementIntegrationTest {
         fixtures.activeAwardsAccount(client);
         fixtures.activeAwardsAccount(secondClient);
         //and
-        awardsService.registerNonExpiringMiles(client.getId(),  10);
+        awardsService.registerNonExpiringMiles(client.getId(), 10);
         //and
         awardsService.deactivateAccount(client.getId());
 

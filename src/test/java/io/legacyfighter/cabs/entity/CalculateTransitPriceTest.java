@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.OffsetDateTime;
 
 import static io.legacyfighter.cabs.entity.Transit.Status.*;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -46,7 +46,7 @@ class CalculateTransitPriceTest {
         Money price = transit.calculateFinalCosts();
 
         //then
-        assertEquals( new Money(2900), price); //29.00
+        assertEquals(new Money(2900), price); //29.00
     }
 
     @Test
@@ -124,27 +124,27 @@ class CalculateTransitPriceTest {
     }
 
     void transitWasOnDoneOnFriday(Transit transit) {
-        transit.setDateTime(LocalDateTime.of(2021, 4, 16, 8, 30).toInstant(ZoneOffset.UTC));
+        transit.setDateTime(LocalDateTime.of(2021, 4, 16, 8, 30).toInstant(OffsetDateTime.now().getOffset()));
     }
 
     void transitWasDoneOnNewYearsEve(Transit transit) {
-        transit.setDateTime(LocalDateTime.of(2021, 12, 31, 8, 30).toInstant(ZoneOffset.UTC));
+        transit.setDateTime(LocalDateTime.of(2021, 12, 31, 8, 30).toInstant(OffsetDateTime.now().getOffset()));
     }
 
     void transitWasDoneOnSaturday(Transit transit) {
-        transit.setDateTime(LocalDateTime.of(2021, 4, 17, 8, 30).toInstant(ZoneOffset.UTC));
+        transit.setDateTime(LocalDateTime.of(2021, 4, 17, 8, 30).toInstant(OffsetDateTime.now().getOffset()));
     }
 
     void transitWasDoneOnSunday(Transit transit) {
-        transit.setDateTime(LocalDateTime.of(2021, 4, 18, 8, 30).toInstant(ZoneOffset.UTC));
+        transit.setDateTime(LocalDateTime.of(2021, 4, 18, 8, 30).toInstant(OffsetDateTime.now().getOffset()));
     }
 
     void transitWasDoneOnSaturdayNight(Transit transit) {
-        transit.setDateTime(LocalDateTime.of(2021, 4, 17, 19, 30).toInstant(ZoneOffset.UTC));
+        transit.setDateTime(LocalDateTime.of(2021, 4, 17, 19, 30).toInstant(OffsetDateTime.now().getOffset()));
     }
 
     void transitWasDoneIn2018(Transit transit) {
-        transit.setDateTime(LocalDateTime.of(2018, 1,1, 8, 30).toInstant(ZoneOffset.UTC));
+        transit.setDateTime(LocalDateTime.of(2018, 1, 1, 8, 30).toInstant(OffsetDateTime.now().getOffset()));
     }
 
 

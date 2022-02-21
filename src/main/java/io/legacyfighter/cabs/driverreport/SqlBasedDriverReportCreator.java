@@ -11,8 +11,8 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.Clock;
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
@@ -27,9 +27,9 @@ class SqlBasedDriverReportCreator {
     private static final String QUERY_FOR_DRIVER_WITH_ATTRS =
             "SELECT d.id, d.first_name, d.last_name, d.driver_license, " +
                     "d.photo, d.status, d.type, attr.name, attr.value " +
-            "FROM Driver d " +
-            "LEFT JOIN driver_attribute attr ON d.id = attr.driver_id " +
-            "WHERE d.id = :driverId AND attr.name <> :filteredAttr";
+                    "FROM Driver d " +
+                    "LEFT JOIN driver_attribute attr ON d.id = attr.driver_id " +
+                    "WHERE d.id = :driverId AND attr.name <> :filteredAttr";
 
     private static final String QUERY_FOR_SESSIONS = "SELECT ds.logged_at, ds.logged_out_at, ds.plates_number, ds.car_class, ds.car_brand, " +
             "t.id as TRANSIT_ID, t.name as TARIFF_NAME, t.status as TRANSIT_STATUS, t.km, t.km_rate, " +
@@ -110,11 +110,11 @@ class SqlBasedDriverReportCreator {
     }
 
     private AddressDTO retrieveToAddress(Tuple tuple) {
-        return new AddressDTO((String) tuple.get("AF_COUNTRY"), (String) tuple.get("AF_CITY"), (String) tuple.get("AF_STREET"), tuple.get("AF_NUMBER") == null? null : ((Integer) tuple.get("AF_NUMBER")));
+        return new AddressDTO((String) tuple.get("AF_COUNTRY"), (String) tuple.get("AF_CITY"), (String) tuple.get("AF_STREET"), tuple.get("AF_NUMBER") == null ? null : ((Integer) tuple.get("AF_NUMBER")));
     }
 
     private AddressDTO retrieveFromAddress(Tuple tuple) {
-        return new AddressDTO((String) tuple.get("AF_COUNTRY"), (String) tuple.get("AF_CITY"), (String) tuple.get("AF_STREET"), tuple.get("AF_NUMBER") == null? null : ((Integer) tuple.get("AF_NUMBER")));
+        return new AddressDTO((String) tuple.get("AF_COUNTRY"), (String) tuple.get("AF_CITY"), (String) tuple.get("AF_STREET"), tuple.get("AF_NUMBER") == null ? null : ((Integer) tuple.get("AF_NUMBER")));
     }
 
     private ClaimDTO retrieveClaim(Tuple tuple) {
@@ -125,12 +125,12 @@ class SqlBasedDriverReportCreator {
         return new ClaimDTO(claim_id.longValue(), ((Number) tuple.get("OWNER_ID")).longValue(), ((Number) tuple.get("TRANSIT_ID")).longValue(),
                 (String) tuple.get("REASON"), (String) tuple.get("INCIDENT_DESCRIPTION"), ((Timestamp) tuple.get("CREATION_DATE")).toInstant(),
                 tuple.get("COMPLETION_DATE") == null ? null : ((Timestamp) tuple.get("COMPLETION_DATE")).toInstant(),
-                tuple.get("CHANGE_DATE") == null ? null : ((Timestamp) tuple.get("CHANGE_DATE")).toInstant(), tuple.get("COMPLETION_MODE") == null? null : Claim.CompletionMode.valueOf((String) tuple.get("COMPLETION_MODE")),
+                tuple.get("CHANGE_DATE") == null ? null : ((Timestamp) tuple.get("CHANGE_DATE")).toInstant(), tuple.get("COMPLETION_MODE") == null ? null : Claim.CompletionMode.valueOf((String) tuple.get("COMPLETION_MODE")),
                 Claim.Status.valueOf((String) tuple.get("CLAIM_STATUS")), (String) tuple.get("CLAIM_NO"));
     }
 
     private Instant calculateStartingPoint(int lastDays) {
-        Instant beggingOfToday = Instant.now(clock).atZone(ZoneId.systemDefault()).toLocalDate().atStartOfDay().toInstant(ZoneOffset.UTC);
+        Instant beggingOfToday = Instant.now(clock).atZone(ZoneId.systemDefault()).toLocalDate().atStartOfDay().toInstant(OffsetDateTime.now().getOffset());
         Instant since = beggingOfToday.minus(lastDays, ChronoUnit.DAYS);
         return since;
     }
