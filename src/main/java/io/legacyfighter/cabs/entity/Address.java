@@ -41,6 +41,14 @@ public class Address extends BaseEntity {
         this.buildingNumber = buildingNumber;
     }
 
+    public Address(String country, String district, String city, String street, int buildingNumber) {
+        this.country = country;
+        this.district = district;
+        this.city = city;
+        this.street = street;
+        this.buildingNumber = buildingNumber;
+    }
+
     public String getCountry() {
         return country;
     }

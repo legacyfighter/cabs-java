@@ -18,7 +18,7 @@ public class TransitAnalyzerController {
     TransitAnalyzer transitAnalyzer;
 
     @GetMapping("/transitAnalyze/{clientId}/{addressId}")
-    AnalyzedAddressesDTO analyze(@PathVariable Long clientId, @PathVariable Long addressId) {
+    public AnalyzedAddressesDTO analyze(@PathVariable Long clientId, @PathVariable Long addressId) {
         List<Address> addresses = transitAnalyzer.analyze(clientId, addressId);
         List<AddressDTO> addressDTOs = addresses
                 .stream()

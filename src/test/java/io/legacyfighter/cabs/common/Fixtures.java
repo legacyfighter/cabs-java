@@ -8,19 +8,20 @@ import io.legacyfighter.cabs.entity.Driver.Status;
 import io.legacyfighter.cabs.money.Money;
 import io.legacyfighter.cabs.repository.*;
 
-import io.legacyfighter.cabs.service.AwardsService;
-import io.legacyfighter.cabs.service.CarTypeService;
-import io.legacyfighter.cabs.service.ClaimService;
-import io.legacyfighter.cabs.service.DriverService;
+import io.legacyfighter.cabs.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.stream.IntStream;
 
+import static io.legacyfighter.cabs.entity.CarType.CarClass.VAN;
 import static java.util.stream.IntStream.range;
+import static org.mockito.Mockito.when;
 
 
 @Component
@@ -51,7 +52,16 @@ public class Fixtures {
     AwardsService awardsService;
 
     @Autowired
+    TransitService transitService;
+
+    @Autowired
     DriverAttributeRepository driverAttributeRepository;
+
+    @Autowired
+    DriverSessionService driverSessionService;
+
+    @Autowired
+    DriverTrackingService driverTrackingService;
 
     public Client aClient() {
         return clientRepository.save(new Client());
@@ -104,26 +114,61 @@ public class Fixtures {
         return driverService.createDriver(driverLicense, lastName, name, Driver.Type.REGULAR, status, "");
     }
 
+    public Driver aNearbyDriver(String plateNumber) {
+        Driver driver = aDriver();
+        driverHasFee(driver, DriverFee.FeeType.FLAT, 10);
+        driverSessionService.logIn(driver.getId(), plateNumber, VAN, "BRAND");
+        driverTrackingService.registerPosition(driver.getId(), 1, 1, Instant.now());
+        return driver;
+    }
+
     public Transit aCompletedTransitAt(int price, Instant when) {
         return aCompletedTransitAt(price, when, aClient(), aDriver());
     }
 
-    public Transit aCompletedTransitAt(int price, Instant when, Client client, Driver driver) {
-        Address destination = addressRepository.save(new Address("Polska", "Warszawa", "Zytnia", 20));
+    public Transit aRequestedAndCompletedTransit(int price, Instant publishedAt, Instant completedAt, Client client, Driver driver, Address from, Address destination) {
+        from = addressRepository.save(from);
+        destination = addressRepository.save(destination);
         Transit transit = new Transit(
-                addressRepository.save(new Address("Polska", "Warszawa", "Młynarska", 20)),
+                from,
                 destination,
                 client,
                 null,
-                when,
+                publishedAt,
                 Distance.ZERO);
-        transit.publishAt(when);
+        transit.publishAt(publishedAt);
         transit.proposeTo(driver);
-        transit.acceptBy(driver, Instant.now());
-        transit.start(Instant.now());
-        transit.completeAt(Instant.now(), destination, Distance.ofKm(20));
+        transit.acceptBy(driver, publishedAt);
+        transit.start(publishedAt);
+        transit.completeAt(completedAt, destination, Distance.ofKm(1));
         transit.setPrice(new Money(price));
         return transitRepository.save(transit);
+    }
+
+    public Transit aCompletedTransitAt(int price, Instant publishedAt, Instant completedAt, Client client, Driver driver) {
+        Address destination = new Address("Polska", "Warszawa", "Zytnia", 20);
+        Address from = new Address("Polska", "Warszawa", "Młynarska", 20);
+        return aRequestedAndCompletedTransit(price, publishedAt, completedAt, client, driver, from, destination);
+    }
+
+    public Transit aCompletedTransitAt(int price, Instant publishedAt, Client client, Driver driver) {
+        return aCompletedTransitAt(price, publishedAt, publishedAt.plus(10, ChronoUnit.MINUTES), client, driver);
+    }
+
+    public Transit aRequestedAndCompletedTransit(int price, Instant publishedAt, Instant completedAt, Client client, Driver driver, Address from, Address destination, Clock clock) {
+        from = addressRepository.save(from);
+        destination = addressRepository.save(destination);
+
+        when(clock.instant()).thenReturn(publishedAt);
+        Transit transit = transitService.createTransit(client.getId(), from, destination, VAN);
+        transitService.publishTransit(transit.getId());
+        transitService.findDriversForTransit(transit.getId());
+        transitService.acceptTransit(driver.getId(), transit.getId());
+        transitService.startTransit(driver.getId(), transit.getId());
+        when(clock.instant()).thenReturn(completedAt);
+        transitService.completeTransit(driver.getId(), transit.getId(), destination);
+
+        return transitRepository.getOne(transit.getId());
     }
 
     public CarType anActiveCarCategory(CarType.CarClass carClass) {
