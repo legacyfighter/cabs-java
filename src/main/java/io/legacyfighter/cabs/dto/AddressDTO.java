@@ -17,6 +17,7 @@ public class AddressDTO  {
         additionalNumber = a.getAdditionalNumber();
         postalCode = a.getPostalCode();
         name = a.getName();
+        hash = a.getHash();
     }
 
     private String country;
@@ -34,6 +35,8 @@ public class AddressDTO  {
     private String postalCode;
 
     private String name;
+
+    private Integer hash;
 
     public AddressDTO(String country, String city, String street, Integer buildingNumber) {
         this.country = country;
@@ -104,6 +107,14 @@ public class AddressDTO  {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Integer getHash() {
+        return hash;
+    }
+
+    public void setHash(Integer hash) {
+        this.hash = hash;
     }
 
     public Address toAddressEntity() {
