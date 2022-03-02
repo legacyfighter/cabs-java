@@ -1,7 +1,9 @@
 package io.legacyfighter.cabs.transitanalyzer;
 
 
+import io.legacyfighter.cabs.entity.events.TransitCompleted;
 import org.neo4j.graphdb.*;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -44,6 +46,11 @@ public class GraphTransitAnalyzer {
 
             t.success();
         }
+    }
+
+    @TransactionalEventListener
+    public void handle(TransitCompleted transitCompleted) {
+        addTransitBetweenAddresses(transitCompleted.clientId, transitCompleted.transitId, transitCompleted.addressFromHash, transitCompleted.addressToHash, transitCompleted.started, transitCompleted.completeAt);
     }
 
     public void onClose() {

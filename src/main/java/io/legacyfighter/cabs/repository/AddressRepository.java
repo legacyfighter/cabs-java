@@ -4,6 +4,7 @@ import io.legacyfighter.cabs.entity.Address;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public class AddressRepository {
@@ -28,5 +29,14 @@ public class AddressRepository {
 
     public Address getOne(Long id) {
         return addressRepositoryInterface.getOne(id);
+    }
+
+    @Transactional
+    public Integer findHashById(Long addressId) {
+        return addressRepositoryInterface.findHashById(addressId);
+    }
+
+    public Address getByHash(int hash) {
+        return addressRepositoryInterface.findByHash(hash);
     }
 }

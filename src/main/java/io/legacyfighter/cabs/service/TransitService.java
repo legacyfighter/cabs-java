@@ -1,10 +1,12 @@
 package io.legacyfighter.cabs.service;
 
+import io.legacyfighter.cabs.common.EventsPublisher;
 import io.legacyfighter.cabs.distance.Distance;
 import io.legacyfighter.cabs.dto.AddressDTO;
 import io.legacyfighter.cabs.dto.DriverPositionDTOV2;
 import io.legacyfighter.cabs.dto.TransitDTO;
 import io.legacyfighter.cabs.entity.*;
+import io.legacyfighter.cabs.entity.events.TransitCompleted;
 import io.legacyfighter.cabs.money.Money;
 import io.legacyfighter.cabs.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +64,9 @@ public class TransitService {
 
     @Autowired
     private AwardsService awardsService;
+
+    @Autowired
+    private EventsPublisher eventsPublisher;
 
     @Transactional
     public Transit createTransit(TransitDTO transitDTO) {
@@ -417,6 +422,10 @@ public class TransitService {
         awardsService.registerMiles(transit.getClient().getId(), transitId);
         transitRepository.save(transit);
         invoiceGenerator.generate(transit.getPrice().toInt(), transit.getClient().getName() + " " + transit.getClient().getLastName());
+        eventsPublisher.publish(new TransitCompleted(
+                transit.getClient().getId(), transitId, transit.getFrom().getHash(), transit.getTo().getHash(), transit.getStarted(), transit.getCompleteAt(), Instant.now(clock))
+        );
+
     }
 
     @Transactional

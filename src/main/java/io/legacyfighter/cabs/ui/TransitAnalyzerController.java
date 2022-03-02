@@ -2,9 +2,8 @@ package io.legacyfighter.cabs.ui;
 
 import io.legacyfighter.cabs.dto.AddressDTO;
 import io.legacyfighter.cabs.dto.AnalyzedAddressesDTO;
-import io.legacyfighter.cabs.entity.Address;
-import io.legacyfighter.cabs.service.TransitAnalyzer;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.legacyfighter.cabs.repository.AddressRepository;
+import io.legacyfighter.cabs.transitanalyzer.GraphTransitAnalyzer;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,17 +13,27 @@ import java.util.stream.Collectors;
 
 @RestController
 public class TransitAnalyzerController {
-    @Autowired
-    TransitAnalyzer transitAnalyzer;
+
+    private final GraphTransitAnalyzer graphTransitAnalyzer;
+    private final AddressRepository addressRepository;
+
+    public TransitAnalyzerController(GraphTransitAnalyzer graphTransitAnalyzer, AddressRepository addressRepository) {
+        this.graphTransitAnalyzer = graphTransitAnalyzer;
+        this.addressRepository = addressRepository;
+    }
 
     @GetMapping("/transitAnalyze/{clientId}/{addressId}")
     public AnalyzedAddressesDTO analyze(@PathVariable Long clientId, @PathVariable Long addressId) {
-        List<Address> addresses = transitAnalyzer.analyze(clientId, addressId);
-        List<AddressDTO> addressDTOs = addresses
+        List<Long> hashes = graphTransitAnalyzer.analyze(clientId, addressRepository.findHashById(addressId));
+        List<AddressDTO> addressDTOs = hashes
                 .stream()
-                .map(a -> new AddressDTO(a))
+                .map(this::mapToAddressDTO)
                 .collect(Collectors.toList());
 
         return new AnalyzedAddressesDTO(addressDTOs);
+    }
+
+    private AddressDTO mapToAddressDTO(Long hash) {
+        return new AddressDTO(addressRepository.getByHash(hash.intValue()));
     }
 }
