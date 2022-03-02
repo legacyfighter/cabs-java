@@ -15,6 +15,8 @@ public interface TransitRepository extends JpaRepository<Transit, Long> {
 
     List<Transit> findAllByClientAndFromAndStatusOrderByDateTimeDesc(Client client, Address from, Transit.Status status);
 
+    List<Transit> findAllByStatus(Transit.Status status);
+
     List<Transit> findAllByClientAndFromAndPublishedAfterAndStatusOrderByDateTimeDesc(Client client, Address from, Instant when, Transit.Status status);
 
     List<Transit> findByClient(Client client);
