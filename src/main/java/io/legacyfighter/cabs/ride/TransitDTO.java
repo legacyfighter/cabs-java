@@ -1,27 +1,30 @@
-package io.legacyfighter.cabs.dto;
+package io.legacyfighter.cabs.ride;
 
 import io.legacyfighter.cabs.carfleet.CarClass;
 import io.legacyfighter.cabs.crm.ClientDTO;
 import io.legacyfighter.cabs.crm.claims.ClaimDTO;
 import io.legacyfighter.cabs.driverfleet.DriverDTO;
-import io.legacyfighter.cabs.entity.Transit;
 import io.legacyfighter.cabs.geolocation.Distance;
 import io.legacyfighter.cabs.geolocation.address.AddressDTO;
-import io.legacyfighter.cabs.transitdetails.TransitDetailsDTO;
+import io.legacyfighter.cabs.ride.details.Status;
+import io.legacyfighter.cabs.ride.details.TransitDetailsDTO;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 public class TransitDTO {
 
-    private Long id;
+    private Long id; //Transit.id
+
+    private UUID requestId;
 
     private String tariff;
 
-    private Transit.Status status;
+    private Status status;
 
     public DriverDTO driver;
 
@@ -70,7 +73,7 @@ public class TransitDTO {
     }
 
     public TransitDTO(TransitDetailsDTO transitDetails, Set<DriverDTO> proposedDrivers, Set<DriverDTO> driverRejections, Long assignedDriver) {
-        this(transitDetails.transitId, transitDetails.tariffName,
+        this(transitDetails.transitId, transitDetails.requestUUID, transitDetails.tariffName,
                 transitDetails.status,
                 proposedDrivers
                         .stream()
@@ -88,13 +91,14 @@ public class TransitDTO {
                 transitDetails.to, transitDetails.carType, transitDetails.client);
     }
 
-    public TransitDTO(Long id, String tariff, Transit.Status status, DriverDTO driver,
+    public TransitDTO(Long id, UUID requestId, String tariff, Status status, DriverDTO driver,
                       Distance distance, float kmRate, BigDecimal price, BigDecimal driverFee,
                       BigDecimal estimatedPrice, BigDecimal baseFee, Instant dateTime,
                       Instant published, Instant acceptedAt, Instant started, Instant completeAt,
                       ClaimDTO claimDTO, List<DriverDTO> proposedDrivers, AddressDTO from, AddressDTO to,
                       CarClass carClass, ClientDTO clientDTO) {
         this.id = id;
+        this.requestId = requestId;
         this.factor = 1;
         this.tariff = tariff;
         this.status = status;
@@ -184,11 +188,11 @@ public class TransitDTO {
         return id;
     }
 
-    public Transit.Status getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(Transit.Status status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 
@@ -250,5 +254,9 @@ public class TransitDTO {
 
     public void setEstimatedPrice(BigDecimal estimatedPrice) {
         this.estimatedPrice = estimatedPrice;
+    }
+
+    public UUID getRequestId() {
+        return requestId;
     }
 }

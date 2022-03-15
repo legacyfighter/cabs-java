@@ -8,10 +8,10 @@ import io.legacyfighter.cabs.driverfleet.Driver.Status;
 import io.legacyfighter.cabs.driverfleet.DriverAttributeName;
 import io.legacyfighter.cabs.driverfleet.DriverFee;
 import io.legacyfighter.cabs.geolocation.address.AddressDTO;
-import io.legacyfighter.cabs.dto.TransitDTO;
+import io.legacyfighter.cabs.ride.TransitDTO;
 import io.legacyfighter.cabs.geolocation.address.Address;
 import io.legacyfighter.cabs.crm.Client;
-import io.legacyfighter.cabs.entity.Transit;
+import io.legacyfighter.cabs.ride.Transit;
 import io.legacyfighter.cabs.geolocation.GeocodingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -119,7 +119,7 @@ public class Fixtures {
         return rideFixture.aRide(price, client, driver, from, destination);
     }
 
-    public Transit aRideWithFixedClock(int price, Instant publishedAt, Instant completedAt, Client client, Driver driver, Address from, Address destination, Clock clock) {
+    public TransitDTO aRideWithFixedClock(int price, Instant publishedAt, Instant completedAt, Client client, Driver driver, Address from, Address destination, Clock clock) {
         return rideFixture.aRideWithFixedClock(price, publishedAt, completedAt, client, driver, from, destination, clock);
     }
 

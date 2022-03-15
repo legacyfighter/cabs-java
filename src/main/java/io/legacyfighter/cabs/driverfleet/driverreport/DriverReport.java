@@ -4,7 +4,7 @@ package io.legacyfighter.cabs.driverfleet.driverreport;
 import io.legacyfighter.cabs.driverfleet.DriverAttributeDTO;
 import io.legacyfighter.cabs.driverfleet.DriverDTO;
 import io.legacyfighter.cabs.tracking.DriverSessionDTO;
-import io.legacyfighter.cabs.dto.TransitDTO;
+import io.legacyfighter.cabs.ride.TransitDTO;
 import io.legacyfighter.cabs.driverfleet.DriverAttributeName;
 
 import java.util.ArrayList;

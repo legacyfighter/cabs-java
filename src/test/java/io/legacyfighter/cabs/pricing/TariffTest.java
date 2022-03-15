@@ -1,6 +1,7 @@
-package io.legacyfighter.cabs.entity;
+package io.legacyfighter.cabs.pricing;
 
 import io.legacyfighter.cabs.money.Money;
+import io.legacyfighter.cabs.pricing.Tariff;
 import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 

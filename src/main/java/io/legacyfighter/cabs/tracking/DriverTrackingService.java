@@ -1,11 +1,13 @@
 package io.legacyfighter.cabs.tracking;
 
 import io.legacyfighter.cabs.carfleet.CarClass;
+import io.legacyfighter.cabs.geolocation.Distance;
+import io.legacyfighter.cabs.geolocation.GeocodingService;
+import io.legacyfighter.cabs.geolocation.address.AddressDTO;
 import io.legacyfighter.cabs.driverfleet.Driver;
 import io.legacyfighter.cabs.driverfleet.DriverDTO;
 import io.legacyfighter.cabs.driverfleet.DriverService;
 import io.legacyfighter.cabs.driverfleet.driverreport.travelleddistance.TravelledDistanceService;
-import io.legacyfighter.cabs.geolocation.Distance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +40,9 @@ public class DriverTrackingService {
     private DriverSessionService driverSessionService;
 
     @Autowired
+    GeocodingService geocodingService;
+
+    @Autowired
     private Clock clock;
 
     @Transactional
@@ -58,6 +63,42 @@ public class DriverTrackingService {
 
     public Distance calculateTravelledDistance(Long driverId, Instant from, Instant to) {
         return travelledDistanceService.calculateDistance(driverId, from, to);
+    }
+
+    public List<DriverPositionDTOV2> findActiveDriversNearby(AddressDTO address, Distance distance, Collection<CarClass> carClasses) {
+        double[] geocoded = new double[2];
+
+        try {
+            geocoded = geocodingService.geocodeAddress(address.toAddressEntity());
+        } catch (Exception e) {
+            // Geocoding failed! Ask Jessica or Bryan for some help if needed.
+        }
+
+        double longitude = geocoded[1];
+        double latitude = geocoded[0];
+
+        //https://gis.stackexchange.com/questions/2951/algorithm-for-offsetting-a-latitude-longitude-by-some-amount-of-meters
+        //Earth’s radius, sphere
+        //double R = 6378;
+        double R = 6371; // Changed to 6371 due to Copy&Paste pattern from different source
+
+        //offsets in meters
+        double dn = distance.toKmInDouble();
+        double de = distance.toKmInDouble();
+
+        //Coordinate offsets in radians
+        double dLat = dn / R;
+        double dLon = de / (R * Math.cos(Math.PI * latitude / 180));
+
+        //Offset positions, decimal degrees
+        double latitudeMin = latitude - dLat * 180 / Math.PI;
+        double latitudeMax = latitude + dLat *
+                180 / Math.PI;
+        double longitudeMin = longitude - dLon *
+                180 / Math.PI;
+        double longitudeMax = longitude + dLon * 180 / Math.PI;
+
+        return findActiveDriversNearby(latitudeMin, latitudeMax, longitudeMin, longitudeMax, latitude, longitude, carClasses);
     }
 
     public List<DriverPositionDTOV2> findActiveDriversNearby(double latitudeMin, double latitudeMax, double longitudeMin, double longitudeMax, double latitude, double longitude, Collection<CarClass> carClasses) {

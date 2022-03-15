@@ -2,11 +2,14 @@ package io.legacyfighter.cabs.integration;
 
 import io.legacyfighter.cabs.common.Fixtures;
 import io.legacyfighter.cabs.config.AppProperties;
-import io.legacyfighter.cabs.loyalty.AwardedMiles;
 import io.legacyfighter.cabs.crm.Client;
+import io.legacyfighter.cabs.geolocation.GeocodingService;
+import io.legacyfighter.cabs.loyalty.AwardedMiles;
 import io.legacyfighter.cabs.loyalty.AwardsAccountRepository;
 import io.legacyfighter.cabs.loyalty.AwardsService;
-import io.legacyfighter.cabs.geolocation.GeocodingService;
+import io.legacyfighter.cabs.money.Money;
+import io.legacyfighter.cabs.pricing.Tariff;
+import io.legacyfighter.cabs.pricing.Tariffs;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,6 +26,7 @@ import java.util.stream.Stream;
 import static io.legacyfighter.cabs.crm.Client.Type.NORMAL;
 import static io.legacyfighter.cabs.crm.Client.Type.VIP;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -51,6 +55,9 @@ class RemovingAwardMilesIntegrationTest {
 
     @MockBean
     GeocodingService geocodingService;
+
+    @MockBean
+    Tariffs tariffs;
 
     @Test
     void byDefaultRemoveOldestFirstEvenWhenTheyAreNonExpiring() {
@@ -97,6 +104,8 @@ class RemovingAwardMilesIntegrationTest {
         //given
         Client client = clientWithAnActiveMilesProgram(NORMAL);
         //and
+        when(tariffs.choose(any())).thenReturn(new Tariff(0, "fake", new Money(10)));
+
         fixtures.clientHasDoneTransits(client, 15, geocodingService);
         //and
         AwardedMiles regularMiles = grantedMilesThatWillExpireInDays(10, 365, TODAY, client);

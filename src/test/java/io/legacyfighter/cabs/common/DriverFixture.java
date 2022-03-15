@@ -19,6 +19,7 @@ import static io.legacyfighter.cabs.carfleet.CarClass.VAN;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.when;
 
+
 @Component
 class DriverFixture {
 
@@ -64,17 +65,16 @@ class DriverFixture {
         return driverService.createDriver(driverLicense, lastName, name, Driver.Type.REGULAR, status, "");
     }
 
+    Driver aNearbyDriver(GeocodingService stubbedGeocodingService, Address pickup, double latitude, double longitude) {
+        when(stubbedGeocodingService.geocodeAddress(argThat(new AddressMatcher(pickup)))).thenReturn(new double[]{latitude, longitude});
+        return aNearbyDriver("WU DAMIAN", latitude, longitude, VAN, Instant.now(), "brand");
+    }
+
     Driver aNearbyDriver(GeocodingService stubbedGeocodingService, Address pickup) {
         Random random = new Random();
         double latitude = random.nextDouble();
         double longitude = random.nextDouble();
-        when(stubbedGeocodingService.geocodeAddress(pickup)).thenReturn(new double[]{latitude, longitude});
-        return aNearbyDriver("WU DAMIAN", latitude, longitude, VAN, Instant.now(), "brand");
-    }
-
-    Driver aNearbyDriver(GeocodingService stubbedGeocodingService, Address pickup, double latitude, double longitude) {
-        when(stubbedGeocodingService.geocodeAddress(argThat(new AddressMatcher(pickup)))).thenReturn(new double[]{latitude, longitude});
-        return aNearbyDriver("WU DAMIAN", latitude, longitude, VAN, Instant.now(), "brand");
+        return aNearbyDriver(stubbedGeocodingService, pickup, latitude, longitude);
     }
 
     Driver aNearbyDriver(String plateNumber, double latitude, double longitude, CarClass carClass, Instant when, String carBrand) {
@@ -93,11 +93,8 @@ class DriverFixture {
         driverSessionService.logIn(driver.getId(), plateNumber, carClass, carBrand);
     }
 
-    void driverLogsOut(Driver driver) {
-        driverSessionService.logOutCurrentSession(driver.getId());
-    }
-
     void driverHasAttribute(Driver driver, DriverAttributeName name, String value) {
         driverAttributeRepository.save(new DriverAttribute(driver, name, value));
     }
 }
+

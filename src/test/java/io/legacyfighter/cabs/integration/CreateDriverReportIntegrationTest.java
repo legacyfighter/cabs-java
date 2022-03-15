@@ -1,22 +1,15 @@
 package io.legacyfighter.cabs.integration;
 
-import io.legacyfighter.cabs.carfleet.CarClass;
-import io.legacyfighter.cabs.carfleet.CarTypeService;
 import io.legacyfighter.cabs.common.Fixtures;
+import io.legacyfighter.cabs.common.RideFixture;
 import io.legacyfighter.cabs.crm.Client;
-import io.legacyfighter.cabs.crm.claims.ClaimService;
 import io.legacyfighter.cabs.driverfleet.Driver;
 import io.legacyfighter.cabs.driverfleet.DriverAttributeDTO;
 import io.legacyfighter.cabs.driverfleet.DriverFee;
 import io.legacyfighter.cabs.driverfleet.driverreport.DriverReport;
 import io.legacyfighter.cabs.driverfleet.driverreport.DriverReportController;
-import io.legacyfighter.cabs.dto.TransitDTO;
 import io.legacyfighter.cabs.geolocation.GeocodingService;
-import io.legacyfighter.cabs.geolocation.address.Address;
-import io.legacyfighter.cabs.geolocation.address.AddressRepository;
-import io.legacyfighter.cabs.service.TransitService;
-import io.legacyfighter.cabs.tracking.DriverSessionService;
-import io.legacyfighter.cabs.tracking.DriverTrackingService;
+import io.legacyfighter.cabs.ride.TransitDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -41,7 +34,6 @@ import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest
 class CreateDriverReportIntegrationTest {
@@ -51,31 +43,16 @@ class CreateDriverReportIntegrationTest {
     static Instant TODAY = YESTERDAY.plus(1, ChronoUnit.DAYS);
 
     @Autowired
-    TransitService transitService;
-
-    @Autowired
-    DriverTrackingService driverTrackingService;
-
-    @Autowired
-    DriverSessionService driverSessionService;
-
-    @Autowired
-    CarTypeService carTypeService;
-
-    @Autowired
     Fixtures fixtures;
+
+    @Autowired
+    RideFixture rideFixture;
 
     @Autowired
     DriverReportController driverReportController;
 
-    @Autowired
-    AddressRepository addressRepository;
-
     @MockBean
     GeocodingService geocodingService;
-
-    @Autowired
-    ClaimService claimService;
 
     @MockBean
     Clock clock;
@@ -97,9 +74,9 @@ class CreateDriverReportIntegrationTest {
         fixtures.driverHasAttribute(driver, PENALTY_POINTS, "21");
         fixtures.driverHasAttribute(driver, MEDICAL_EXAMINATION_REMARKS, "private info");
         //and
-        driverHasDoneSessionAndPicksSomeoneUpInCar(driver, client, VAN, "WU1213", "SCODA FABIA", TODAY);
-        driverHasDoneSessionAndPicksSomeoneUpInCar(driver, client, VAN, "WU1213", "SCODA OCTAVIA", YESTERDAY);
-        TransitDTO inBmw = driverHasDoneSessionAndPicksSomeoneUpInCar(driver, client, VAN, "WU1213", "BMW M2", DAY_BEFORE_YESTERDAY);
+        rideFixture.driverHasDoneSessionAndPicksSomeoneUpInCar(driver, client, VAN, "WU1213", "SCODA FABIA", TODAY, geocodingService, clock);
+        rideFixture.driverHasDoneSessionAndPicksSomeoneUpInCar(driver, client, VAN, "WU1213", "SCODA OCTAVIA", YESTERDAY, geocodingService, clock);
+        TransitDTO inBmw = rideFixture.driverHasDoneSessionAndPicksSomeoneUpInCar(driver, client, VAN, "WU1213", "BMW M2", DAY_BEFORE_YESTERDAY, geocodingService, clock);
         //and
         fixtures.createClaim(client, inBmw, "za szybko");
 
@@ -152,35 +129,10 @@ class CreateDriverReportIntegrationTest {
                 .collect(toList());
     }
 
-    TransitDTO driverHasDoneSessionAndPicksSomeoneUpInCar(Driver driver, Client client, CarClass carClass, String plateNumber, String carBrand, Instant when) {
-        when(clock.instant()).thenReturn(when);
-        Long driverId = driver.getId();
-        driverSessionService.logIn(driverId, plateNumber, carClass, carBrand);
-        driverTrackingService.registerPosition(driverId, 10, 20, Instant.now());
-        TransitDTO transit = transitService.createTransit(client.getId(), address("PL", "MAZ", "WAW", "STREET", 1, 10, 20), address("PL", "MAZ", "WAW", "STREET", 100, 10.01, 20.01), carClass);
-        transitService.publishTransit(transit.getId());
-        transitService.acceptTransit(driverId, transit.getId());
-        transitService.startTransit(driverId, transit.getId());
-        transitService.completeTransit(driverId, transit.getId(), address("PL", "MAZ", "WAW", "STREET", 100, 10.01, 20.01));
-        driverSessionService.logOutCurrentSession(driverId);
-        return transit;
-    }
-
-
     Driver aDriver(Driver.Status status, String name, String lastName, String driverLicense) {
         Driver driver = fixtures.aDriver(ACTIVE, name, lastName, driverLicense);
         fixtures.driverHasFee(driver, DriverFee.FeeType.FLAT, 10);
         return driver;
     }
 
-    Address address(String country, String district, String city, String street, Integer buildingNumber, double latitude, double longitude) {
-        Address address = new Address();
-        address.setCountry(country);
-        address.setDistrict(district);
-        address.setCity(city);
-        address.setStreet(street);
-        address.setBuildingNumber(buildingNumber);
-        when(geocodingService.geocodeAddress(address)).thenReturn(new double[]{latitude, longitude});
-        return addressRepository.save(address);
-    }
 }

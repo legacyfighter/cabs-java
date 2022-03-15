@@ -1,6 +1,6 @@
 package io.legacyfighter.cabs.crm.transitanalyzer;
 
-import io.legacyfighter.cabs.transitdetails.TransitDetailsFacade;
+import io.legacyfighter.cabs.ride.details.TransitDetailsFacade;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

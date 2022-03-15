@@ -1,16 +1,16 @@
 package io.legacyfighter.cabs.crm.claims;
 
-import io.legacyfighter.cabs.crm.claims.ClaimsResolver.Result;
 import io.legacyfighter.cabs.crm.Client;
-import io.legacyfighter.cabs.entity.Transit;
+import io.legacyfighter.cabs.crm.claims.ClaimsResolver.Result;
 import io.legacyfighter.cabs.money.Money;
+import io.legacyfighter.cabs.ride.Transit;
 import org.junit.jupiter.api.Test;
 
+import static io.legacyfighter.cabs.crm.Client.Type.NORMAL;
+import static io.legacyfighter.cabs.crm.Client.Type.VIP;
 import static io.legacyfighter.cabs.crm.claims.ClaimsResolver.WhoToAsk.*;
 import static io.legacyfighter.cabs.crm.claims.Status.ESCALATED;
 import static io.legacyfighter.cabs.crm.claims.Status.REFUNDED;
-import static io.legacyfighter.cabs.crm.Client.Type.NORMAL;
-import static io.legacyfighter.cabs.crm.Client.Type.VIP;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ClaimAutomaticResolvingTest {
@@ -20,13 +20,13 @@ class ClaimAutomaticResolvingTest {
         //given
         ClaimsResolver resolver = new ClaimsResolver();
         //and
-        Transit transit = aTransit(1L, 39);
+        Transit transit = aTransit(1L);
         //and
-        Claim claim = createClaim(transit);
+        Claim claim = createClaim(transit, 39);
         //and
         resolver.resolve(claim, NORMAL, 40, 15, 10);
         //and
-        Claim claim2 = createClaim(transit);
+        Claim claim2 = createClaim(transit, 39);
 
         //when
         Result result = resolver.resolve(claim2, NORMAL, 40, 15, 10);
@@ -41,9 +41,9 @@ class ClaimAutomaticResolvingTest {
         //given
         ClaimsResolver resolver = new ClaimsResolver();
         //and
-        Transit transit = aTransit(1L, 39);
+        Transit transit = aTransit(1L);
         //and
-        Claim claim = createClaim(transit);
+        Claim claim = createClaim(transit, 39);
 
         //when
         Result result = resolver.resolve(claim, VIP, 40, 15, 10);
@@ -58,14 +58,14 @@ class ClaimAutomaticResolvingTest {
         //given
         ClaimsResolver resolver = new ClaimsResolver();
         //and
-        Claim claim = createClaim(aTransit(1L, 39));
+        Claim claim = createClaim(aTransit(1L), 39);
         resolver.resolve(claim, VIP, 40, 15, 10);
-        Claim claim2 = createClaim(aTransit(2L, 39));
+        Claim claim2 = createClaim(aTransit(2L), 39);
         resolver.resolve(claim2, VIP, 40, 15, 10);
-        Claim claim3 = createClaim(aTransit(3L, 39));
+        Claim claim3 = createClaim(aTransit(3L), 39);
         resolver.resolve(claim3, VIP, 40, 15, 10);
         //and
-        Claim claim4 = createClaim(aTransit(4L, 41), aClient(VIP));
+        Claim claim4 = createClaim(aTransit(4L), 41);
 
         //when
         Result result = resolver.resolve(claim4, VIP, 40, 15, 10);
@@ -80,15 +80,15 @@ class ClaimAutomaticResolvingTest {
         //given
         ClaimsResolver resolver = new ClaimsResolver();
         //and
-        Claim claim = createClaim(aTransit(1L, 39));
+        Claim claim = createClaim(aTransit(1L), 39);
         Result result1 = resolver.resolve(claim, NORMAL, 40, 15, 10);
-        Claim claim2 = createClaim(aTransit(2L, 39));
+        Claim claim2 = createClaim(aTransit(2L), 39);
         Result result2 = resolver.resolve(claim2, NORMAL, 40, 15, 10);
-        Claim claim3 = createClaim(aTransit(3L, 39));
+        Claim claim3 = createClaim(aTransit(3L), 39);
         Result result3 = resolver.resolve(claim3, NORMAL, 40, 15, 10);
 
         //when
-        Claim claim4 = createClaim(aTransit(4L, 39), aClient(NORMAL));
+        Claim claim4 = createClaim(aTransit(4L), 39);
         Result result4 = resolver.resolve(claim4, NORMAL, 40, 4, 10);
 
         //then
@@ -107,14 +107,14 @@ class ClaimAutomaticResolvingTest {
         //given
         ClaimsResolver resolver = new ClaimsResolver();
         //and
-        Claim claim = createClaim(aTransit(1L, 39));
+        Claim claim = createClaim(aTransit(1L), 39);
         resolver.resolve(claim, NORMAL, 40, 15, 10);
-        Claim claim2 = createClaim(aTransit(2L, 39));
+        Claim claim2 = createClaim(aTransit(2L), 39);
         resolver.resolve(claim2, NORMAL, 40, 15, 10);
-        Claim claim3 = createClaim(aTransit(3L, 39));
+        Claim claim3 = createClaim(aTransit(3L), 39);
         resolver.resolve(claim3, NORMAL, 40, 15, 10);
         //and
-        Claim claim4 = createClaim(aTransit(4L, 39), aClient(NORMAL));
+        Claim claim4 = createClaim(aTransit(4L), 39);
 
         //when
         Result result = resolver.resolve(claim4, NORMAL, 40, 10, 9);
@@ -129,14 +129,14 @@ class ClaimAutomaticResolvingTest {
         //given
         ClaimsResolver resolver = new ClaimsResolver();
         //and
-        Claim claim = createClaim(aTransit(1L, 39));
+        Claim claim = createClaim(aTransit(1L), 39);
         resolver.resolve(claim, NORMAL, 40, 15, 10);
-        Claim claim2 = createClaim(aTransit(2L, 39));
+        Claim claim2 = createClaim(aTransit(2L), 39);
         resolver.resolve(claim2, NORMAL, 40, 15, 10);
-        Claim claim3 = createClaim(aTransit(3L, 39));
+        Claim claim3 = createClaim(aTransit(3L), 39);
         resolver.resolve(claim3, NORMAL, 40, 15, 10);
         //and
-        Claim claim4 = createClaim(aTransit(4L, 50), aClient(NORMAL));
+        Claim claim4 = createClaim(aTransit(4L), 50);
 
         //when
         Result result = resolver.resolve(claim4, NORMAL, 40, 12, 10);
@@ -151,14 +151,14 @@ class ClaimAutomaticResolvingTest {
         //given
         ClaimsResolver resolver = new ClaimsResolver();
         //and
-        Claim claim = createClaim(aTransit(1L, 39));
+        Claim claim = createClaim(aTransit(1L), 39);
         resolver.resolve(claim, NORMAL, 40, 15, 10);
-        Claim claim2 = createClaim(aTransit(2L, 39));
+        Claim claim2 = createClaim(aTransit(2L), 39);
         resolver.resolve(claim2, NORMAL, 40, 15, 10);
-        Claim claim3 = createClaim(aTransit(3L, 39));
+        Claim claim3 = createClaim(aTransit(3L), 39);
         resolver.resolve(claim3, NORMAL, 40, 15, 10);
         //and
-        Claim claim4 = createClaim(aTransit(4L, 50), aClient(NORMAL));
+        Claim claim4 = createClaim(aTransit(4L), 50);
 
         //when
         Result result = resolver.resolve(claim4, NORMAL, 40, 2, 10);
@@ -168,24 +168,15 @@ class ClaimAutomaticResolvingTest {
         assertEquals(ASK_DRIVER, result.whoToAsk);
     }
 
-    Transit aTransit(Long id, int price) {
-        Transit transit = new Transit(id);
-        transit.setPrice(new Money(price));
-        return transit;
+    Transit aTransit(Long id) {
+        return new Transit(id);
     }
 
-    Claim createClaim(Transit transit) {
+    Claim createClaim(Transit transit, int transitPrice) {
         Claim claim = new Claim();
         claim.setTransit(transit.getId());
-        claim.setTransitPrice(transit.getPrice());
-        return claim;
-    }
-
-    Claim createClaim(Transit transit, Client client) {
-        Claim claim = new Claim();
-        claim.setTransit(transit.getId());
-        claim.setTransitPrice(transit.getPrice());
-        claim.setOwnerId(client.getId());
+        claim.setTransitPrice(new Money(transitPrice));
+        claim.setOwnerId(1L);
         return claim;
     }
 

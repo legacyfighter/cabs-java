@@ -1,8 +1,8 @@
 package io.legacyfighter.cabs.driverfleet;
 
 import io.legacyfighter.cabs.money.Money;
-import io.legacyfighter.cabs.transitdetails.TransitDetailsDTO;
-import io.legacyfighter.cabs.transitdetails.TransitDetailsFacade;
+import io.legacyfighter.cabs.ride.details.TransitDetailsDTO;
+import io.legacyfighter.cabs.ride.details.TransitDetailsFacade;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

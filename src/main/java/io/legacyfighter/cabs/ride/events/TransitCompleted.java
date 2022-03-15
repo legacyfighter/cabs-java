@@ -1,4 +1,4 @@
-package io.legacyfighter.cabs.entity.events;
+package io.legacyfighter.cabs.ride.events;
 
 import io.legacyfighter.cabs.common.Event;
 

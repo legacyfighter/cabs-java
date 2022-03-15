@@ -3,28 +3,28 @@ package io.legacyfighter.cabs.integration;
 
 import io.legacyfighter.cabs.common.Fixtures;
 import io.legacyfighter.cabs.config.AppProperties;
+import io.legacyfighter.cabs.crm.Client;
 import io.legacyfighter.cabs.crm.claims.Claim;
 import io.legacyfighter.cabs.crm.claims.ClaimService;
-import io.legacyfighter.cabs.geolocation.address.Address;
-import io.legacyfighter.cabs.crm.Client;
 import io.legacyfighter.cabs.driverfleet.Driver;
-import io.legacyfighter.cabs.entity.Transit;
+import io.legacyfighter.cabs.geolocation.GeocodingService;
+import io.legacyfighter.cabs.geolocation.address.Address;
 import io.legacyfighter.cabs.loyalty.AwardsService;
 import io.legacyfighter.cabs.notification.ClientNotificationService;
 import io.legacyfighter.cabs.notification.DriverNotificationService;
-import io.legacyfighter.cabs.geolocation.GeocodingService;
+import io.legacyfighter.cabs.ride.Transit;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import static io.legacyfighter.cabs.crm.Client.Type.NORMAL;
+import static io.legacyfighter.cabs.crm.Client.Type.VIP;
 import static io.legacyfighter.cabs.crm.claims.Claim.CompletionMode.AUTOMATIC;
 import static io.legacyfighter.cabs.crm.claims.Claim.CompletionMode.MANUAL;
 import static io.legacyfighter.cabs.crm.claims.Status.ESCALATED;
 import static io.legacyfighter.cabs.crm.claims.Status.REFUNDED;
-import static io.legacyfighter.cabs.crm.Client.Type.NORMAL;
-import static io.legacyfighter.cabs.crm.Client.Type.VIP;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
