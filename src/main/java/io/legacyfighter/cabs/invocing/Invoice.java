@@ -1,4 +1,4 @@
-package io.legacyfighter.cabs.entity;
+package io.legacyfighter.cabs.invocing;
 
 import io.legacyfighter.cabs.common.BaseEntity;
 
@@ -6,19 +6,19 @@ import javax.persistence.Entity;
 import java.math.BigDecimal;
 
 @Entity
-public class Invoice extends BaseEntity {
-
-    public Invoice() {
-
-    }
+class Invoice extends BaseEntity {
 
     private BigDecimal amount;
 
     private String subjectName;
 
-    public Invoice(BigDecimal amount, String subjectName) {
+    Invoice(BigDecimal amount, String subjectName) {
         this.amount = amount;
         this.subjectName = subjectName;
+    }
+
+    Invoice() {
+
     }
 
     @Override
