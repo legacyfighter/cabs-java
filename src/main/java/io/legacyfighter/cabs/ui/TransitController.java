@@ -19,7 +19,7 @@ public class TransitController {
     }
 
     @PostMapping("/transits/")
-    TransitDTO createTransit(@RequestBody TransitDTO transitDTO) {
+    public TransitDTO createTransit(@RequestBody TransitDTO transitDTO) {
         Transit transit = transitService.createTransit(transitDTO);
         return transitService.loadTransit(transit.getId());
     }

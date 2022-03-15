@@ -2,14 +2,8 @@ package io.legacyfighter.cabs.integration;
 
 import io.legacyfighter.cabs.common.Fixtures;
 import io.legacyfighter.cabs.config.AppProperties;
-import io.legacyfighter.cabs.entity.Claim;
-import io.legacyfighter.cabs.entity.Client;
-import io.legacyfighter.cabs.entity.Driver;
-import io.legacyfighter.cabs.entity.Transit;
-import io.legacyfighter.cabs.service.AwardsService;
-import io.legacyfighter.cabs.service.ClaimService;
-import io.legacyfighter.cabs.service.ClientNotificationService;
-import io.legacyfighter.cabs.service.DriverNotificationService;
+import io.legacyfighter.cabs.entity.*;
+import io.legacyfighter.cabs.service.*;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,16 +41,21 @@ class ClaimAutomaticResolvingIntegrationTest {
     @Autowired
     Fixtures fixtures;
 
+    @MockBean
+    GeocodingService geocodingService;
+
     @Test
     void secondClaimForTheSameTransitWillBeEscalated() {
         //given
         lowCostThresholdIs(40);
         //and
-        Driver driver = fixtures.aDriver();
+        Address pickup = fixtures.anAddress();
+        //and
+        Driver driver = fixtures.aNearbyDriver(geocodingService, pickup);
         //and
         Client client = fixtures.aClient(VIP);
         //and
-        Transit transit = aTransit(client, driver, 39);
+        Transit transit = aTransit(pickup, client, driver, 39);
         //and
         Claim claim = fixtures.createClaim(client, transit);
         //and
@@ -81,9 +80,11 @@ class ClaimAutomaticResolvingIntegrationTest {
         //and
         Client client = fixtures.aClientWithClaims(VIP, 3);
         //and
-        Driver driver = fixtures.aDriver();
+        Address pickup = fixtures.anAddress();
         //and
-        Transit transit = aTransit(client, driver, 39);
+        Driver driver = fixtures.aNearbyDriver(geocodingService, pickup);
+        //and
+        Transit transit = aTransit(pickup, client, driver, 39);
         //and
         Claim claim = fixtures.createClaim(client, transit);
 
@@ -105,9 +106,11 @@ class ClaimAutomaticResolvingIntegrationTest {
         //and
         Client client = fixtures.aClientWithClaims(VIP, 3);
         //and
-        Driver driver = fixtures.aDriver();
+        Address pickup = fixtures.anAddress();
         //and
-        Transit transit = aTransit(client, driver, 50);
+        Driver driver = fixtures.aNearbyDriver(geocodingService, pickup);
+        //and
+        Transit transit = aTransit(pickup, client, driver, 50);
         //and
         Claim claim = fixtures.createClaim(client, transit);
 
@@ -131,13 +134,20 @@ class ClaimAutomaticResolvingIntegrationTest {
         //and
         Client client = aClient(NORMAL);
         //and
-        Driver driver = fixtures.aDriver();
+        Address pickup = fixtures.anAddress();
+        //and
+        Driver driver = fixtures.aNearbyDriver(geocodingService, pickup);
 
         //when
-        Claim claim1 = claimService.tryToResolveAutomatically(fixtures.createClaim(client, aTransit(client, driver, 50)).getId());
-        Claim claim2 = claimService.tryToResolveAutomatically(fixtures.createClaim(client, aTransit(client, driver, 50)).getId());
-        Claim claim3 = claimService.tryToResolveAutomatically(fixtures.createClaim(client, aTransit(client, driver, 50)).getId());
-        Claim claim4 = claimService.tryToResolveAutomatically(fixtures.createClaim(client, aTransit(client, driver, 50)).getId());
+        Claim claim1 = claimService.tryToResolveAutomatically(fixtures.createClaim(client, aTransit(pickup, client, driver, 50)).getId());
+        Claim claim2 = claimService.tryToResolveAutomatically(fixtures.createClaim(client, aTransit(pickup, client, driver, 50)).getId());
+        Claim claim3 = claimService.tryToResolveAutomatically(fixtures.createClaim(client, aTransit(pickup, client, driver, 50)).getId());
+        //and
+        Transit transit = aTransit(pickup, client, driver, 50);
+        //and
+        Mockito.clearInvocations(awardsService);
+        //and
+        Claim claim4 = claimService.tryToResolveAutomatically(fixtures.createClaim(client, transit).getId());
 
         //then
         assertEquals(REFUNDED, claim1.getStatus());
@@ -164,11 +174,17 @@ class ClaimAutomaticResolvingIntegrationTest {
         //and
         Client client = fixtures.aClientWithClaims(NORMAL, 3);
         //and
-        fixtures.clientHasDoneTransits(client, 12);
+        fixtures.clientHasDoneTransits(client, 12, geocodingService);
         //and
-        Transit transit = aTransit(client, fixtures.aDriver(), 39);
+        Address pickup = fixtures.anAddress();
+        //and
+        Driver driver = fixtures.aNearbyDriver(geocodingService, pickup);
+        //and
+        Transit transit = aTransit(pickup, client, driver, 39);
         //and
         Claim claim = fixtures.createClaim(client, transit);
+        //and
+        Mockito.clearInvocations(awardsService);
 
         //when
         claim = claimService.tryToResolveAutomatically(claim.getId());
@@ -189,10 +205,15 @@ class ClaimAutomaticResolvingIntegrationTest {
         //and
         Client client = fixtures.aClientWithClaims(NORMAL, 3);
         //and
-        fixtures.clientHasDoneTransits(client, 12);
+        fixtures.clientHasDoneTransits(client, 12, geocodingService);
         //and
-        Claim claim = fixtures.createClaim(client, aTransit(client, fixtures.aDriver(), 50));
-
+        Address pickup = fixtures.anAddress();
+        //and
+        Driver driver = fixtures.aNearbyDriver(geocodingService, pickup);
+        //and
+        Claim claim = fixtures.createClaim(client, aTransit(pickup, client, driver, 50));
+        //and
+        Mockito.clearInvocations(awardsService);
         //when
         claim = claimService.tryToResolveAutomatically(claim.getId());
 
@@ -212,11 +233,17 @@ class ClaimAutomaticResolvingIntegrationTest {
         //and
         Client client = fixtures.aClientWithClaims(NORMAL, 3);
         //and
-        fixtures.clientHasDoneTransits(client, 2);
+        fixtures.clientHasDoneTransits(client, 2, geocodingService);
         //and
-        Driver driver = fixtures.aDriver();
+        Address pickup = fixtures.anAddress();
         //and
-        Claim claim = fixtures.createClaim(client, aTransit(client, driver, 50));
+        Driver driver = fixtures.aNearbyDriver(geocodingService, pickup);
+        //and
+        Transit transit = aTransit(pickup, client, driver, 50);
+        //and
+        Mockito.clearInvocations(awardsService);
+        //and
+        Claim claim = fixtures.createClaim(client, transit);
 
         //when
         claim = claimService.tryToResolveAutomatically(claim.getId());
@@ -228,8 +255,8 @@ class ClaimAutomaticResolvingIntegrationTest {
         verifyNoInteractions(awardsService);
     }
 
-    Transit aTransit(Client client, Driver driver, int price) {
-        return fixtures.aCompletedTransitAt(price, now(), client, driver);
+    Transit aTransit(Address pickup, Client client, Driver driver, int price) {
+        return fixtures.aJourney(price, client, driver, pickup, fixtures.anAddress());
     }
 
     void lowCostThresholdIs(int price) {

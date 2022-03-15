@@ -23,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -37,16 +38,10 @@ class TransitLifeCycleIntegrationTest {
     @MockBean
     GeocodingService geocodingService;
 
-    @Autowired
-    DriverSessionService driverSessionService;
-
-    @Autowired
-    DriverTrackingService driverTrackingService;
-
     @BeforeEach
     public void setup() {
         fixtures.anActiveCarCategory(VAN);
-        when(geocodingService.geocodeAddress(any(Address.class))).thenReturn(new double[]{1, 1});
+        when(geocodingService.geocodeAddress(any(Address.class))).thenReturn(new double[]{(double) 1, (double) 1});
     }
 
     @Test
@@ -444,25 +439,18 @@ class TransitLifeCycleIntegrationTest {
 
     AddressDTO farAwayAddress(AddressDTO from) {
         AddressDTO addressDTO = new AddressDTO("Dania", "Kopenhaga", "Mylve", 2);
-        when(geocodingService.geocodeAddress(any())).thenReturn(new double[]{1000, 1000});
-        when(geocodingService.geocodeAddress(Mockito.refEq(from.toAddressEntity(), "id", "hash", "version"))).thenReturn(new double[]{1, 1});
+        when(geocodingService.geocodeAddress(any(Address.class))).thenReturn(new double[]{1000, 1000});
+        when(geocodingService.geocodeAddress(Mockito.refEq(from.toAddressEntity()))).thenReturn(new double[]{1,1});
         return addressDTO;
     }
 
     Long aNearbyDriver(String plateNumber) {
-        Driver driver = fixtures.aDriver();
-        fixtures.driverHasFee(driver, DriverFee.FeeType.FLAT, 10);
-        driverSessionService.logIn(driver.getId(), plateNumber, VAN, "BRAND");
-        driverTrackingService.registerPosition(driver.getId(), 1, 1, Instant.now());
-        return driver.getId();
+        return fixtures.aNearbyDriver(plateNumber, 1, 1, VAN, Instant.now(), "BRAND").getId();
     }
 
     Long aFarAwayDriver(String plateNumber) {
-        Driver driver = fixtures.aDriver();
-        fixtures.driverHasFee(driver, DriverFee.FeeType.FLAT, 10);
-        driverSessionService.logIn(driver.getId(), plateNumber, VAN, "BRAND");
-        driverTrackingService.registerPosition(driver.getId(), 1000, 1000, Instant.now());
-        return driver.getId();
+        return fixtures.aNearbyDriver(plateNumber, 1000, 1000, VAN, Instant.now(), "BRAND").getId();
+
     }
 
     Transit requestTransitFromTo(AddressDTO pickup, AddressDTO destination) {
