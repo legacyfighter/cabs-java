@@ -37,6 +37,12 @@ public class RideService {
     private RequestTransitService requestTransitService;
 
     @Autowired
+    private ChangePickupService changePickupService;
+
+    @Autowired
+    private ChangeDestinationService changeDestinationService;
+
+    @Autowired
     private DriverRepository driverRepository;
 
     @Autowired
@@ -103,6 +109,24 @@ public class RideService {
         return loadTransit(requestForTransit.getId());
     }
 
+    @Transactional
+    public void changeTransitAddressFrom(UUID requestUUID, Address newAddress) {
+        if (driverAssignmentFacade.isDriverAssigned(requestUUID)) {
+            throw new IllegalStateException("Driver already assigned, requestUUID = " + requestUUID);
+        }
+        newAddress = addressRepository.save(newAddress);
+        TransitDetailsDTO transitDetails = transitDetailsFacade.find(requestUUID);
+        Address oldAddress = transitDetails.from.toAddressEntity();
+        Distance newDistance = changePickupService.changeTransitAddressFrom(requestUUID, newAddress, oldAddress);
+        transitDetailsFacade.pickupChangedTo(requestUUID, newAddress, newDistance);
+        driverAssignmentFacade.notifyProposedDriversAboutChangedDestination(requestUUID);
+    }
+
+    @Transactional
+    public void changeTransitAddressFrom(UUID requestUUID, AddressDTO newAddress) {
+        changeTransitAddressFrom(requestUUID, newAddress.toAddressEntity());
+    }
+
     private Client findClient(Long clientId) {
         Client client = clientRepository.getOne(clientId);
         if (client == null) {
@@ -117,79 +141,21 @@ public class RideService {
     }
 
     @Transactional
-    public void changeTransitAddressFrom(UUID requestUUID, Address newAddress) {
-        newAddress = addressRepository.save(newAddress);
-        TransitDemand transitDemand = transitDemandRepository.findByTransitRequestUUID(requestUUID);
-        if (transitDemand == null) {
-            throw new IllegalArgumentException("Transit does not exist, id = " + requestUUID);
-        }
-        if (driverAssignmentFacade.isDriverAssigned(requestUUID)) {
-            throw new IllegalStateException("Driver already assigned, requestUUID = " + requestUUID);
-        }
-        TransitDetailsDTO transitDetails = transitDetailsFacade.find(requestUUID);
-        // FIXME later: add some exceptions handling
-        double[] geoFromNew = geocodingService.geocodeAddress(newAddress);
-        double[] geoFromOld = geocodingService.geocodeAddress(transitDetails.from.toAddressEntity());
-
-        // https://www.geeksforgeeks.org/program-distance-two-points-earth/
-        // The math module contains a function
-        // named toRadians which converts from
-        // degrees to radians.
-        double lon1 = Math.toRadians(geoFromNew[1]);
-        double lon2 = Math.toRadians(geoFromOld[1]);
-        double lat1 = Math.toRadians(geoFromNew[0]);
-        double lat2 = Math.toRadians(geoFromOld[0]);
-
-        // Haversine formula
-        double dlon = lon2 - lon1;
-        double dlat = lat2 - lat1;
-        double a = Math.pow(Math.sin(dlat / 2), 2)
-                + Math.cos(lat1) * Math.cos(lat2)
-                * Math.pow(Math.sin(dlon / 2), 2);
-
-        double c = 2 * Math.asin(Math.sqrt(a));
-
-        // Radius of earth in kilometers. Use 3956 for miles
-        double r = 6371;
-
-        // calculate the result
-        double distanceInKMeters = c * r;
-
-        Distance newDistance = Distance.ofKm((float) distanceCalculator.calculateByMap(geoFromNew[0], geoFromNew[1], geoFromOld[0], geoFromOld[1]));
-        transitDemand.changePickup(distanceInKMeters);
-        transitDetailsFacade.pickupChangedTo(requestUUID, newAddress, newDistance);
-        driverAssignmentFacade.notifyProposedDriversAboutChangedDestination(requestUUID);
-    }
-
-    @Transactional
     public void changeTransitAddressTo(UUID requestUUID, AddressDTO newAddress) {
         changeTransitAddressTo(requestUUID, newAddress.toAddressEntity());
     }
 
     @Transactional
-    public void changeTransitAddressFrom(UUID requestUUID, AddressDTO newAddress) {
-        changeTransitAddressFrom(requestUUID, newAddress.toAddressEntity());
-    }
-
-    @Transactional
     public void changeTransitAddressTo(UUID requestUUID, Address newAddress) {
-        addressRepository.save(newAddress);
-        RequestForTransit requestForTransit = requestForTransitRepository.findByRequestUUID(requestUUID);
+        newAddress = addressRepository.save(newAddress);
         TransitDetailsDTO transitDetails = transitDetailsFacade.find(requestUUID);
-        if (requestForTransit == null) {
+        if (transitDetails == null) {
             throw new IllegalArgumentException("Transit does not exist, id = " + requestUUID);
         }
-
-        // FIXME later: add some exceptions handling
-        double[] geoFrom = geocodingService.geocodeAddress(transitDetails.from.toAddressEntity());
-        double[] geoTo = geocodingService.geocodeAddress(newAddress);
-        Distance newDistance = Distance.ofKm((float) distanceCalculator.calculateByMap(geoFrom[0], geoFrom[1], geoTo[0], geoTo[1]));
-        Transit transit = transitRepository.findByTransitRequestUUID(requestUUID);
-        if (transit != null) {
-            transit.changeDestination(newDistance);
-        }
+        Address oldAddress = transitDetails.from.toAddressEntity();
+        Distance distance = changeDestinationService.changeTransitAddressTo(requestUUID, newAddress, oldAddress);
         driverAssignmentFacade.notifyAssignedDriverAboutChangedDestination(requestUUID);
-        transitDetailsFacade.destinationChanged(requestUUID, newAddress);
+        transitDetailsFacade.destinationChanged(requestUUID, newAddress, distance);
     }
 
     @Transactional
