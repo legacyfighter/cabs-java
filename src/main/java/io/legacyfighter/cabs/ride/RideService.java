@@ -16,7 +16,6 @@ import io.legacyfighter.cabs.geolocation.address.AddressRepository;
 import io.legacyfighter.cabs.invocing.InvoiceGenerator;
 import io.legacyfighter.cabs.loyalty.AwardsService;
 import io.legacyfighter.cabs.money.Money;
-import io.legacyfighter.cabs.pricing.Tariff;
 import io.legacyfighter.cabs.pricing.Tariffs;
 import io.legacyfighter.cabs.ride.details.TransitDetailsDTO;
 import io.legacyfighter.cabs.ride.details.TransitDetailsFacade;
@@ -32,7 +31,11 @@ import java.util.UUID;
 
 // If this class will still be here in 2022 I will quit.
 @Service
-public class TransitService {
+public class RideService {
+
+    @Autowired
+    private RequestTransitService requestTransitService;
+
     @Autowired
     private DriverRepository driverRepository;
 
@@ -86,38 +89,31 @@ public class TransitService {
 
     @Transactional
     public TransitDTO createTransit(TransitDTO transitDTO) {
-        Address from = addressFromDto(transitDTO.getFrom());
-        Address to = addressFromDto(transitDTO.getTo());
-        return createTransit(transitDTO.getClientDTO().getId(), from, to, transitDTO.getCarClass());
+        return createTransit(transitDTO.getClientDTO().getId(), transitDTO.getFrom(), transitDTO.getTo(), transitDTO.getCarClass());
     }
 
+    @Transactional
+    public TransitDTO createTransit(Long clientId, AddressDTO fromDto, AddressDTO toDto, CarClass carClass) {
+        Client client = findClient(clientId);
+        Address from = addressFromDto(fromDto);
+        Address to = addressFromDto(toDto);
+        Instant now = Instant.now(clock);
+        RequestForTransit requestForTransit = requestTransitService.createRequestForTransit(from, to);
+        transitDetailsFacade.transitRequested(now, requestForTransit.getRequestUUID(), from, to, requestForTransit.getDistance(), client, carClass, requestForTransit.getEstimatedPrice(), requestForTransit.getTariff());
+        return loadTransit(requestForTransit.getId());
+    }
+
+    private Client findClient(Long clientId) {
+        Client client = clientRepository.getOne(clientId);
+        if (client == null) {
+            throw new IllegalArgumentException("Client does not exist, id = " + clientId);
+        }
+        return client;
+    }
 
     private Address addressFromDto(AddressDTO addressDTO) {
         Address address = addressDTO.toAddressEntity();
         return addressRepository.save(address);
-    }
-
-    @Transactional
-    public TransitDTO createTransit(Long clientId, Address from, Address to, CarClass carClass) {
-        Client client = clientRepository.getOne(clientId);
-
-        if (client == null) {
-            throw new IllegalArgumentException("Client does not exist, id = " + clientId);
-        }
-
-        // FIXME later: add some exceptions handling
-        double[] geoFrom = geocodingService.geocodeAddress(from);
-        double[] geoTo = geocodingService.geocodeAddress(to);
-        Distance distance = Distance.ofKm((float) distanceCalculator.calculateByMap(geoFrom[0], geoFrom[1], geoTo[0], geoTo[1]));
-        Instant now = Instant.now(clock);
-        Tariff tariff = chooseTariff(now);
-        RequestForTransit requestForTransit = requestForTransitRepository.save(new RequestForTransit(tariff, distance));
-        transitDetailsFacade.transitRequested(now, requestForTransit.getRequestUUID(), from, to, distance, client, carClass, requestForTransit.getEstimatedPrice(), requestForTransit.getTariff());
-        return loadTransit(requestForTransit.getId());
-    }
-
-    private Tariff chooseTariff(Instant when) {
-        return tariffs.choose(when);
     }
 
     @Transactional
@@ -273,7 +269,7 @@ public class TransitService {
             throw new IllegalStateException("Driver not assigned, requestUUID = " + requestUUID);
         }
         Instant now = Instant.now(clock);
-        Transit transit = new Transit(chooseTariff(now), requestUUID);
+        Transit transit = new Transit(tariffs.choose(now), requestUUID);
         transitRepository.save(transit);
         transitDetailsFacade.transitStarted(requestUUID, transit.getId(), now);
     }

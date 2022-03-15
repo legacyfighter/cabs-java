@@ -5,7 +5,7 @@ import io.legacyfighter.cabs.common.Fixtures;
 import io.legacyfighter.cabs.geolocation.address.AddressDTO;
 import io.legacyfighter.cabs.ride.TransitDTO;
 import io.legacyfighter.cabs.geolocation.GeocodingService;
-import io.legacyfighter.cabs.ride.TransitService;
+import io.legacyfighter.cabs.ride.RideService;
 import io.legacyfighter.cabs.ride.details.Status;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ class TransitLifeCycleIntegrationTest {
     Fixtures fixtures;
 
     @Autowired
-    TransitService transitService;
+    RideService rideService;
 
     @MockBean
     GeocodingService geocodingService;
@@ -54,7 +54,7 @@ class TransitLifeCycleIntegrationTest {
                 destination);
 
         //then
-        TransitDTO loaded = transitService.loadTransit(transit.getRequestId());
+        TransitDTO loaded = rideService.loadTransit(transit.getRequestId());
         assertNull(loaded.getCarClass());
         assertNull(loaded.getClaimDTO());
         assertNotNull(loaded.getEstimatedPrice());
@@ -89,10 +89,10 @@ class TransitLifeCycleIntegrationTest {
         //when
         AddressDTO newDestination = newAddress("Polska", "Warszawa", "Mazowiecka", 30);
         //and
-        transitService.changeTransitAddressTo(transit.getRequestId(), newDestination);
+        rideService.changeTransitAddressTo(transit.getRequestId(), newDestination);
 
         //then
-        TransitDTO loaded = transitService.loadTransit(transit.getRequestId());
+        TransitDTO loaded = rideService.loadTransit(transit.getRequestId());
         assertEquals(30, loaded.getTo().getBuildingNumber());
         assertEquals("Mazowiecka", loaded.getTo().getStreet());
         assertNotNull(loaded.getEstimatedPrice());
@@ -112,17 +112,17 @@ class TransitLifeCycleIntegrationTest {
                 pickup,
                 destination);
         //and
-        transitService.publishTransit(transit.getRequestId());
+        rideService.publishTransit(transit.getRequestId());
         //and
-        transitService.acceptTransit(driver, transit.getRequestId());
+        rideService.acceptTransit(driver, transit.getRequestId());
         //and
-        transitService.startTransit(driver, transit.getRequestId());
+        rideService.startTransit(driver, transit.getRequestId());
         //and
-        transitService.completeTransit(driver, transit.getRequestId(), destination);
+        rideService.completeTransit(driver, transit.getRequestId(), destination);
 
         //expect
         assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> transitService.changeTransitAddressTo(transit.getRequestId(),
+                .isThrownBy(() -> rideService.changeTransitAddressTo(transit.getRequestId(),
                         newAddress("Polska", "Warszawa", "Żytnia", 23)));
     }
 
@@ -139,16 +139,16 @@ class TransitLifeCycleIntegrationTest {
                 pickup,
                 destination);
         //and
-        transitService.publishTransit(transit.getRequestId());
+        rideService.publishTransit(transit.getRequestId());
 
         //when
         AddressDTO newPickup = newPickupAddress("Puławska", 28);
         //and
-        transitService.changeTransitAddressFrom(transit.getRequestId(),
+        rideService.changeTransitAddressFrom(transit.getRequestId(),
                 newPickup);
 
         //then
-        TransitDTO loaded = transitService.loadTransit(transit.getRequestId());
+        TransitDTO loaded = rideService.loadTransit(transit.getRequestId());
         assertEquals(28, loaded.getFrom().getBuildingNumber());
         assertEquals("Puławska", loaded.getFrom().getStreet());
     }
@@ -168,25 +168,25 @@ class TransitLifeCycleIntegrationTest {
         //and
         AddressDTO changedTo = newPickupAddress(10);
         //and
-        transitService.publishTransit(transit.getRequestId());
+        rideService.publishTransit(transit.getRequestId());
         //and
-        transitService.acceptTransit(driver, transit.getRequestId());
+        rideService.acceptTransit(driver, transit.getRequestId());
 
         //expect
         assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> transitService.changeTransitAddressFrom(transit.getRequestId(), changedTo));
+                .isThrownBy(() -> rideService.changeTransitAddressFrom(transit.getRequestId(), changedTo));
 
         //and
-        transitService.startTransit(driver, transit.getRequestId());
+        rideService.startTransit(driver, transit.getRequestId());
         //expect
         assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> transitService.changeTransitAddressFrom(transit.getRequestId(), changedTo));
+                .isThrownBy(() -> rideService.changeTransitAddressFrom(transit.getRequestId(), changedTo));
 
         //and
-        transitService.completeTransit(driver, transit.getRequestId(), destination);
+        rideService.completeTransit(driver, transit.getRequestId(), destination);
         //expect
         assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> transitService.changeTransitAddressFrom(transit.getRequestId(), changedTo));
+                .isThrownBy(() -> rideService.changeTransitAddressFrom(transit.getRequestId(), changedTo));
     }
 
     @Test
@@ -202,21 +202,21 @@ class TransitLifeCycleIntegrationTest {
                 pickup,
                 destination);
         //and
-        transitService.publishTransit(transit.getRequestId());
+        rideService.publishTransit(transit.getRequestId());
 
         //and
         AddressDTO newPickup1 = newPickupAddress(10);
-        transitService.changeTransitAddressFrom(transit.getRequestId(), newPickup1);
+        rideService.changeTransitAddressFrom(transit.getRequestId(), newPickup1);
         //and
         AddressDTO newPickup2 = newPickupAddress(11);
-        transitService.changeTransitAddressFrom(transit.getRequestId(), newPickup2);
+        rideService.changeTransitAddressFrom(transit.getRequestId(), newPickup2);
         //and
         AddressDTO newPickup3 = newPickupAddress(12);
-        transitService.changeTransitAddressFrom(transit.getRequestId(), newPickup3);
+        rideService.changeTransitAddressFrom(transit.getRequestId(), newPickup3);
 
         //expect
         assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> transitService.changeTransitAddressFrom(transit.getRequestId(),
+                .isThrownBy(() -> rideService.changeTransitAddressFrom(transit.getRequestId(),
                         newPickupAddress(13)));
     }
 
@@ -233,11 +233,11 @@ class TransitLifeCycleIntegrationTest {
                 pickup,
                 destination);
         //and
-        transitService.publishTransit(transit.getRequestId());
+        rideService.publishTransit(transit.getRequestId());
         //expect
         assertThatExceptionOfType(IllegalStateException.class)
                 .isThrownBy(() ->
-                        transitService.changeTransitAddressFrom(transit.getRequestId(), farAwayAddress()));
+                        rideService.changeTransitAddressFrom(transit.getRequestId(), farAwayAddress()));
     }
 
     @Test
@@ -253,10 +253,10 @@ class TransitLifeCycleIntegrationTest {
                 pickup,
                 destination);
         //when
-        transitService.cancelTransit(transit.getRequestId());
+        rideService.cancelTransit(transit.getRequestId());
 
         //then
-        TransitDTO loaded = transitService.loadTransit(transit.getRequestId());
+        TransitDTO loaded = rideService.loadTransit(transit.getRequestId());
         assertEquals(CANCELLED, loaded.getStatus());
     }
 
@@ -273,21 +273,21 @@ class TransitLifeCycleIntegrationTest {
                 pickup,
                 destination);
         //and
-        transitService.publishTransit(transit.getRequestId());
+        rideService.publishTransit(transit.getRequestId());
         //and
-        transitService.acceptTransit(driver, transit.getRequestId());
+        rideService.acceptTransit(driver, transit.getRequestId());
 
         //and
-        transitService.startTransit(driver, transit.getRequestId());
+        rideService.startTransit(driver, transit.getRequestId());
         //expect
         assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> transitService.cancelTransit(transit.getRequestId()));
+                .isThrownBy(() -> rideService.cancelTransit(transit.getRequestId()));
 
         //and
-        transitService.completeTransit(driver, transit.getRequestId(), destination);
+        rideService.completeTransit(driver, transit.getRequestId(), destination);
         //expect
         assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> transitService.cancelTransit(transit.getRequestId()));
+                .isThrownBy(() -> rideService.cancelTransit(transit.getRequestId()));
     }
 
     @Test
@@ -302,10 +302,10 @@ class TransitLifeCycleIntegrationTest {
         TransitDTO transit = requestTransitFromTo(pickup, destination);
 
         //when
-        transitService.publishTransit(transit.getRequestId());
+        rideService.publishTransit(transit.getRequestId());
 
         //then
-        TransitDTO loaded = transitService.loadTransit(transit.getRequestId());
+        TransitDTO loaded = rideService.loadTransit(transit.getRequestId());
         assertEquals(WAITING_FOR_DRIVER_ASSIGNMENT, loaded.getStatus());
         assertNotNull(loaded.getPublished());
     }
@@ -321,13 +321,13 @@ class TransitLifeCycleIntegrationTest {
         //and
         TransitDTO transit = requestTransitFromTo(pickup, destination);
         //and
-        transitService.publishTransit(transit.getRequestId());
+        rideService.publishTransit(transit.getRequestId());
 
         //when
-        transitService.acceptTransit(driver, transit.getRequestId());
+        rideService.acceptTransit(driver, transit.getRequestId());
 
         //then
-        TransitDTO loaded = transitService.loadTransit(transit.getRequestId());
+        TransitDTO loaded = rideService.loadTransit(transit.getRequestId());
         assertEquals(TRANSIT_TO_PASSENGER, loaded.getStatus());
         assertNotNull(loaded.getAcceptedAt());
     }
@@ -347,13 +347,13 @@ class TransitLifeCycleIntegrationTest {
         //and
         Long secondDriver = aNearbyDriver(pickup);
         //and
-        transitService.publishTransit(transit.getRequestId());
+        rideService.publishTransit(transit.getRequestId());
         //and
-        transitService.acceptTransit(driver, transit.getRequestId());
+        rideService.acceptTransit(driver, transit.getRequestId());
 
         //expect
         assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> transitService.acceptTransit(secondDriver, transit.getRequestId()));
+                .isThrownBy(() -> rideService.acceptTransit(secondDriver, transit.getRequestId()));
     }
 
     @Test
@@ -369,14 +369,14 @@ class TransitLifeCycleIntegrationTest {
                 pickup,
                 destination);
         //and
-        transitService.publishTransit(transit.getRequestId());
+        rideService.publishTransit(transit.getRequestId());
 
         //and
-        transitService.rejectTransit(driver, transit.getRequestId());
+        rideService.rejectTransit(driver, transit.getRequestId());
 
         //expect
         assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> transitService.acceptTransit(driver, transit.getRequestId()));
+                .isThrownBy(() -> rideService.acceptTransit(driver, transit.getRequestId()));
     }
 
     @Test
@@ -390,11 +390,11 @@ class TransitLifeCycleIntegrationTest {
         //and
         TransitDTO transit = requestTransitFromTo(pickup, destination);
         //and
-        transitService.publishTransit(transit.getRequestId());
+        rideService.publishTransit(transit.getRequestId());
 
         //expect
         assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> transitService.acceptTransit(farAwayDriver, transit.getRequestId()));
+                .isThrownBy(() -> rideService.acceptTransit(farAwayDriver, transit.getRequestId()));
     }
 
     @Test
@@ -408,14 +408,14 @@ class TransitLifeCycleIntegrationTest {
         //and
         TransitDTO transit = requestTransitFromTo(pickup, destination);
         //and
-        transitService.publishTransit(transit.getRequestId());
+        rideService.publishTransit(transit.getRequestId());
         //and
-        transitService.acceptTransit(driver, transit.getRequestId());
+        rideService.acceptTransit(driver, transit.getRequestId());
         //when
-        transitService.startTransit(driver, transit.getRequestId());
+        rideService.startTransit(driver, transit.getRequestId());
 
         //then
-        TransitDTO loaded = transitService.loadTransit(transit.getRequestId());
+        TransitDTO loaded = rideService.loadTransit(transit.getRequestId());
         assertEquals(Status.IN_TRANSIT, loaded.getStatus());
         assertNotNull(loaded.getStarted());
     }
@@ -431,11 +431,11 @@ class TransitLifeCycleIntegrationTest {
         //and
         TransitDTO transit = requestTransitFromTo(pickup, destination);
         //and
-        transitService.publishTransit(transit.getRequestId());
+        rideService.publishTransit(transit.getRequestId());
 
         //expect
         assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> transitService.startTransit(driver, transit.getRequestId()));
+                .isThrownBy(() -> rideService.startTransit(driver, transit.getRequestId()));
     }
 
     @Test
@@ -451,17 +451,17 @@ class TransitLifeCycleIntegrationTest {
                 pickup,
                 destination);
         //and
-        transitService.publishTransit(transit.getRequestId());
+        rideService.publishTransit(transit.getRequestId());
         //and
-        transitService.acceptTransit(driver, transit.getRequestId());
+        rideService.acceptTransit(driver, transit.getRequestId());
         //and
-        transitService.startTransit(driver, transit.getRequestId());
+        rideService.startTransit(driver, transit.getRequestId());
 
         //when
-        transitService.completeTransit(driver, transit.getRequestId(), destination);
+        rideService.completeTransit(driver, transit.getRequestId(), destination);
 
         //then
-        TransitDTO loaded = transitService.loadTransit(transit.getRequestId());
+        TransitDTO loaded = rideService.loadTransit(transit.getRequestId());
         assertEquals(COMPLETED, loaded.getStatus());
         assertNotNull(loaded.getTariff());
         assertNotNull(loaded.getPrice());
@@ -482,13 +482,13 @@ class TransitLifeCycleIntegrationTest {
                 pickup,
                 addressTo);
         //and
-        transitService.publishTransit(transit.getRequestId());
+        rideService.publishTransit(transit.getRequestId());
         //and
-        transitService.acceptTransit(driver, transit.getRequestId());
+        rideService.acceptTransit(driver, transit.getRequestId());
 
         //expect
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> transitService.completeTransit(driver, transit.getRequestId(), addressTo));
+                .isThrownBy(() -> rideService.completeTransit(driver, transit.getRequestId(), addressTo));
     }
 
     @Test
@@ -504,13 +504,13 @@ class TransitLifeCycleIntegrationTest {
                 pickup,
                 destination);
         //and
-        transitService.publishTransit(transit.getRequestId());
+        rideService.publishTransit(transit.getRequestId());
 
         //when
-        transitService.rejectTransit(driver, transit.getRequestId());
+        rideService.rejectTransit(driver, transit.getRequestId());
 
         //then
-        TransitDTO loaded = transitService.loadTransit(transit.getRequestId());
+        TransitDTO loaded = rideService.loadTransit(transit.getRequestId());
         assertEquals(WAITING_FOR_DRIVER_ASSIGNMENT, loaded.getStatus());
         assertNull(loaded.getAcceptedAt());
     }
@@ -538,7 +538,7 @@ class TransitLifeCycleIntegrationTest {
 
     TransitDTO requestTransitFromTo(AddressDTO pickupDto, AddressDTO destination) {
         when(geocodingService.geocodeAddress(argThat(new AddressMatcher(destination)))).thenReturn(new double[]{1,1});
-        return transitService.createTransit(fixtures.aTransitDTO(
+        return rideService.createTransit(fixtures.aTransitDTO(
                 pickupDto,
                 destination));
     }

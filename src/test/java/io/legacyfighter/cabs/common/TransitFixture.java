@@ -13,7 +13,7 @@ import io.legacyfighter.cabs.ride.Transit;
 import io.legacyfighter.cabs.money.Money;
 import io.legacyfighter.cabs.pricing.Tariff;
 import io.legacyfighter.cabs.ride.TransitRepository;
-import io.legacyfighter.cabs.ride.TransitService;
+import io.legacyfighter.cabs.ride.RideService;
 import io.legacyfighter.cabs.ride.details.TransitDetailsFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -27,7 +27,7 @@ import java.util.UUID;
 class TransitFixture {
 
     @Autowired
-    TransitService transitService;
+    RideService rideService;
 
     @Autowired
     TransitRepository transitRepository;
