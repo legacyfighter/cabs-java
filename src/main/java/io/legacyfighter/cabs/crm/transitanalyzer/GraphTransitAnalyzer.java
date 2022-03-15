@@ -1,7 +1,7 @@
 package io.legacyfighter.cabs.crm.transitanalyzer;
 
 
-import io.legacyfighter.cabs.entity.events.TransitCompleted;
+import io.legacyfighter.cabs.ride.events.TransitCompleted;
 import org.neo4j.graphdb.*;
 import org.springframework.transaction.event.TransactionalEventListener;
 

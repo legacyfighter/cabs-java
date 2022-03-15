@@ -1,11 +1,10 @@
-package io.legacyfighter.cabs.ui;
+package io.legacyfighter.cabs.ride;
 
 import io.legacyfighter.cabs.crm.ClientDTO;
-import io.legacyfighter.cabs.dto.TransitDTO;
-import io.legacyfighter.cabs.entity.Tariff;
 import io.legacyfighter.cabs.geolocation.Distance;
 import io.legacyfighter.cabs.geolocation.address.AddressDTO;
-import io.legacyfighter.cabs.transitdetails.TransitDetailsDTO;
+import io.legacyfighter.cabs.pricing.Tariff;
+import io.legacyfighter.cabs.ride.details.TransitDetailsDTO;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;

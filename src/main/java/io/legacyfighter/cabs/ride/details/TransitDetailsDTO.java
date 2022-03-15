@@ -1,18 +1,20 @@
-package io.legacyfighter.cabs.transitdetails;
+package io.legacyfighter.cabs.ride.details;
 
 import io.legacyfighter.cabs.carfleet.CarClass;
+import io.legacyfighter.cabs.crm.ClientDTO;
 import io.legacyfighter.cabs.geolocation.Distance;
 import io.legacyfighter.cabs.geolocation.address.AddressDTO;
-import io.legacyfighter.cabs.crm.ClientDTO;
-import io.legacyfighter.cabs.entity.Tariff;
-import io.legacyfighter.cabs.entity.Transit;
 import io.legacyfighter.cabs.money.Money;
+import io.legacyfighter.cabs.pricing.Tariff;
 
 import java.time.Instant;
+import java.util.UUID;
 
 public class TransitDetailsDTO {
 
     public Long transitId;
+
+    public UUID requestUUID;
 
     public Instant dateTime;
 
@@ -38,7 +40,7 @@ public class TransitDetailsDTO {
 
     public Money estimatedPrice;
 
-    public Transit.Status status;
+    public Status status;
 
     public Instant publishedAt;
 
@@ -50,8 +52,10 @@ public class TransitDetailsDTO {
 
     public String tariffName;
 
+
     public TransitDetailsDTO(TransitDetails td) {
         transitId = td.getTransitId();
+        requestUUID = td.getRequestUUID();
         dateTime = td.getDateTime();
         completedAt = td.getCompleteAt();
         client = new ClientDTO(td.getClient());
@@ -87,4 +91,5 @@ public class TransitDetailsDTO {
         this.baseFee = tariff.getBaseFee();
         this.tariffName = tariff.getName();
     }
+
 }

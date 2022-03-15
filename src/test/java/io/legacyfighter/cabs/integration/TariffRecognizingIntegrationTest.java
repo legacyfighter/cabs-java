@@ -3,9 +3,9 @@ package io.legacyfighter.cabs.integration;
 import io.legacyfighter.cabs.common.Fixtures;
 import io.legacyfighter.cabs.geolocation.address.AddressDTO;
 import io.legacyfighter.cabs.crm.ClientDTO;
-import io.legacyfighter.cabs.dto.TransitDTO;
+import io.legacyfighter.cabs.ride.TransitDTO;
 import io.legacyfighter.cabs.crm.Client;
-import io.legacyfighter.cabs.ui.TransitController;
+import io.legacyfighter.cabs.ride.TransitController;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,7 @@ class TariffRecognizingIntegrationTest {
         TransitDTO transitDTO = createTransit(of(2021, 12, 31, 8, 30).toInstant(ZoneOffset.UTC));
 
         //when
-        transitDTO = transitController.getTransit(transitDTO.getId());
+        transitDTO = transitController.getTransit(transitDTO.getRequestId());
 
         //then
         assertEquals("Sylwester", transitDTO.getTariff());
@@ -51,7 +51,7 @@ class TariffRecognizingIntegrationTest {
         TransitDTO transitDTO = createTransit(of(2021, 4, 17, 8, 30).toInstant(ZoneOffset.UTC));
 
         //when
-        transitDTO = transitController.getTransit(transitDTO.getId());
+        transitDTO = transitController.getTransit(transitDTO.getRequestId());
 
         //then
         assertEquals("Weekend", transitDTO.getTariff());
@@ -64,7 +64,7 @@ class TariffRecognizingIntegrationTest {
         TransitDTO transitDTO = createTransit(of(2021, 4, 17, 22, 30).toInstant(ZoneOffset.UTC));
 
         //when
-        transitDTO = transitController.getTransit(transitDTO.getId());
+        transitDTO = transitController.getTransit(transitDTO.getRequestId());
 
         //then
         assertEquals("Weekend+", transitDTO.getTariff());
@@ -77,7 +77,7 @@ class TariffRecognizingIntegrationTest {
         TransitDTO transitDTO = createTransit(of(2021, 4, 13, 22, 30).toInstant(ZoneOffset.UTC));
 
         //when
-        transitDTO = transitController.getTransit(transitDTO.getId());
+        transitDTO = transitController.getTransit(transitDTO.getRequestId());
 
         //then
         assertEquals("Standard", transitDTO.getTariff());

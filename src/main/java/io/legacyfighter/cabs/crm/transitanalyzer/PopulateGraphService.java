@@ -1,8 +1,8 @@
 package io.legacyfighter.cabs.crm.transitanalyzer;
 
 
-import io.legacyfighter.cabs.transitdetails.TransitDetailsDTO;
-import io.legacyfighter.cabs.transitdetails.TransitDetailsFacade;
+import io.legacyfighter.cabs.ride.details.TransitDetailsDTO;
+import io.legacyfighter.cabs.ride.details.TransitDetailsFacade;
 import org.springframework.transaction.annotation.Transactional;
 
 public class PopulateGraphService {
