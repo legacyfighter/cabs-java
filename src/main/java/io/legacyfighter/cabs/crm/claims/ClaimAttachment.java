@@ -1,12 +1,15 @@
-package io.legacyfighter.cabs.entity;
+package io.legacyfighter.cabs.crm.claims;
 
 import io.legacyfighter.cabs.common.BaseEntity;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import java.time.Instant;
 
 @Entity
-public class ClaimAttachment extends BaseEntity {
+class ClaimAttachment extends BaseEntity {
 
     public ClaimAttachment() {
 
@@ -24,8 +27,8 @@ public class ClaimAttachment extends BaseEntity {
     @Column(name = "data", columnDefinition="BLOB")
     private byte[] data;
 
-    Client getClient() {
-        return claim.getOwner();
+    Long getClientId() {
+        return claim.getOwnerId();
     }
 
     Claim getClaim() {

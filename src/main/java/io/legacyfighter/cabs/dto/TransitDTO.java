@@ -1,5 +1,6 @@
 package io.legacyfighter.cabs.dto;
 
+import io.legacyfighter.cabs.crm.claims.ClaimDTO;
 import io.legacyfighter.cabs.distance.Distance;
 import io.legacyfighter.cabs.entity.CarType;
 import io.legacyfighter.cabs.entity.Driver;

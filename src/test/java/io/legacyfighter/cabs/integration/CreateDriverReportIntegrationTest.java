@@ -1,6 +1,7 @@
 package io.legacyfighter.cabs.integration;
 
 import io.legacyfighter.cabs.common.Fixtures;
+import io.legacyfighter.cabs.crm.claims.ClaimService;
 import io.legacyfighter.cabs.driverreport.DriverReportController;
 import io.legacyfighter.cabs.dto.CarTypeDTO;
 import io.legacyfighter.cabs.dto.DriverAttributeDTO;

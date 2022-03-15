@@ -5,7 +5,6 @@ import io.legacyfighter.cabs.common.TestWithGraphDB;
 import io.legacyfighter.cabs.entity.Address;
 import io.legacyfighter.cabs.entity.Client;
 import io.legacyfighter.cabs.entity.Driver;
-import io.legacyfighter.cabs.repository.TransitRepository;
 import io.legacyfighter.cabs.service.GeocodingService;
 import io.legacyfighter.cabs.transitanalyzer.GraphTransitAnalyzer;
 import io.legacyfighter.cabs.transitanalyzer.PopulateGraphService;

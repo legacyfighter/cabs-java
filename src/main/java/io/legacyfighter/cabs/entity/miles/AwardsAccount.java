@@ -1,11 +1,13 @@
 package io.legacyfighter.cabs.entity.miles;
 
 import io.legacyfighter.cabs.common.BaseEntity;
-import io.legacyfighter.cabs.entity.Client;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.OneToMany;
 import java.time.Instant;
 import java.util.*;
 
@@ -15,8 +17,7 @@ import static io.legacyfighter.cabs.entity.miles.ConstantUntil.constantUntilFore
 @Entity
 public class AwardsAccount extends BaseEntity {
 
-    @OneToOne
-    private Client client;
+    private Long clientId;
 
     @Column(nullable = false)
     private Instant date = Instant.now();
@@ -34,25 +35,25 @@ public class AwardsAccount extends BaseEntity {
     public AwardsAccount() {
     }
 
-    public AwardsAccount(Client client, boolean isActive, Instant date) {
-        this.client = client;
+    public AwardsAccount(Long clientId, boolean isActive, Instant date) {
+        this.clientId = clientId;
         this.isActive = isActive;
         this.date = date;
     }
 
-    public static AwardsAccount notActiveAccount(Client client, Instant date) {
-        return new AwardsAccount(client, false, date);
+    public static AwardsAccount notActiveAccount(Long clientId, Instant date) {
+        return new AwardsAccount(clientId, false, date);
     }
 
     public AwardedMiles addExpiringMiles(Integer amount, Instant expireAt, Long transitId, Instant when) {
-        AwardedMiles expiringMiles = new AwardedMiles(this, transitId, client, when, constantUntil(amount, expireAt));
+        AwardedMiles expiringMiles = new AwardedMiles(this, transitId, clientId, when, constantUntil(amount, expireAt));
         this.miles.add(expiringMiles);
         transactions++;
         return expiringMiles;
     }
 
     public AwardedMiles addNonExpiringMiles(Integer amount, Instant when) {
-        AwardedMiles nonExpiringMiles = new AwardedMiles(this, null, client, when, constantUntilForever(amount));
+        AwardedMiles nonExpiringMiles = new AwardedMiles(this, null, clientId, when, constantUntilForever(amount));
         this.miles.add(nonExpiringMiles);
         transactions++;
         return nonExpiringMiles;
@@ -88,7 +89,7 @@ public class AwardsAccount extends BaseEntity {
                 }
             }
         } else {
-            throw new IllegalArgumentException("Insufficient miles, id = " + client.getId() + ", miles requested = " + miles);
+            throw new IllegalArgumentException("Insufficient miles, id = " + clientId + ", miles requested = " + miles);
         }
     }
 
@@ -135,10 +136,6 @@ public class AwardsAccount extends BaseEntity {
                 this.getId().equals(other.getId());
     }
 
-    public Client getClient() {
-        return client;
-    }
-
     public Boolean isActive() {
         return isActive;
     }
@@ -153,5 +150,9 @@ public class AwardsAccount extends BaseEntity {
 
     public List<AwardedMiles> getMiles() {
         return Collections.unmodifiableList(new ArrayList<>(miles));
+    }
+
+    public Long getClientId() {
+        return clientId;
     }
 }

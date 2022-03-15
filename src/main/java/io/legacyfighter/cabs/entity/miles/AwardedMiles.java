@@ -1,7 +1,6 @@
 package io.legacyfighter.cabs.entity.miles;
 
 import io.legacyfighter.cabs.common.BaseEntity;
-import io.legacyfighter.cabs.entity.Client;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,8 +10,7 @@ import java.time.Instant;
 @Entity
 public class AwardedMiles extends BaseEntity {
 
-    @ManyToOne
-    private Client client;
+    private Long clientId;
 
     @Column(nullable = false)
     private Instant date = Instant.now();
@@ -27,20 +25,20 @@ public class AwardedMiles extends BaseEntity {
     public AwardedMiles() {
     }
 
-    public AwardedMiles(AwardsAccount awardsAccount, Long transitId, Client client, Instant when, Miles constantUntil) {
+    public AwardedMiles(AwardsAccount awardsAccount, Long transitId, Long clientId, Instant when, Miles constantUntil) {
         this.account = awardsAccount;
         this.transitId = transitId;
-        this.client = client;
+        this.clientId = clientId;
         this.date = when;
         setMiles(constantUntil);
     }
 
-    public Client getClient() {
-        return client;
+    public Long getClientId() {
+        return clientId;
     }
 
     void transferTo(AwardsAccount account) {
-        this.client = account.getClient();
+        this.clientId = account.getClientId();
         this.account = account;
 
     }

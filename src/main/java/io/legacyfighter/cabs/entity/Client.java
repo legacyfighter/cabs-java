@@ -2,9 +2,9 @@ package io.legacyfighter.cabs.entity;
 
 import io.legacyfighter.cabs.common.BaseEntity;
 
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 
 @Entity
 public class Client extends BaseEntity {
@@ -32,17 +32,6 @@ public class Client extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private ClientType clientType;
-
-    public List<Claim> getClaims() {
-        return claims;
-    }
-
-    public void setClaims(List<Claim> claims) {
-        this.claims = claims;
-    }
-
-    @OneToMany(mappedBy = "owner")
-    private List<Claim> claims = new ArrayList<>();
 
     public Client() {
 
