@@ -1,5 +1,6 @@
 package io.legacyfighter.cabs.config;
 
+import io.legacyfighter.cabs.transitdetails.TransitDetailsFacade;
 import io.legacyfighter.cabs.repository.TransitRepository;
 import io.legacyfighter.cabs.transitanalyzer.GraphTransitAnalyzer;
 import io.legacyfighter.cabs.transitanalyzer.PopulateGraphService;
@@ -26,8 +27,8 @@ class Neo4jConfig {
     }
 
     @Bean
-    PopulateGraphService populateGraphService(TransitRepository transitRepository, GraphTransitAnalyzer graphTransitAnalyzer) {
-        return new PopulateGraphService(transitRepository, graphTransitAnalyzer);
+    PopulateGraphService populateGraphService(TransitRepository transitRepository, GraphTransitAnalyzer graphTransitAnalyzer, TransitDetailsFacade transitDetailsFacade) {
+        return new PopulateGraphService(transitRepository, graphTransitAnalyzer, transitDetailsFacade);
     }
 }
 

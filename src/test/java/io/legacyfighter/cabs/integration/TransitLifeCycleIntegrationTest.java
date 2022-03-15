@@ -10,6 +10,7 @@ import io.legacyfighter.cabs.service.GeocodingService;
 import io.legacyfighter.cabs.service.TransitService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -196,14 +197,16 @@ class TransitLifeCycleIntegrationTest {
     @Test
     void cannotChangePickupPlaceWhenItIsFarWayFromOriginal() {
         //given
+        AddressDTO from = new AddressDTO("Polska", "Warszawa", "Młynarska", 20);
+        //and
         Transit transit = requestTransitFromTo(
-                new AddressDTO("Polska", "Warszawa", "Młynarska", 20),
+                from,
                 new AddressDTO("Polska", "Warszawa", "Żytnia", 25));
 
         //expect
         assertThatExceptionOfType(IllegalStateException.class)
                 .isThrownBy(() ->
-                        transitService.changeTransitAddressFrom(transit.getId(), farAwayAddress(transit)));
+                        transitService.changeTransitAddressFrom(transit.getId(), farAwayAddress(from)));
     }
 
     @Test
@@ -439,10 +442,10 @@ class TransitLifeCycleIntegrationTest {
         assertNull(loaded.getAcceptedAt());
     }
 
-    AddressDTO farAwayAddress(Transit t) {
+    AddressDTO farAwayAddress(AddressDTO from) {
         AddressDTO addressDTO = new AddressDTO("Dania", "Kopenhaga", "Mylve", 2);
         when(geocodingService.geocodeAddress(any())).thenReturn(new double[]{1000, 1000});
-        when(geocodingService.geocodeAddress(t.getFrom())).thenReturn(new double[]{1, 1});
+        when(geocodingService.geocodeAddress(Mockito.refEq(from.toAddressEntity(), "id", "hash", "version"))).thenReturn(new double[]{1, 1});
         return addressDTO;
     }
 

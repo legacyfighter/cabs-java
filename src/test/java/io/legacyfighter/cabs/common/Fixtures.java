@@ -9,6 +9,7 @@ import io.legacyfighter.cabs.money.Money;
 import io.legacyfighter.cabs.repository.*;
 
 import io.legacyfighter.cabs.service.*;
+import io.legacyfighter.cabs.transitdetails.TransitDetailsFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -63,6 +64,9 @@ public class Fixtures {
     @Autowired
     DriverTrackingService driverTrackingService;
 
+    @Autowired
+    TransitDetailsFacade transitDetailsFacade;
+
     public Client aClient() {
         return clientRepository.save(new Client());
     }
@@ -74,11 +78,14 @@ public class Fixtures {
     }
 
     public Transit aTransit(Driver driver, Integer price, LocalDateTime when, Client client) {
-        Transit transit = new Transit(null, null, client, null, when.toInstant(ZoneOffset.UTC), Distance.ZERO);
+        Instant dateTime = when.toInstant(ZoneOffset.UTC);
+        Transit transit = new Transit(dateTime, Distance.ZERO);
         transit.setPrice(new Money(price));
         transit.proposeTo(driver);
         transit.acceptBy(driver, Instant.now());
-        return transitRepository.save(transit);
+        transit = transitRepository.save(transit);
+        transitDetailsFacade.transitRequested(dateTime, transit.getId(), null, null, Distance.ZERO, client, null, new Money(price), transit.getTariff());
+        return transit;
     }
 
     public Transit aTransit(Money price) {
@@ -129,20 +136,19 @@ public class Fixtures {
     public Transit aRequestedAndCompletedTransit(int price, Instant publishedAt, Instant completedAt, Client client, Driver driver, Address from, Address destination) {
         from = addressRepository.save(from);
         destination = addressRepository.save(destination);
-        Transit transit = new Transit(
-                from,
-                destination,
-                client,
-                null,
-                publishedAt,
-                Distance.ZERO);
+        Transit transit = new Transit(publishedAt, Distance.ZERO);
         transit.publishAt(publishedAt);
         transit.proposeTo(driver);
         transit.acceptBy(driver, publishedAt);
         transit.start(publishedAt);
         transit.completeAt(completedAt, destination, Distance.ofKm(1));
         transit.setPrice(new Money(price));
-        return transitRepository.save(transit);
+        transit = transitRepository.save(transit);
+        transitDetailsFacade.transitRequested(publishedAt, transit.getId(), from, destination, Distance.ZERO, client, null, new Money(price), transit.getTariff());
+        transitDetailsFacade.transitAccepted(transit.getId(), publishedAt, driver.getId());
+        transitDetailsFacade.transitStarted(transit.getId(), publishedAt);
+        transitDetailsFacade.transitCompleted(transit.getId(), publishedAt, new Money(price), new Money(0));
+        return transit;
     }
 
     public Transit aCompletedTransitAt(int price, Instant publishedAt, Instant completedAt, Client client, Driver driver) {
@@ -246,6 +252,7 @@ public class Fixtures {
         awardsAccount(client);
         awardsService.activateAccount(client.getId());
     }
+
     public void driverHasAttribute(Driver driver, DriverAttribute.DriverAttributeName name, String value) {
         driverAttributeRepository.save(new DriverAttribute(driver, name, value));
     }

@@ -1,15 +1,16 @@
 package io.legacyfighter.cabs.ui;
 
 import io.legacyfighter.cabs.distance.Distance;
+import io.legacyfighter.cabs.dto.AddressDTO;
+import io.legacyfighter.cabs.dto.ClientDTO;
 import io.legacyfighter.cabs.dto.TransitDTO;
-import io.legacyfighter.cabs.entity.Address;
-import io.legacyfighter.cabs.entity.Client;
 import io.legacyfighter.cabs.entity.Transit;
 import io.legacyfighter.cabs.money.Money;
+import io.legacyfighter.cabs.transitdetails.TransitDetailsDTO;
 import org.junit.jupiter.api.Test;
 
-import java.time.Instant;
 
+import static java.time.Instant.now;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -46,9 +47,11 @@ public class CalculateTransitDistanceTest {
     }
 
     TransitDTO transitForDistance(float km) {
-        Transit t = new Transit(new Address(), new Address(), new Client(), null, Instant.now(), Distance.ofKm(km));
-        t.setPrice(new Money(10));
-        return new TransitDTO(t);
+        Distance distance = Distance.ofKm(km);
+        Transit transit = new Transit(now(), distance);
+        transit.setPrice(new Money(10));
+        TransitDetailsDTO transitDetails = new TransitDetailsDTO(1L, now(), now(), new ClientDTO(), null, new AddressDTO(), new AddressDTO(), now(), now(), distance, transit.getTariff());
+        return new TransitDTO(transit, transitDetails);
     }
 
 }

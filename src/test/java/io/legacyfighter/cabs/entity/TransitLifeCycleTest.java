@@ -1,6 +1,7 @@
 package io.legacyfighter.cabs.entity;
 
 import io.legacyfighter.cabs.distance.Distance;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 
@@ -15,40 +16,25 @@ class TransitLifeCycleTest {
     @Test
     void canCreateTransit() {
         //when
-        Transit transit = requestTransitFromTo(
-                new Address("Polska", "Warszawa", "Młynarska", 20),
-                new Address("Polska", "Warszawa", "Żytnia", 25));
+        Transit transit = requestTransit();
 
         //then
-        assertNull(transit.getCarType());
         assertNull(transit.getPrice());
-        assertEquals("Polska", transit.getFrom().getCountry());
-        assertEquals("Warszawa", transit.getFrom().getCity());
-        assertEquals("Młynarska", transit.getFrom().getStreet());
-        assertEquals(20, transit.getFrom().getBuildingNumber());
-        assertEquals("Polska", transit.getTo().getCountry());
-        assertEquals("Warszawa", transit.getTo().getCity());
-        assertEquals("Żytnia", transit.getTo().getStreet());
-        assertEquals(25, transit.getTo().getBuildingNumber());
         assertEquals(DRAFT, transit.getStatus());
         assertNotNull(transit.getTariff());
         assertNotEquals(0, transit.getTariff().getKmRate());
-        assertNotNull(transit.getDateTime());
     }
 
     @Test
     void canChangeTransitDestination() {
         //given
-        Transit transit = requestTransitFromTo(
-                new Address("Polska", "Warszawa", "Młynarska", 20),
-                new Address("Polska", "Warszawa", "Żytnia", 25));
+        Transit transit = requestTransit();
+
         //when
         transit.changeDestinationTo(
                 new Address("Polska", "Warszawa", "Mazowiecka", 30), ofKm(20));
 
         //then
-        assertEquals(30, transit.getTo().getBuildingNumber());
-        assertEquals("Mazowiecka", transit.getTo().getStreet());
         assertNotNull(transit.getEstimatedPrice());
         assertNull(transit.getPrice());
     }
@@ -60,8 +46,7 @@ class TransitLifeCycleTest {
         //and
         Driver driver = new Driver();
         //and
-        Transit transit = requestTransitFromTo(new Address("Polska", "Warszawa", "Młynarska", 20),
-                destination);
+        Transit transit = requestTransit();
         //and
         transit.publishAt(now());
         //and
@@ -82,17 +67,11 @@ class TransitLifeCycleTest {
     @Test
     void canChangePickupPlace() {
         //given
-        Transit transit = requestTransitFromTo(
-                new Address("Polska", "Warszawa", "Młynarska", 20),
-                new Address("Polska", "Warszawa", "Żytnia", 25));
+        Transit transit = requestTransit();
 
-        //when
-        transit.changePickupTo(
-                new Address("Polska", "Warszawa", "Puławska", 28), ofKm(20), 0.2);
-
-        //then
-        assertEquals(28, transit.getFrom().getBuildingNumber());
-        assertEquals("Puławska", transit.getFrom().getStreet());
+        //expect
+        Assertions.assertThatNoException().isThrownBy(() -> transit.changePickupTo(
+                new Address("Polska", "Warszawa", "Puławska", 28), ofKm(20), 0.2));
     }
 
     @Test
@@ -102,9 +81,8 @@ class TransitLifeCycleTest {
         //and
         Driver driver = new Driver();
         //and
-        Transit transit = requestTransitFromTo(
-                new Address("Polska", "Warszawa", "Młynarska", 20),
-                destination);
+        Transit transit = requestTransit();
+
         //and
         Address changedTo = new Address("Polska", "Warszawa", "Żytnia", 27);
         //and
@@ -134,7 +112,7 @@ class TransitLifeCycleTest {
     @Test
     void cannotChangePickupPlaceMoreThanThreeTimes() {
         //given
-        Transit transit = requestTransitFromTo(new Address("Polska", "Warszawa", "Młynarska", 20), new Address("Polska", "Warszawa", "Żytnia", 25));
+        Transit transit = requestTransit();
         //and
         transit.changePickupTo(
                 new Address("Polska", "Warszawa", "Żytnia", 26), ofKm(20.1f), 0.1d);
@@ -155,7 +133,7 @@ class TransitLifeCycleTest {
     @Test
     void cannotChangePickupPlaceWhenItIsFarWayFromOriginal() {
         //given
-        Transit transit = requestTransitFromTo(new Address("Polska", "Warszawa", "Młynarska", 20), new Address("Polska", "Warszawa", "Żytnia", 25));
+        Transit transit = requestTransit();
 
         //expect
         assertThatExceptionOfType(IllegalStateException.class)
@@ -166,7 +144,7 @@ class TransitLifeCycleTest {
     @Test
     void canCancelTransit() {
         //given
-        Transit transit = requestTransitFromTo(new Address("Polska", "Warszawa", "Młynarska", 20), new Address("Polska", "Warszawa", "Żytnia", 25));
+        Transit transit = requestTransit();
 
         //when
         transit.cancel();
@@ -181,9 +159,7 @@ class TransitLifeCycleTest {
         Address destination =
                 new Address("Polska", "Warszawa", "Żytnia", 25);
         //and
-        Transit transit = requestTransitFromTo(
-                new Address("Polska", "Warszawa", "Młynarska", 20),
-                destination);
+        Transit transit = requestTransit();
         //and
         Driver driver = new Driver();
         //and
@@ -209,9 +185,7 @@ class TransitLifeCycleTest {
     @Test
     void canPublishTransit() {
         //given
-        Transit transit = requestTransitFromTo(
-                new Address("Polska", "Warszawa", "Młynarska", 20),
-                new Address("Polska", "Warszawa", "Żytnia", 25));
+        Transit transit = requestTransit();
 
         //when
         transit.publishAt(now());
@@ -224,9 +198,7 @@ class TransitLifeCycleTest {
     @Test
     void canAcceptTransit() {
         //given
-        Transit transit = requestTransitFromTo(
-                new Address("Polska", "Warszawa", "Młynarska", 20),
-                new Address("Polska", "Warszawa", "Żytnia", 25));
+        Transit transit = requestTransit();
         //and
         Driver driver = new Driver();
         //and
@@ -238,15 +210,12 @@ class TransitLifeCycleTest {
         transit.acceptBy(driver, now());
         //then
         assertEquals(TRANSIT_TO_PASSENGER, transit.getStatus());
-        assertNotNull(transit.getAcceptedAt());
     }
 
     @Test
     void onlyOneDriverCanAcceptTransit() {
         //given
-        Transit transit = requestTransitFromTo(
-                new Address("Polska", "Warszawa", "Młynarska", 20),
-                new Address("Polska", "Warszawa", "Żytnia", 25));
+        Transit transit = requestTransit();
         //and
         Driver driver = new Driver();
         //and
@@ -266,9 +235,7 @@ class TransitLifeCycleTest {
     @Test
     void transitCannotByAcceptedByDriverWhoAlreadyRejected() {
         //given
-        Transit transit = requestTransitFromTo(
-                new Address("Polska", "Warszawa", "Młynarska", 20),
-                new Address("Polska", "Warszawa", "Żytnia", 25));
+        Transit transit = requestTransit();
         //and
         Driver driver = new Driver();
         //and
@@ -284,9 +251,7 @@ class TransitLifeCycleTest {
     @Test
     void transitCannotByAcceptedByDriverWhoHasNotSeenProposal() {
         //given
-        Transit transit = requestTransitFromTo(
-                new Address("Polska", "Warszawa", "Młynarska", 20),
-                new Address("Polska", "Warszawa", "Żytnia", 25));
+        Transit transit = requestTransit();
         //and
         Driver driver = new Driver();
         //and
@@ -300,9 +265,7 @@ class TransitLifeCycleTest {
     @Test
     void canStartTransit() {
         //given
-        Transit transit = requestTransitFromTo(
-                new Address("Polska", "Warszawa", "Młynarska", 20),
-                new Address("Polska", "Warszawa", "Żytnia", 25));
+        Transit transit = requestTransit();
         //and
         Driver driver = new Driver();
         //and
@@ -316,15 +279,12 @@ class TransitLifeCycleTest {
 
         //then
         assertEquals(Transit.Status.IN_TRANSIT, transit.getStatus());
-        assertNotNull(transit.getStarted());
     }
 
     @Test
     void cannotStartNotAcceptedTransit() {
         //given
-        Transit transit = requestTransitFromTo(
-                new Address("Polska", "Warszawa", "Młynarska", 20),
-                new Address("Polska", "Warszawa", "Żytnia", 25));
+        Transit transit = requestTransit();
         //and
         transit.publishAt(now());
 
@@ -339,9 +299,7 @@ class TransitLifeCycleTest {
         Address destination =
                 new Address("Polska", "Warszawa", "Żytnia", 25);
         //and
-        Transit transit = requestTransitFromTo(
-                new Address("Polska", "Warszawa", "Młynarska", 20),
-                destination);
+        Transit transit = requestTransit();
         //and
         Driver driver = new Driver();
         //and
@@ -360,7 +318,6 @@ class TransitLifeCycleTest {
         assertEquals(COMPLETED, transit.getStatus());
         assertNotNull(transit.getTariff());
         assertNotNull(transit.getPrice());
-        assertNotNull(transit.getCompleteAt());
     }
 
     @Test
@@ -369,9 +326,8 @@ class TransitLifeCycleTest {
         Address addressTo =
                 new Address("Polska", "Warszawa", "Żytnia", 25);
         //and
-        Transit transit = requestTransitFromTo(
-                new Address("Polska", "Warszawa", "Młynarska", 20),
-                addressTo);
+        Transit transit = requestTransit();
+
         //and
         Driver driver = new Driver();
         //and
@@ -389,9 +345,7 @@ class TransitLifeCycleTest {
     @Test
     void canRejectTransit() {
         //given
-        Transit transit = requestTransitFromTo(
-                new Address("Polska", "Warszawa", "Młynarska", 20),
-                new Address("Polska", "Warszawa", "Żytnia", 25));
+        Transit transit = requestTransit();
         //and
         Driver driver = new Driver();
         //and
@@ -402,10 +356,9 @@ class TransitLifeCycleTest {
 
         //then
         assertEquals(WAITING_FOR_DRIVER_ASSIGNMENT, transit.getStatus());
-        assertNull(transit.getAcceptedAt());
     }
 
-    Transit requestTransitFromTo(Address pickup, Address destination) {
-        return new Transit(pickup, destination, new Client(), null, now(), Distance.ZERO);
+    Transit requestTransit() {
+        return new Transit(now(), Distance.ZERO);
     }
 }
