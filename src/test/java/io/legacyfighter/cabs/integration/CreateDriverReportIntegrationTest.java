@@ -3,6 +3,7 @@ package io.legacyfighter.cabs.integration;
 import io.legacyfighter.cabs.carfleet.CarClass;
 import io.legacyfighter.cabs.carfleet.CarTypeService;
 import io.legacyfighter.cabs.common.Fixtures;
+import io.legacyfighter.cabs.crm.Client;
 import io.legacyfighter.cabs.crm.claims.ClaimService;
 import io.legacyfighter.cabs.driverfleet.Driver;
 import io.legacyfighter.cabs.driverfleet.DriverAttributeDTO;
@@ -10,14 +11,12 @@ import io.legacyfighter.cabs.driverfleet.DriverFee;
 import io.legacyfighter.cabs.driverfleet.driverreport.DriverReport;
 import io.legacyfighter.cabs.driverfleet.driverreport.DriverReportController;
 import io.legacyfighter.cabs.dto.TransitDTO;
-import io.legacyfighter.cabs.geolocation.address.Address;
-import io.legacyfighter.cabs.crm.Client;
-import io.legacyfighter.cabs.entity.Transit;
-import io.legacyfighter.cabs.geolocation.address.AddressRepository;
-import io.legacyfighter.cabs.service.DriverSessionService;
-import io.legacyfighter.cabs.service.DriverTrackingService;
 import io.legacyfighter.cabs.geolocation.GeocodingService;
+import io.legacyfighter.cabs.geolocation.address.Address;
+import io.legacyfighter.cabs.geolocation.address.AddressRepository;
 import io.legacyfighter.cabs.service.TransitService;
+import io.legacyfighter.cabs.tracking.DriverSessionService;
+import io.legacyfighter.cabs.tracking.DriverTrackingService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -100,7 +99,7 @@ class CreateDriverReportIntegrationTest {
         //and
         driverHasDoneSessionAndPicksSomeoneUpInCar(driver, client, VAN, "WU1213", "SCODA FABIA", TODAY);
         driverHasDoneSessionAndPicksSomeoneUpInCar(driver, client, VAN, "WU1213", "SCODA OCTAVIA", YESTERDAY);
-        Transit inBmw = driverHasDoneSessionAndPicksSomeoneUpInCar(driver, client, VAN, "WU1213", "BMW M2", DAY_BEFORE_YESTERDAY);
+        TransitDTO inBmw = driverHasDoneSessionAndPicksSomeoneUpInCar(driver, client, VAN, "WU1213", "BMW M2", DAY_BEFORE_YESTERDAY);
         //and
         fixtures.createClaim(client, inBmw, "za szybko");
 
@@ -153,12 +152,12 @@ class CreateDriverReportIntegrationTest {
                 .collect(toList());
     }
 
-    Transit driverHasDoneSessionAndPicksSomeoneUpInCar(Driver driver, Client client, CarClass carClass, String plateNumber, String carBrand, Instant when) {
+    TransitDTO driverHasDoneSessionAndPicksSomeoneUpInCar(Driver driver, Client client, CarClass carClass, String plateNumber, String carBrand, Instant when) {
         when(clock.instant()).thenReturn(when);
         Long driverId = driver.getId();
         driverSessionService.logIn(driverId, plateNumber, carClass, carBrand);
         driverTrackingService.registerPosition(driverId, 10, 20, Instant.now());
-        Transit transit = transitService.createTransit(client.getId(), address("PL", "MAZ", "WAW", "STREET", 1, 10, 20), address("PL", "MAZ", "WAW", "STREET", 100, 10.01, 20.01), carClass);
+        TransitDTO transit = transitService.createTransit(client.getId(), address("PL", "MAZ", "WAW", "STREET", 1, 10, 20), address("PL", "MAZ", "WAW", "STREET", 100, 10.01, 20.01), carClass);
         transitService.publishTransit(transit.getId());
         transitService.acceptTransit(driverId, transit.getId());
         transitService.startTransit(driverId, transit.getId());

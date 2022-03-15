@@ -12,9 +12,8 @@ import java.time.Instant;
 import java.time.Month;
 import java.time.YearMonth;
 import java.time.ZoneId;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static io.legacyfighter.cabs.driverfleet.DriverLicense.withLicense;
 
@@ -148,4 +147,10 @@ public class DriverService {
     }
 
 
+    public Set<DriverDTO> loadDrivers(Collection<Long> ids) {
+        return driverRepository.findAllById(ids)
+                .stream()
+                .map(DriverDTO::new)
+                .collect(Collectors.toSet());
+    }
 }

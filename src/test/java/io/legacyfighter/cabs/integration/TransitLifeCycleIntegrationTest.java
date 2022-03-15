@@ -1,15 +1,14 @@
 package io.legacyfighter.cabs.integration;
 
+import io.legacyfighter.cabs.common.AddressMatcher;
 import io.legacyfighter.cabs.common.Fixtures;
-import io.legacyfighter.cabs.geolocation.address.AddressDTO;
 import io.legacyfighter.cabs.dto.TransitDTO;
-import io.legacyfighter.cabs.entity.*;
-import io.legacyfighter.cabs.geolocation.address.Address;
+import io.legacyfighter.cabs.entity.Transit;
 import io.legacyfighter.cabs.geolocation.GeocodingService;
+import io.legacyfighter.cabs.geolocation.address.AddressDTO;
 import io.legacyfighter.cabs.service.TransitService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -20,9 +19,7 @@ import static io.legacyfighter.cabs.carfleet.CarClass.VAN;
 import static io.legacyfighter.cabs.entity.Transit.Status.*;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -40,15 +37,21 @@ class TransitLifeCycleIntegrationTest {
     @BeforeEach
     public void setup() {
         fixtures.anActiveCarCategory(VAN);
-        when(geocodingService.geocodeAddress(any(Address.class))).thenReturn(new double[]{(double) 1, (double) 1});
     }
 
     @Test
     void canCreateTransit() {
+        //given
+        AddressDTO pickup = new AddressDTO("Polska", "Warszawa", "Młynarska", 20);
+        //and
+        AddressDTO destination = new AddressDTO("Polska", "Warszawa", "Żytnia", 25);
+        //and
+        aNearbyDriver(pickup);
+
         //when
-        Transit transit = requestTransitFromTo(
-                new AddressDTO("Polska", "Warszawa", "Młynarska", 20),
-                new AddressDTO("Polska", "Warszawa", "Żytnia", 25));
+        TransitDTO transit = requestTransitFromTo(
+                pickup,
+                destination);
 
         //then
         TransitDTO loaded = transitService.loadTransit(transit.getId());
@@ -73,13 +76,20 @@ class TransitLifeCycleIntegrationTest {
     @Test
     void canChangeTransitDestination() {
         //given
-        Transit transit = requestTransitFromTo(
-                new AddressDTO("Polska", "Warszawa", "Młynarska", 20),
-                new AddressDTO("Polska", "Warszawa", "Żytnia", 25));
+        AddressDTO pickup = new AddressDTO("Polska", "Warszawa", "Młynarska", 20);
+        //and
+        AddressDTO destination = new AddressDTO("Polska", "Warszawa", "Żytnia", 25);
+        //and
+        aNearbyDriver(pickup);
+        //and
+        TransitDTO transit = requestTransitFromTo(
+                pickup,
+                destination);
 
         //when
-        transitService.changeTransitAddressTo(transit.getId(),
-                new AddressDTO("Polska", "Warszawa", "Mazowiecka", 30));
+        AddressDTO newDestination = newAddress("Polska", "Warszawa", "Mazowiecka", 30);
+        //and
+        transitService.changeTransitAddressTo(transit.getId(), newDestination);
 
         //then
         TransitDTO loaded = transitService.loadTransit(transit.getId());
@@ -92,13 +102,15 @@ class TransitLifeCycleIntegrationTest {
     @Test
     void cannotChangeDestinationWhenTransitIsCompleted() {
         //given
+        AddressDTO pickup = new AddressDTO("Polska", "Warszawa", "Młynarska", 20);
+        //and
         AddressDTO destination = new AddressDTO("Polska", "Warszawa", "Żytnia", 25);
         //and
-        Transit transit = requestTransitFromTo(
-                new AddressDTO("Polska", "Warszawa", "Młynarska", 20),
-                destination);
+        Long driver = aNearbyDriver(pickup);
         //and
-        Long driver = aNearbyDriver("WU1212");
+        TransitDTO transit = requestTransitFromTo(
+                pickup,
+                destination);
         //and
         transitService.publishTransit(transit.getId());
         //and
@@ -111,19 +123,29 @@ class TransitLifeCycleIntegrationTest {
         //expect
         assertThatExceptionOfType(IllegalStateException.class)
                 .isThrownBy(() -> transitService.changeTransitAddressTo(transit.getId(),
-                        new AddressDTO("Polska", "Warszawa", "Żytnia", 23)));
+                        newAddress("Polska", "Warszawa", "Żytnia", 23)));
     }
 
     @Test
     void canChangePickupPlace() {
         //given
-        Transit transit = requestTransitFromTo(
-                new AddressDTO("Polska", "Warszawa", "Młynarska", 20),
-                new AddressDTO("Polska", "Warszawa", "Żytnia", 25));
+        AddressDTO pickup = new AddressDTO("Polska", "Warszawa", "Młynarska", 20);
+        //and
+        AddressDTO destination = new AddressDTO("Polska", "Warszawa", "Żytnia", 25);
+        //and
+        aNearbyDriver(pickup);
+        //and
+        TransitDTO transit = requestTransitFromTo(
+                pickup,
+                destination);
+        //and
+        transitService.publishTransit(transit.getId());
 
         //when
+        AddressDTO newPickup = newPickupAddress("Puławska", 28);
+        //and
         transitService.changeTransitAddressFrom(transit.getId(),
-                new AddressDTO("Polska", "Warszawa", "Puławska", 28));
+                newPickup);
 
         //then
         TransitDTO loaded = transitService.loadTransit(transit.getId());
@@ -134,15 +156,17 @@ class TransitLifeCycleIntegrationTest {
     @Test
     void cannotChangePickupPlaceAfterTransitIsAccepted() {
         //given
+        AddressDTO pickup = new AddressDTO("Polska", "Warszawa", "Młynarska", 20);
+        //and
         AddressDTO destination = new AddressDTO("Polska", "Warszawa", "Żytnia", 25);
         //and
-        Transit transit = requestTransitFromTo(
-                new AddressDTO("Polska", "Warszawa", "Młynarska", 20),
+        Long driver = aNearbyDriver(pickup);
+        //and
+        TransitDTO transit = requestTransitFromTo(
+                pickup,
                 destination);
         //and
-        AddressDTO changedTo = new AddressDTO("Polska", "Warszawa", "Żytnia", 27);
-        //and
-        Long driver = aNearbyDriver("WU1212");
+        AddressDTO changedTo = newPickupAddress(10);
         //and
         transitService.publishTransit(transit.getId());
         //and
@@ -168,48 +192,66 @@ class TransitLifeCycleIntegrationTest {
     @Test
     void cannotChangePickupPlaceMoreThanThreeTimes() {
         //given
-        Transit transit = requestTransitFromTo(
-                new AddressDTO("Polska", "Warszawa", "Młynarska", 20),
-                new AddressDTO("Polska", "Warszawa", "Żytnia", 25));
+        AddressDTO pickup = new AddressDTO("Polska", "Warszawa", "Młynarska", 20);
         //and
-        transitService.changeTransitAddressFrom(transit.getId(),
-                new AddressDTO("Polska", "Warszawa", "Żytnia", 26));
+        AddressDTO destination = new AddressDTO("Polska", "Warszawa", "Żytnia", 25);
         //and
-        transitService.changeTransitAddressFrom(transit.getId(),
-                new AddressDTO("Polska", "Warszawa", "Żytnia", 27));
+        aNearbyDriver(pickup);
         //and
-        transitService.changeTransitAddressFrom(transit.getId(),
-                new AddressDTO("Polska", "Warszawa", "Żytnia", 28));
+        TransitDTO transit = requestTransitFromTo(
+                pickup,
+                destination);
+        //and
+        transitService.publishTransit(transit.getId());
+
+        //and
+        AddressDTO newPickup1 = newPickupAddress(10);
+        transitService.changeTransitAddressFrom(transit.getId(), newPickup1);
+        //and
+        AddressDTO newPickup2 = newPickupAddress(11);
+        transitService.changeTransitAddressFrom(transit.getId(), newPickup2);
+        //and
+        AddressDTO newPickup3 = newPickupAddress(12);
+        transitService.changeTransitAddressFrom(transit.getId(), newPickup3);
 
         //expect
         assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() ->
-                        transitService.changeTransitAddressFrom(transit.getId(),
-                                new AddressDTO("Polska", "Warszawa", "Żytnia", 29)));
+                .isThrownBy(() -> transitService.changeTransitAddressFrom(transit.getId(),
+                        newPickupAddress(13)));
     }
 
     @Test
     void cannotChangePickupPlaceWhenItIsFarWayFromOriginal() {
         //given
-        AddressDTO from = new AddressDTO("Polska", "Warszawa", "Młynarska", 20);
+        AddressDTO pickup = new AddressDTO("Polska", "Warszawa", "Młynarska", 20);
         //and
-        Transit transit = requestTransitFromTo(
-                from,
-                new AddressDTO("Polska", "Warszawa", "Żytnia", 25));
-
+        AddressDTO destination = new AddressDTO("Polska", "Warszawa", "Żytnia", 25);
+        //and
+        aNearbyDriver(pickup);
+        //and
+        TransitDTO transit = requestTransitFromTo(
+                pickup,
+                destination);
+        //and
+        transitService.publishTransit(transit.getId());
         //expect
         assertThatExceptionOfType(IllegalStateException.class)
                 .isThrownBy(() ->
-                        transitService.changeTransitAddressFrom(transit.getId(), farAwayAddress(from)));
+                        transitService.changeTransitAddressFrom(transit.getId(), farAwayAddress()));
     }
 
     @Test
     void canCancelTransit() {
         //given
-        Transit transit = requestTransitFromTo(
-                new AddressDTO("Polska", "Warszawa", "Młynarska", 20),
-                new AddressDTO("Polska", "Warszawa", "Żytnia", 25));
-
+        AddressDTO pickup = new AddressDTO("Polska", "Warszawa", "Młynarska", 20);
+        //and
+        AddressDTO destination = new AddressDTO("Polska", "Warszawa", "Żytnia", 25);
+        //and
+        aNearbyDriver(pickup);
+        //and
+        TransitDTO transit = requestTransitFromTo(
+                pickup,
+                destination);
         //when
         transitService.cancelTransit(transit.getId());
 
@@ -221,13 +263,15 @@ class TransitLifeCycleIntegrationTest {
     @Test
     void cannotCancelTransitAfterItWasStarted() {
         //given
+        AddressDTO pickup = new AddressDTO("Polska", "Warszawa", "Młynarska", 20);
+        //and
         AddressDTO destination = new AddressDTO("Polska", "Warszawa", "Żytnia", 25);
         //and
-        Transit transit = requestTransitFromTo(
-                new AddressDTO("Polska", "Warszawa", "Młynarska", 20),
-                destination);
+        Long driver = aNearbyDriver(pickup);
         //and
-        Long driver = aNearbyDriver("WU1212");
+        TransitDTO transit = requestTransitFromTo(
+                pickup,
+                destination);
         //and
         transitService.publishTransit(transit.getId());
         //and
@@ -249,9 +293,13 @@ class TransitLifeCycleIntegrationTest {
     @Test
     void canPublishTransit() {
         //given
-        Transit transit = requestTransitFromTo(new AddressDTO("Polska", "Warszawa", "Młynarska", 20), new AddressDTO("Polska", "Warszawa", "Żytnia", 25));
+        AddressDTO pickup = new AddressDTO("Polska", "Warszawa", "Młynarska", 20);
         //and
-        aNearbyDriver("WU1212");
+        AddressDTO destination = new AddressDTO("Polska", "Warszawa", "Żytnia", 25);
+        //and
+        aNearbyDriver(pickup);
+        //and
+        TransitDTO transit = requestTransitFromTo(pickup, destination);
 
         //when
         transitService.publishTransit(transit.getId());
@@ -265,9 +313,13 @@ class TransitLifeCycleIntegrationTest {
     @Test
     void canAcceptTransit() {
         //given
-        Transit transit = requestTransitFromTo(new AddressDTO("Polska", "Warszawa", "Młynarska", 20), new AddressDTO("Polska", "Warszawa", "Żytnia", 25));
+        AddressDTO pickup = new AddressDTO("Polska", "Warszawa", "Młynarska", 20);
         //and
-        Long driver = aNearbyDriver("WU1212");
+        AddressDTO destination = new AddressDTO("Polska", "Warszawa", "Żytnia", 25);
+        //and
+        Long driver = aNearbyDriver(pickup);
+        //and
+        TransitDTO transit = requestTransitFromTo(pickup, destination);
         //and
         transitService.publishTransit(transit.getId());
 
@@ -283,13 +335,17 @@ class TransitLifeCycleIntegrationTest {
     @Test
     void onlyOneDriverCanAcceptTransit() {
         //given
-        Transit transit = requestTransitFromTo(
-                new AddressDTO("Polska", "Warszawa", "Młynarska", 20),
-                new AddressDTO("Polska", "Warszawa", "Żytnia", 25));
+        AddressDTO pickup = new AddressDTO("Polska", "Warszawa", "Młynarska", 20);
         //and
-        Long driver = aNearbyDriver("WU1212");
+        AddressDTO destination = new AddressDTO("Polska", "Warszawa", "Żytnia", 25);
         //and
-        Long secondDriver = aNearbyDriver("DW MARIO");
+        Long driver = aNearbyDriver(pickup);
+        //and
+        TransitDTO transit = requestTransitFromTo(
+                pickup,
+                destination);
+        //and
+        Long secondDriver = aNearbyDriver(pickup);
         //and
         transitService.publishTransit(transit.getId());
         //and
@@ -303,11 +359,15 @@ class TransitLifeCycleIntegrationTest {
     @Test
     void transitCannotByAcceptedByDriverWhoAlreadyRejected() {
         //given
-        Transit transit = requestTransitFromTo(
-                new AddressDTO("Polska", "Warszawa", "Młynarska", 20),
-                new AddressDTO("Polska", "Warszawa", "Żytnia", 25));
+        AddressDTO pickup = new AddressDTO("Polska", "Warszawa", "Młynarska", 20);
         //and
-        Long driver = aNearbyDriver("WU1212");
+        AddressDTO destination = new AddressDTO("Polska", "Warszawa", "Żytnia", 25);
+        //and
+        Long driver = aNearbyDriver(pickup);
+        //and
+        TransitDTO transit = requestTransitFromTo(
+                pickup,
+                destination);
         //and
         transitService.publishTransit(transit.getId());
 
@@ -322,9 +382,13 @@ class TransitLifeCycleIntegrationTest {
     @Test
     void transitCannotByAcceptedByDriverWhoHasNotSeenProposal() {
         //given
-        Transit transit = requestTransitFromTo(new AddressDTO("Polska", "Warszawa", "Młynarska", 20), new AddressDTO("Polska", "Warszawa", "Żytnia", 25));
+        AddressDTO pickup = new AddressDTO("Polska", "Warszawa", "Młynarska", 20);
         //and
-        Long farAwayDriver = aFarAwayDriver("WU1212");
+        AddressDTO destination = new AddressDTO("Polska", "Warszawa", "Żytnia", 25);
+        //and
+        Long farAwayDriver = aFarAwayDriver(pickup);
+        //and
+        TransitDTO transit = requestTransitFromTo(pickup, destination);
         //and
         transitService.publishTransit(transit.getId());
 
@@ -336,9 +400,13 @@ class TransitLifeCycleIntegrationTest {
     @Test
     void canStartTransit() {
         //given
-        Transit transit = requestTransitFromTo(new AddressDTO("Polska", "Warszawa", "Młynarska", 20), new AddressDTO("Polska", "Warszawa", "Żytnia", 25));
+        AddressDTO pickup = new AddressDTO("Polska", "Warszawa", "Młynarska", 20);
         //and
-        Long driver = aNearbyDriver("WU1212");
+        AddressDTO destination = new AddressDTO("Polska", "Warszawa", "Żytnia", 25);
+        //and
+        Long driver = aNearbyDriver(pickup);
+        //and
+        TransitDTO transit = requestTransitFromTo(pickup, destination);
         //and
         transitService.publishTransit(transit.getId());
         //and
@@ -355,9 +423,13 @@ class TransitLifeCycleIntegrationTest {
     @Test
     void cannotStartNotAcceptedTransit() {
         //given
-        Transit transit = requestTransitFromTo(new AddressDTO("Polska", "Warszawa", "Młynarska", 20), new AddressDTO("Polska", "Warszawa", "Żytnia", 25));
+        AddressDTO pickup = new AddressDTO("Polska", "Warszawa", "Młynarska", 20);
         //and
-        Long driver = aNearbyDriver("WU1212");
+        AddressDTO destination = new AddressDTO("Polska", "Warszawa", "Żytnia", 25);
+        //and
+        Long driver = aNearbyDriver(pickup);
+        //and
+        TransitDTO transit = requestTransitFromTo(pickup, destination);
         //and
         transitService.publishTransit(transit.getId());
 
@@ -371,11 +443,13 @@ class TransitLifeCycleIntegrationTest {
         //given
         AddressDTO destination = new AddressDTO("Polska", "Warszawa", "Żytnia", 25);
         //and
-        Transit transit = requestTransitFromTo(
-                new AddressDTO("Polska", "Warszawa", "Młynarska", 20),
-                destination);
+        AddressDTO pickup = new AddressDTO("Polska", "Warszawa", "Młynarska", 20);
         //and
-        Long driver = aNearbyDriver("WU1212");
+        Long driver = aNearbyDriver(pickup);
+        //and
+        TransitDTO transit = requestTransitFromTo(
+                pickup,
+                destination);
         //and
         transitService.publishTransit(transit.getId());
         //and
@@ -400,11 +474,13 @@ class TransitLifeCycleIntegrationTest {
         //given
         AddressDTO addressTo = new AddressDTO("Polska", "Warszawa", "Żytnia", 25);
         //and
-        Transit transit = requestTransitFromTo(
-                new AddressDTO("Polska", "Warszawa", "Młynarska", 20),
-                addressTo);
+        AddressDTO pickup = new AddressDTO(null, null, null, 0);
         //and
-        Long driver = aNearbyDriver("WU1212");
+        Long driver = aNearbyDriver(pickup);
+        //and
+        TransitDTO transit = requestTransitFromTo(
+                pickup,
+                addressTo);
         //and
         transitService.publishTransit(transit.getId());
         //and
@@ -413,17 +489,20 @@ class TransitLifeCycleIntegrationTest {
         //expect
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> transitService.completeTransit(driver, transit.getId(), addressTo));
-
     }
 
     @Test
     void canRejectTransit() {
         //given
-        Transit transit = requestTransitFromTo(
-                new AddressDTO("Polska", "Warszawa", "Młynarska", 20),
-                new AddressDTO("Polska", "Warszawa", "Żytnia", 25));
+        AddressDTO pickup = new AddressDTO("Polska", "Warszawa", "Młynarska", 20);
         //and
-        Long driver = aNearbyDriver("WU1212");
+        AddressDTO destination = new AddressDTO("Polska", "Warszawa", "Żytnia", 25);
+        //and
+        Long driver = aNearbyDriver(pickup);
+        //and
+        TransitDTO transit = requestTransitFromTo(
+                pickup,
+                destination);
         //and
         transitService.publishTransit(transit.getId());
 
@@ -436,25 +515,44 @@ class TransitLifeCycleIntegrationTest {
         assertNull(loaded.getAcceptedAt());
     }
 
-    AddressDTO farAwayAddress(AddressDTO from) {
-        AddressDTO addressDTO = new AddressDTO("Dania", "Kopenhaga", "Mylve", 2);
-        when(geocodingService.geocodeAddress(any(Address.class))).thenReturn(new double[]{1000, 1000});
-        when(geocodingService.geocodeAddress(Mockito.refEq(from.toAddressEntity()))).thenReturn(new double[]{1,1});
+    AddressDTO newAddress(String country, String city, String street, int buildingNumber) {
+        AddressDTO addressDTO = fixtures.anAddress(geocodingService, country, city, street, buildingNumber);
+        when(geocodingService.geocodeAddress(argThat(new AddressMatcher(addressDTO)))).thenReturn(new double[]{1, 1});
         return addressDTO;
     }
 
-    Long aNearbyDriver(String plateNumber) {
-        return fixtures.aNearbyDriver(plateNumber, 1, 1, VAN, Instant.now(), "BRAND").getId();
+    AddressDTO farAwayAddress() {
+        AddressDTO addressDTO = newAddress("Dania", "Kopenhaga", "Mylve", 2);
+        when(geocodingService.geocodeAddress(argThat(new AddressMatcher(addressDTO)))).thenReturn(new double[]{10000, 21211321});
+        return addressDTO;
     }
 
-    Long aFarAwayDriver(String plateNumber) {
-        return fixtures.aNearbyDriver(plateNumber, 1000, 1000, VAN, Instant.now(), "BRAND").getId();
-
+    Long aNearbyDriver(AddressDTO from) {
+        return fixtures.aNearbyDriver(geocodingService, from.toAddressEntity(), 1, 1).getId();
     }
 
-    Transit requestTransitFromTo(AddressDTO pickup, AddressDTO destination) {
+    Long aFarAwayDriver(AddressDTO address) {
+        when(geocodingService.geocodeAddress(argThat(new AddressMatcher(address)))).thenReturn(new double[]{20000000, 100000000});
+        return fixtures.aNearbyDriver("DW MARIO", 1000000000, 1000000000, VAN, Instant.now(), "BRAND").getId();
+    }
+
+    TransitDTO requestTransitFromTo(AddressDTO pickupDto, AddressDTO destination) {
+        when(geocodingService.geocodeAddress(argThat(new AddressMatcher(destination)))).thenReturn(new double[]{1, 1});
         return transitService.createTransit(fixtures.aTransitDTO(
-                pickup,
+                pickupDto,
                 destination));
     }
+
+    AddressDTO newPickupAddress(int buildingNumber) {
+        AddressDTO newPickup = new AddressDTO("Polska", "Warszawa", "Mazowiecka", buildingNumber);
+        when(geocodingService.geocodeAddress(argThat(new AddressMatcher(newPickup)))).thenReturn(new double[]{1, 1});
+        return newPickup;
+    }
+
+    AddressDTO newPickupAddress(String street, int buildingNumber) {
+        AddressDTO newPickup = new AddressDTO("Polska", "Warszawa", street, buildingNumber);
+        when(geocodingService.geocodeAddress(argThat(new AddressMatcher(newPickup)))).thenReturn(new double[]{1, 1});
+        return newPickup;
+    }
+
 }

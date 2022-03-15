@@ -1,8 +1,5 @@
-package io.legacyfighter.cabs.ui;
+package io.legacyfighter.cabs.tracking;
 
-import io.legacyfighter.cabs.dto.DriverPositionDTO;
-import io.legacyfighter.cabs.entity.DriverPosition;
-import io.legacyfighter.cabs.service.DriverTrackingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,10 +22,9 @@ public class DriverTrackingController {
         return trackingService.calculateTravelledDistance(id, from, to).toKmInDouble();
     }
 
-
     private DriverPositionDTO toDto(DriverPosition driverPosition) {
         DriverPositionDTO dto = new DriverPositionDTO();
-        dto.setDriverId(driverPosition.getDriver().getId());
+        dto.setDriverId(driverPosition.getDriverId());
         dto.setLatitude(driverPosition.getLatitude());
         dto.setLongitude(driverPosition.getLongitude());
         dto.setSeenAt(driverPosition.getSeenAt());

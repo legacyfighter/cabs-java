@@ -2,13 +2,13 @@ package io.legacyfighter.cabs.integration;
 
 import io.legacyfighter.cabs.common.Fixtures;
 import io.legacyfighter.cabs.common.TestWithGraphDB;
-import io.legacyfighter.cabs.geolocation.address.AddressDTO;
-import io.legacyfighter.cabs.crm.transitanalyzer.AnalyzedAddressesDTO;
-import io.legacyfighter.cabs.geolocation.address.Address;
 import io.legacyfighter.cabs.crm.Client;
+import io.legacyfighter.cabs.crm.transitanalyzer.AnalyzedAddressesDTO;
+import io.legacyfighter.cabs.crm.transitanalyzer.TransitAnalyzerController;
 import io.legacyfighter.cabs.driverfleet.Driver;
 import io.legacyfighter.cabs.geolocation.GeocodingService;
-import io.legacyfighter.cabs.crm.transitanalyzer.TransitAnalyzerController;
+import io.legacyfighter.cabs.geolocation.address.Address;
+import io.legacyfighter.cabs.geolocation.address.AddressDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +21,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static io.legacyfighter.cabs.carfleet.CarClass.VAN;
-import static java.time.Instant.now;
 import static java.time.LocalDateTime.of;
 import static java.time.ZoneOffset.UTC;
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -226,7 +225,7 @@ public class AnalyzeNearbyTransitsIntegrationTest extends TestWithGraphDB {
     void aTransitFromTo(Instant publishedAt, Instant completedAt, Client client, Address pickup, Address destination) {
         when(geocodingService.geocodeAddress(destination)).thenReturn(new double[]{1, 1});
         Driver driver = fixtures.aNearbyDriver(geocodingService, pickup);
-        fixtures.aJourneyWithFixedClock(40, publishedAt, completedAt, client, driver, pickup, destination, clock);
+        fixtures.aRideWithFixedClock(40, publishedAt, completedAt, client, driver, pickup, destination, clock);
     }
 
     void addressesContainExactly(AnalyzedAddressesDTO analyzedAddressesDTO, Address... expectedAddresses) {

@@ -47,6 +47,7 @@ public class TransitDetailsFacade {
         details.destinationChangedTo(newAddress, newDistance);
     }
 
+    @Transactional
     public void transitPublished(Long transitId, Instant when) {
         TransitDetails details = load(transitId);
         details.publishedAt(when);

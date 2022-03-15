@@ -1,6 +1,4 @@
-package io.legacyfighter.cabs.dto;
-
-import io.legacyfighter.cabs.driverfleet.Driver;
+package io.legacyfighter.cabs.tracking;
 
 import java.time.Instant;
 
@@ -10,7 +8,7 @@ public class DriverPositionDTOV2 {
 
     }
 
-    private Driver driver;
+    private Long driverId;
 
     private double latitude;
 
@@ -18,19 +16,19 @@ public class DriverPositionDTOV2 {
 
     private Instant seenAt;
 
-    public DriverPositionDTOV2(Driver driver, double latitude, double longitude, Instant seenAt) {
-        this.driver = driver;
+    public DriverPositionDTOV2(Long driverId, double latitude, double longitude, Instant seenAt) {
+        this.driverId = driverId;
         this.latitude = latitude;
         this.longitude = longitude;
         this.seenAt = seenAt;
     }
 
-    public Driver getDriver() {
-        return driver;
+    public Long getDriverId() {
+        return driverId;
     }
 
-    public void setDriver(Driver driver) {
-        this.driver = driver;
+    public void setDriverId(Long driverId) {
+        this.driverId = driverId;
     }
 
     public double getLatitude() {

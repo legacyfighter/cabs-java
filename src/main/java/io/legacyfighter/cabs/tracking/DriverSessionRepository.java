@@ -1,7 +1,6 @@
-package io.legacyfighter.cabs.repository;
+package io.legacyfighter.cabs.tracking;
 
 import io.legacyfighter.cabs.carfleet.CarClass;
-import io.legacyfighter.cabs.entity.DriverSession;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Collection;

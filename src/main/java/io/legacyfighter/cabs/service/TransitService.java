@@ -3,27 +3,25 @@ package io.legacyfighter.cabs.service;
 import io.legacyfighter.cabs.carfleet.CarClass;
 import io.legacyfighter.cabs.carfleet.CarTypeService;
 import io.legacyfighter.cabs.common.EventsPublisher;
-import io.legacyfighter.cabs.crm.ClientRepository;
-import io.legacyfighter.cabs.geolocation.GeocodingService;
-import io.legacyfighter.cabs.geolocation.address.AddressRepository;
-import io.legacyfighter.cabs.geolocation.Distance;
-import io.legacyfighter.cabs.driverfleet.DriverFeeService;
-import io.legacyfighter.cabs.driverfleet.DriverRepository;
-import io.legacyfighter.cabs.geolocation.address.AddressDTO;
-import io.legacyfighter.cabs.dto.DriverPositionDTOV2;
-import io.legacyfighter.cabs.dto.TransitDTO;
-import io.legacyfighter.cabs.geolocation.address.Address;
 import io.legacyfighter.cabs.crm.Client;
-import io.legacyfighter.cabs.driverfleet.Driver;
-import io.legacyfighter.cabs.entity.DriverSession;
+import io.legacyfighter.cabs.crm.ClientRepository;
+import io.legacyfighter.cabs.driverfleet.*;
+import io.legacyfighter.cabs.dto.TransitDTO;
 import io.legacyfighter.cabs.entity.Transit;
 import io.legacyfighter.cabs.entity.events.TransitCompleted;
+import io.legacyfighter.cabs.geolocation.Distance;
 import io.legacyfighter.cabs.geolocation.DistanceCalculator;
+import io.legacyfighter.cabs.geolocation.GeocodingService;
+import io.legacyfighter.cabs.geolocation.address.Address;
+import io.legacyfighter.cabs.geolocation.address.AddressDTO;
+import io.legacyfighter.cabs.geolocation.address.AddressRepository;
 import io.legacyfighter.cabs.invocing.InvoiceGenerator;
 import io.legacyfighter.cabs.loyalty.AwardsService;
 import io.legacyfighter.cabs.money.Money;
-import io.legacyfighter.cabs.repository.*;
 import io.legacyfighter.cabs.notification.DriverNotificationService;
+import io.legacyfighter.cabs.repository.TransitRepository;
+import io.legacyfighter.cabs.tracking.DriverPositionDTOV2;
+import io.legacyfighter.cabs.tracking.DriverTrackingService;
 import io.legacyfighter.cabs.transitdetails.TransitDetailsDTO;
 import io.legacyfighter.cabs.transitdetails.TransitDetailsFacade;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,12 +30,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-
-import static java.util.stream.Collectors.toList;
+import java.util.Set;
 
 // If this class will still be here in 2022 I will quit.
 @Service
@@ -59,12 +54,6 @@ public class TransitService {
 
     @Autowired
     private DistanceCalculator distanceCalculator;
-
-    @Autowired
-    private DriverPositionRepository driverPositionRepository;
-
-    @Autowired
-    private DriverSessionRepository driverSessionRepository;
 
     @Autowired
     private CarTypeService carTypeService;
@@ -90,8 +79,14 @@ public class TransitService {
     @Autowired
     private EventsPublisher eventsPublisher;
 
+    @Autowired
+    private DriverTrackingService driverTrackingService;
+
+    @Autowired
+    private DriverService driverService;
+
     @Transactional
-    public Transit createTransit(TransitDTO transitDTO) {
+    public TransitDTO createTransit(TransitDTO transitDTO) {
         Address from = addressFromDto(transitDTO.getFrom());
         Address to = addressFromDto(transitDTO.getTo());
         return createTransit(transitDTO.getClientDTO().getId(), from, to, transitDTO.getCarClass());
@@ -104,7 +99,7 @@ public class TransitService {
     }
 
     @Transactional
-    public Transit createTransit(Long clientId, Address from, Address to, CarClass carClass) {
+    public TransitDTO createTransit(Long clientId, Address from, Address to, CarClass carClass) {
         Client client = clientRepository.getOne(clientId);
 
         if (client == null) {
@@ -120,7 +115,7 @@ public class TransitService {
         Money estimatedPrice = transit.estimateCost();
         transit = transitRepository.save(transit);
         transitDetailsFacade.transitRequested(now, transit.getId(), from, to, km, client, carClass, estimatedPrice, transit.getTariff());
-        return transit;
+        return loadTransit(transit.getId());
     }
 
     @Transactional
@@ -165,8 +160,8 @@ public class TransitService {
         transitRepository.save(transit);
         transitDetailsFacade.pickupChangedTo(transit.getId(), newAddress, newDistance);
 
-        for (Driver driver : transit.getProposedDrivers()) {
-            notificationService.notifyAboutChangedTransitAddress(driver.getId(), transitId);
+        for (Long driverId : transit.getProposedDrivers()) {
+            notificationService.notifyAboutChangedTransitAddress(driverId, transitId);
         }
     }
 
@@ -196,8 +191,8 @@ public class TransitService {
         Distance newDistance = Distance.ofKm((float) distanceCalculator.calculateByMap(geoFrom[0], geoFrom[1], geoTo[0], geoTo[1]));
         transit.changeDestinationTo(newAddress, newDistance);
         transitDetailsFacade.destinationChanged(transit.getId(), newAddress, newDistance);
-        if (transit.getDriver() != null) {
-            notificationService.notifyAboutChangedTransitAddress(transit.getDriver().getId(), transitId);
+        if (transit.getDriverId() != null) {
+            notificationService.notifyAboutChangedTransitAddress(transit.getDriverId(), transitId);
         }
     }
 
@@ -209,8 +204,8 @@ public class TransitService {
             throw new IllegalArgumentException("Transit does not exist, id = " + transitId);
         }
 
-        if (transit.getDriver() != null) {
-            notificationService.notifyAboutCancelledTransit(transit.getDriver().getId(), transitId);
+        if (transit.getDriverId() != null) {
+            notificationService.notifyAboutCancelledTransit(transit.getDriverId(), transitId);
         }
 
         transit.cancel();
@@ -295,65 +290,28 @@ public class TransitService {
                             180 / Math.PI;
                     double longitudeMax = longitude + dLon * 180 / Math.PI;
 
-                    List<DriverPositionDTOV2> driversAvgPositions = driverPositionRepository
-                            .findAverageDriverPositionSince(latitudeMin, latitudeMax, longitudeMin, longitudeMax, Instant.now(clock).minus(5, ChronoUnit.MINUTES));
+                    List<CarClass> carClasses = choosePossibleCarClasses(transitDetails.carType);
+                    if (carClasses.isEmpty()) {
+                        return transit;
+                    }
 
-                    if (!driversAvgPositions.isEmpty()) {
-                        Comparator<DriverPositionDTOV2> comparator = (DriverPositionDTOV2 d1, DriverPositionDTOV2 d2) -> Double.compare(
-                                Math.sqrt(Math.pow(latitude - d1.getLatitude(), 2) + Math.pow(longitude - d1.getLongitude(), 2)),
-                                Math.sqrt(Math.pow(latitude - d2.getLatitude(), 2) + Math.pow(longitude - d2.getLongitude(), 2))
-                        );
-                        driversAvgPositions.sort(comparator);
-                        driversAvgPositions = driversAvgPositions.stream().limit(20).collect(toList());
+                    List<DriverPositionDTOV2> driversAvgPositions = driverTrackingService
+                            .findActiveDriversNearby(latitudeMin, latitudeMax, longitudeMin, longitudeMax, latitude, longitude, carClasses);
 
-                        List<CarClass> carClasses = new ArrayList<>();
-                        List<CarClass> activeCarClasses = carTypeService.findActiveCarClasses();
-                        if (activeCarClasses.isEmpty()) {
-                            return transit;
-                        }
-                        if (transitDetails.carType
-
-                                != null) {
-                            if (activeCarClasses.contains(transitDetails.carType)) {
-                                carClasses.add(transitDetails.carType);
-                            } else {
-                                return transit;
-                            }
-                        } else {
-                            carClasses.addAll(activeCarClasses);
-                        }
-
-                        List<Long> drivers = driversAvgPositions.stream().map(pos -> pos.getDriver().getId()).collect(toList());
-
-                        List<Long> activeDriverIdsInSpecificCar = driverSessionRepository.findAllByLoggedOutAtNullAndDriverIdInAndCarClassIn(drivers, carClasses)
-
-                                .stream()
-                                .map(DriverSession::getDriverId).collect(toList());
-
-                        driversAvgPositions = driversAvgPositions
-                                .stream()
-                                .filter(dp -> activeDriverIdsInSpecificCar.contains(dp.getDriver().getId())).collect(toList());
-
-                        // Iterate across average driver positions
-                        for (DriverPositionDTOV2 driverAvgPosition : driversAvgPositions) {
-                            Driver driver = driverAvgPosition.getDriver();
-                            if (driver.getStatus().equals(Driver.Status.ACTIVE) &&
-                                    driver.getOccupied() == false) {
-                                if (transit.canProposeTo(driver)) {
-                                    transit.proposeTo(driver);
-                                    notificationService.notifyAboutPossibleTransit(driver.getId(), transitId);
-                                }
-                            } else {
-                                // Not implemented yet!
-                            }
-                        }
-
-                        transitRepository.save(transit);
-
-                    } else {
-                        // Next iteration, no drivers at specified area
+                    if (driversAvgPositions.isEmpty()) {
+                        //next iteration
                         continue;
                     }
+
+                    // Iterate across average driver positions
+                    for (DriverPositionDTOV2 driverAvgPosition : driversAvgPositions) {
+                        if (transit.canProposeTo(driverAvgPosition.getDriverId())) {
+                            transit.proposeTo(driverAvgPosition.getDriverId());
+                            notificationService.notifyAboutPossibleTransit(driverAvgPosition.getDriverId(), transitId);
+                        }
+
+                    }
+                    return transit;
                 }
             } else {
                 throw new IllegalStateException("..., id = " + transitId);
@@ -362,6 +320,19 @@ public class TransitService {
             throw new IllegalArgumentException("Transit does not exist, id = " + transitId);
         }
 
+    }
+
+    private List<CarClass> choosePossibleCarClasses(CarClass carClass) {
+        List<CarClass> carClasses = new ArrayList<>();
+        List<CarClass> activeCarClasses = carTypeService.findActiveCarClasses();
+        if (carClass != null) {
+            if (activeCarClasses.contains(carClass)) {
+                carClasses.add(carClass);
+            }
+        } else {
+            carClasses.addAll(activeCarClasses);
+        }
+        return carClasses;
     }
 
     @Transactional
@@ -377,7 +348,8 @@ public class TransitService {
                 throw new IllegalArgumentException("Transit does not exist, id = " + transitId);
             } else {
                 Instant now = Instant.now(clock);
-                transit.acceptBy(driver, now);
+                transit.acceptBy(driverId, now);
+                driver.setOccupied(true);
                 transitDetailsFacade.transitAccepted(transitId, now, driverId);
                 transitRepository.save(transit);
                 driverRepository.save(driver);
@@ -419,7 +391,7 @@ public class TransitService {
             throw new IllegalArgumentException("Transit does not exist, id = " + transitId);
         }
 
-        transit.rejectBy(driver);
+        transit.rejectBy(driverId);
         transitRepository.save(transit);
     }
 
@@ -465,7 +437,10 @@ public class TransitService {
     @Transactional
     public TransitDTO loadTransit(Long id) {
         TransitDetailsDTO transitDetails = findTransitDetails(id);
-        return new TransitDTO(transitRepository.getOne(id), transitDetails);
+        Transit transit = transitRepository.getOne(id);
+        Set<DriverDTO> proposedDrivers = driverService.loadDrivers(transit.getProposedDrivers());
+        Set<DriverDTO> driverRejections = driverService.loadDrivers(transit.getDriverRejections());
+        return new TransitDTO(transitDetails, proposedDrivers, driverRejections, transit.getDriverId());
     }
 
     private TransitDetailsDTO findTransitDetails(Long transitId) {

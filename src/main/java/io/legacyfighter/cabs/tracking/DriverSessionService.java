@@ -1,16 +1,17 @@
-package io.legacyfighter.cabs.service;
+package io.legacyfighter.cabs.tracking;
 
 import io.legacyfighter.cabs.carfleet.CarClass;
 import io.legacyfighter.cabs.carfleet.CarTypeService;
-import io.legacyfighter.cabs.entity.DriverSession;
-import io.legacyfighter.cabs.repository.DriverSessionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 public class DriverSessionService {
@@ -57,5 +58,12 @@ public class DriverSessionService {
 
     public List<DriverSession> findByDriver(Long driverId) {
         return driverSessionRepository.findByDriverId(driverId);
+    }
+
+    public List<Long> findCurrentlyLoggedDriverIds(List<Long> driversIds, Collection<CarClass> carClasses) {
+        return driverSessionRepository.findAllByLoggedOutAtNullAndDriverIdInAndCarClassIn(driversIds, carClasses)
+                .stream()
+                .map(DriverSession::getDriverId).collect(toList());
+
     }
 }

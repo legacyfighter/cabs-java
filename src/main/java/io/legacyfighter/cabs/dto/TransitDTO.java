@@ -3,17 +3,17 @@ package io.legacyfighter.cabs.dto;
 import io.legacyfighter.cabs.carfleet.CarClass;
 import io.legacyfighter.cabs.crm.ClientDTO;
 import io.legacyfighter.cabs.crm.claims.ClaimDTO;
-import io.legacyfighter.cabs.geolocation.address.AddressDTO;
-import io.legacyfighter.cabs.geolocation.Distance;
 import io.legacyfighter.cabs.driverfleet.DriverDTO;
-import io.legacyfighter.cabs.driverfleet.Driver;
 import io.legacyfighter.cabs.entity.Transit;
+import io.legacyfighter.cabs.geolocation.Distance;
+import io.legacyfighter.cabs.geolocation.address.AddressDTO;
 import io.legacyfighter.cabs.transitdetails.TransitDetailsDTO;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class TransitDTO {
 
@@ -69,9 +69,14 @@ public class TransitDTO {
 
     }
 
-    public TransitDTO(Transit transit, TransitDetailsDTO transitDetails) {
+    public TransitDTO(TransitDetailsDTO transitDetails, Set<DriverDTO> proposedDrivers, Set<DriverDTO> driverRejections, Long assignedDriver) {
         this(transitDetails.transitId, transitDetails.tariffName,
-                transitDetails.status, transit.getDriver() == null ? null : new DriverDTO(transit.getDriver()),
+                transitDetails.status,
+                proposedDrivers
+                        .stream()
+                        .filter(driver -> driver.getId().equals(assignedDriver))
+                        .findFirst()
+                        .orElse(null),
                 transitDetails.distance, transitDetails.kmRate,
                 transitDetails.price != null ? new BigDecimal(transitDetails.price.toInt()) : null,
                 transitDetails.driverFee != null ? new BigDecimal(transitDetails.driverFee.toInt()) : null,
@@ -79,12 +84,8 @@ public class TransitDTO {
                 new BigDecimal(transitDetails.baseFee),
                 transitDetails.dateTime, transitDetails.publishedAt,
                 transitDetails.acceptedAt, transitDetails.started, transitDetails.completedAt,
-                null, new ArrayList<>(), transitDetails.from,
+                null, new ArrayList<>(proposedDrivers), transitDetails.from,
                 transitDetails.to, transitDetails.carType, transitDetails.client);
-
-        for (Driver d : transit.getProposedDrivers()) {
-            proposedDrivers.add(new DriverDTO(d));
-        }
     }
 
     public TransitDTO(Long id, String tariff, Transit.Status status, DriverDTO driver,

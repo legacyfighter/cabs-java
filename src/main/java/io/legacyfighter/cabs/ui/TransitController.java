@@ -1,8 +1,7 @@
 package io.legacyfighter.cabs.ui;
 
-import io.legacyfighter.cabs.geolocation.address.AddressDTO;
 import io.legacyfighter.cabs.dto.TransitDTO;
-import io.legacyfighter.cabs.entity.Transit;
+import io.legacyfighter.cabs.geolocation.address.AddressDTO;
 import io.legacyfighter.cabs.service.TransitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -20,8 +19,7 @@ public class TransitController {
 
     @PostMapping("/transits/")
     public TransitDTO createTransit(@RequestBody TransitDTO transitDTO) {
-        Transit transit = transitService.createTransit(transitDTO);
-        return transitService.loadTransit(transit.getId());
+        return transitService.createTransit(transitDTO);
     }
 
     @PostMapping("/transits/{id}/changeAddressTo")

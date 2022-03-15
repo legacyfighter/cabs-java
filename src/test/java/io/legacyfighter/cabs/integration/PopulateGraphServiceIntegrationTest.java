@@ -62,6 +62,6 @@ class PopulateGraphServiceIntegrationTest extends TestWithGraphDB {
     void aTransitFromTo(Address pickup, Address destination, Client client) {
         when(geocodingService.geocodeAddress(destination)).thenReturn(new double[]{1, 1});
         Driver driver = fixtures.aNearbyDriver(geocodingService, pickup);
-        fixtures.aJourney(50, client, driver, pickup, destination);
+        fixtures.aRide(50, client, driver, pickup, destination);
     }
 }

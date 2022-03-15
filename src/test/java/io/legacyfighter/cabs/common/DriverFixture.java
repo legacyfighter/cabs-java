@@ -7,7 +7,8 @@ import io.legacyfighter.cabs.driverfleet.Driver.Status;
 import io.legacyfighter.cabs.geolocation.GeocodingService;
 import io.legacyfighter.cabs.geolocation.address.Address;
 import io.legacyfighter.cabs.money.Money;
-import io.legacyfighter.cabs.service.*;
+import io.legacyfighter.cabs.tracking.DriverSessionService;
+import io.legacyfighter.cabs.tracking.DriverTrackingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +16,7 @@ import java.time.Instant;
 import java.util.Random;
 
 import static io.legacyfighter.cabs.carfleet.CarClass.VAN;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.when;
 
 @Component
@@ -62,7 +64,6 @@ class DriverFixture {
         return driverService.createDriver(driverLicense, lastName, name, Driver.Type.REGULAR, status, "");
     }
 
-
     Driver aNearbyDriver(GeocodingService stubbedGeocodingService, Address pickup) {
         Random random = new Random();
         double latitude = random.nextDouble();
@@ -71,8 +72,9 @@ class DriverFixture {
         return aNearbyDriver("WU DAMIAN", latitude, longitude, VAN, Instant.now(), "brand");
     }
 
-    Driver aNearbyDriver(String plateNumber, double latitude, double longitude, CarClass carClass, Instant when) {
-        return aNearbyDriver(plateNumber, latitude, longitude, carClass, when, "brand");
+    Driver aNearbyDriver(GeocodingService stubbedGeocodingService, Address pickup, double latitude, double longitude) {
+        when(stubbedGeocodingService.geocodeAddress(argThat(new AddressMatcher(pickup)))).thenReturn(new double[]{latitude, longitude});
+        return aNearbyDriver("WU DAMIAN", latitude, longitude, VAN, Instant.now(), "brand");
     }
 
     Driver aNearbyDriver(String plateNumber, double latitude, double longitude, CarClass carClass, Instant when, String carBrand) {

@@ -1,18 +1,19 @@
 package io.legacyfighter.cabs.ui;
 
-import io.legacyfighter.cabs.geolocation.Distance;
-import io.legacyfighter.cabs.geolocation.address.AddressDTO;
 import io.legacyfighter.cabs.crm.ClientDTO;
 import io.legacyfighter.cabs.dto.TransitDTO;
-import io.legacyfighter.cabs.entity.Transit;
-import io.legacyfighter.cabs.money.Money;
+import io.legacyfighter.cabs.entity.Tariff;
+import io.legacyfighter.cabs.geolocation.Distance;
+import io.legacyfighter.cabs.geolocation.address.AddressDTO;
 import io.legacyfighter.cabs.transitdetails.TransitDetailsDTO;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
+import java.util.HashSet;
 
 import static java.time.Instant.now;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CalculateTransitDistanceTest {
 
@@ -47,11 +48,9 @@ public class CalculateTransitDistanceTest {
     }
 
     TransitDTO transitForDistance(float km) {
-        Distance distance = Distance.ofKm(km);
-        Transit transit = new Transit(now(), distance);
-        transit.setPrice(new Money(10));
-        TransitDetailsDTO transitDetails = new TransitDetailsDTO(1L, now(), now(), new ClientDTO(), null, new AddressDTO(), new AddressDTO(), now(), now(), distance, transit.getTariff());
-        return new TransitDTO(transit, transitDetails);
+        Tariff tariff = Tariff.ofTime(LocalDateTime.now());
+        TransitDetailsDTO transitDetails = new TransitDetailsDTO(1L, now(), now(), new ClientDTO(), null, new AddressDTO(), new AddressDTO(), now(), now(), Distance.ofKm(km), tariff);
+        return new TransitDTO(transitDetails, new HashSet<>(), new HashSet<>(), null);
     }
 
 }

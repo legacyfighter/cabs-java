@@ -1,4 +1,4 @@
-package io.legacyfighter.cabs.dto;
+package io.legacyfighter.cabs.tracking;
 
 import java.time.Instant;
 
