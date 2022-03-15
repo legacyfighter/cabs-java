@@ -1,5 +1,6 @@
 package io.legacyfighter.cabs.common;
 
+import io.legacyfighter.cabs.carfleet.CarClass;
 import io.legacyfighter.cabs.distance.Distance;
 import io.legacyfighter.cabs.dto.AddressDTO;
 import io.legacyfighter.cabs.dto.ClientDTO;
@@ -12,7 +13,6 @@ import io.legacyfighter.cabs.transitdetails.TransitDetailsFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
@@ -35,7 +35,7 @@ class TransitFixture {
         Transit transit = transitRepository.save(new Transit());
         stubbedTransitPrice.stub(transit.getId(), new Money(price));
         Long transitId = transit.getId();
-        transitDetailsFacade.transitRequested(when.toInstant(ZoneOffset.UTC), transitId, from, to, Distance.ZERO, client, CarType.CarClass.VAN, new Money(price), Tariff.ofTime(when));
+        transitDetailsFacade.transitRequested(when.toInstant(ZoneOffset.UTC), transitId, from, to, Distance.ZERO, client, CarClass.VAN, new Money(price), Tariff.ofTime(when));
         transitDetailsFacade.transitAccepted(transitId, when.toInstant(ZoneOffset.UTC), driver.getId());
         transitDetailsFacade.transitStarted(transitId, when.toInstant(ZoneOffset.UTC));
         transitDetailsFacade.transitCompleted(transitId, when.toInstant(ZoneOffset.UTC), new Money(price), null);

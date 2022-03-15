@@ -1,6 +1,7 @@
 package io.legacyfighter.cabs.common;
 
 
+import io.legacyfighter.cabs.carfleet.CarClass;
 import io.legacyfighter.cabs.entity.*;
 import io.legacyfighter.cabs.entity.Driver.Status;
 import io.legacyfighter.cabs.money.Money;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Component;
 import java.time.Instant;
 import java.util.Random;
 
-import static io.legacyfighter.cabs.entity.CarType.CarClass.VAN;
+import static io.legacyfighter.cabs.carfleet.CarClass.VAN;
 import static org.mockito.Mockito.when;
 
 @Component
@@ -69,23 +70,23 @@ class DriverFixture {
         return aNearbyDriver("WU DAMIAN", latitude, longitude, VAN, Instant.now(), "brand");
     }
 
-    Driver aNearbyDriver(String plateNumber, double latitude, double longitude, CarType.CarClass carClass, Instant when) {
+    Driver aNearbyDriver(String plateNumber, double latitude, double longitude, CarClass carClass, Instant when) {
         return aNearbyDriver(plateNumber, latitude, longitude, carClass, when, "brand");
     }
 
-    Driver aNearbyDriver(String plateNumber, double latitude, double longitude, CarType.CarClass carClass, Instant when, String carBrand) {
+    Driver aNearbyDriver(String plateNumber, double latitude, double longitude, CarClass carClass, Instant when, String carBrand) {
         Driver driver = aDriver();
         driverHasFee(driver, DriverFee.FeeType.FLAT, 10);
         driverLogsIn(plateNumber, carClass, driver, carBrand);
         return driverIsAtGeoLocalization(plateNumber, latitude, longitude, carClass, driver, when, carBrand);
     }
 
-    Driver driverIsAtGeoLocalization(String plateNumber, double latitude, double longitude, CarType.CarClass carClass, Driver driver, Instant when, String carBrand) {
+    Driver driverIsAtGeoLocalization(String plateNumber, double latitude, double longitude, CarClass carClass, Driver driver, Instant when, String carBrand) {
         driverTrackingService.registerPosition(driver.getId(), latitude, longitude, when);
         return driver;
     }
 
-    void driverLogsIn(String plateNumber, CarType.CarClass carClass, Driver driver, String carBrand) {
+    void driverLogsIn(String plateNumber, CarClass carClass, Driver driver, String carBrand) {
         driverSessionService.logIn(driver.getId(), plateNumber, carClass, carBrand);
     }
 

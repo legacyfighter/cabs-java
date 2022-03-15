@@ -1,5 +1,6 @@
 package io.legacyfighter.cabs.transitdetails;
 
+import io.legacyfighter.cabs.carfleet.CarClass;
 import io.legacyfighter.cabs.common.BaseEntity;
 import io.legacyfighter.cabs.distance.Distance;
 import io.legacyfighter.cabs.entity.*;
@@ -21,7 +22,7 @@ class TransitDetails extends BaseEntity {
     private Client client;
 
     @Enumerated(EnumType.STRING)
-    private CarType.CarClass carType;
+    private CarClass carType;
 
     @OneToOne(fetch = FetchType.EAGER)
     private Address from;
@@ -65,7 +66,7 @@ class TransitDetails extends BaseEntity {
 
     }
 
-    TransitDetails(Instant dateTime, Long transitId, Address from, Address to, Distance distance, Client client, CarType.CarClass carClass, Money estimatedPrice, Tariff tariff) {
+    TransitDetails(Instant dateTime, Long transitId, Address from, Address to, Distance distance, Client client, CarClass carClass, Money estimatedPrice, Tariff tariff) {
         this.dateTime = dateTime;
         this.transitId = transitId;
         this.from = from;
@@ -90,7 +91,7 @@ class TransitDetails extends BaseEntity {
         return client;
     }
 
-    CarType.CarClass getCarType() {
+    CarClass getCarType() {
         return carType;
     }
 

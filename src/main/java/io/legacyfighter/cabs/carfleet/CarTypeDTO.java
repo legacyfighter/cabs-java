@@ -1,12 +1,10 @@
-package io.legacyfighter.cabs.dto;
-
-import io.legacyfighter.cabs.entity.CarType;
+package io.legacyfighter.cabs.carfleet;
 
 public class CarTypeDTO {
 
     private Long id;
 
-    private CarType.CarClass carClass;
+    private CarClass carClass;
 
     private CarType.Status status;
 
@@ -36,11 +34,11 @@ public class CarTypeDTO {
         return id;
     }
 
-    public CarType.CarClass getCarClass() {
+    public CarClass getCarClass() {
         return carClass;
     }
 
-    public void setCarClass(CarType.CarClass carClass) {
+    public void setCarClass(CarClass carClass) {
         this.carClass = carClass;
     }
 

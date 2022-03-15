@@ -1,16 +1,19 @@
 package io.legacyfighter.cabs.integration;
 
+import io.legacyfighter.cabs.carfleet.CarClass;
+import io.legacyfighter.cabs.carfleet.CarTypeService;
 import io.legacyfighter.cabs.common.Fixtures;
 import io.legacyfighter.cabs.crm.claims.ClaimService;
 import io.legacyfighter.cabs.driverreport.DriverReportController;
-import io.legacyfighter.cabs.dto.CarTypeDTO;
 import io.legacyfighter.cabs.dto.DriverAttributeDTO;
 import io.legacyfighter.cabs.dto.DriverReport;
 import io.legacyfighter.cabs.dto.TransitDTO;
 import io.legacyfighter.cabs.entity.*;
-import io.legacyfighter.cabs.entity.CarType.CarClass;
 import io.legacyfighter.cabs.repository.AddressRepository;
-import io.legacyfighter.cabs.service.*;
+import io.legacyfighter.cabs.service.DriverSessionService;
+import io.legacyfighter.cabs.service.DriverTrackingService;
+import io.legacyfighter.cabs.service.GeocodingService;
+import io.legacyfighter.cabs.service.TransitService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -26,10 +29,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.IntStream;
 
-import static io.legacyfighter.cabs.entity.CarType.CarClass.PREMIUM;
-import static io.legacyfighter.cabs.entity.CarType.CarClass.VAN;
+import static io.legacyfighter.cabs.carfleet.CarClass.PREMIUM;
+import static io.legacyfighter.cabs.carfleet.CarClass.VAN;
 import static io.legacyfighter.cabs.entity.Driver.Status.ACTIVE;
 import static io.legacyfighter.cabs.entity.DriverAttribute.DriverAttributeName.*;
 import static java.util.stream.Collectors.toList;
@@ -77,8 +79,8 @@ class CreateDriverReportIntegrationTest {
 
     @BeforeEach
     public void setup() {
-        anActiveCarCategory(VAN);
-        anActiveCarCategory(PREMIUM);
+        fixtures.anActiveCarCategory(VAN);
+        fixtures.anActiveCarCategory(PREMIUM);
     }
 
     @Test
@@ -177,16 +179,5 @@ class CreateDriverReportIntegrationTest {
         address.setBuildingNumber(buildingNumber);
         when(geocodingService.geocodeAddress(address)).thenReturn(new double[]{latitude, longitude});
         return addressRepository.save(address);
-    }
-
-    CarType anActiveCarCategory(CarClass carClass) {
-        CarTypeDTO carTypeDTO = new CarTypeDTO();
-        carTypeDTO.setCarClass(carClass);
-        carTypeDTO.setDescription("opis");
-        CarType carType = carTypeService.create(carTypeDTO);
-        IntStream.range(1, carType.getMinNoOfCarsToActivateClass() + 1)
-                .forEach(i -> carTypeService.registerCar(carType.getCarClass()));
-        carTypeService.activate(carType.getId());
-        return carType;
     }
 }

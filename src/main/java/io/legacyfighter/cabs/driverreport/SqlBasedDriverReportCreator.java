@@ -1,11 +1,11 @@
 package io.legacyfighter.cabs.driverreport;
 
+import io.legacyfighter.cabs.carfleet.CarClass;
 import io.legacyfighter.cabs.crm.claims.Claim;
 import io.legacyfighter.cabs.crm.claims.ClaimDTO;
 import io.legacyfighter.cabs.crm.claims.Status;
 import io.legacyfighter.cabs.distance.Distance;
 import io.legacyfighter.cabs.dto.*;
-import io.legacyfighter.cabs.entity.CarType;
 import io.legacyfighter.cabs.entity.Driver;
 import io.legacyfighter.cabs.entity.DriverAttribute;
 import io.legacyfighter.cabs.entity.Transit;
@@ -108,11 +108,11 @@ class SqlBasedDriverReportCreator {
                 ((Timestamp) tuple.get("DATE_TIME")).toInstant(), ((Timestamp) tuple.get("PUBLISHED_AT")).toInstant(),
                 ((Timestamp) tuple.get("ACCEPTED_AT")).toInstant(), ((Timestamp) tuple.get("STARTED")).toInstant(),
                 ((Timestamp) tuple.get("COMPLETE_AT")).toInstant(), retrieveClaim(tuple), null, retrieveFromAddress(tuple), retrieveToAddress(tuple),
-                CarType.CarClass.valueOf((String) tuple.get("CAR_TYPE")), null);
+                CarClass.valueOf((String) tuple.get("CAR_TYPE")), null);
     }
 
     private DriverSessionDTO retrieveDrivingSession(Tuple tuple) {
-        return new DriverSessionDTO(((Timestamp) tuple.get("LOGGED_AT")).toInstant(), ((Timestamp) tuple.get("LOGGED_OUT_AT")).toInstant(), (String) tuple.get("PLATES_NUMBER"), CarType.CarClass.valueOf((String) tuple.get("CAR_CLASS")), (String) tuple.get("CAR_BRAND"));
+        return new DriverSessionDTO(((Timestamp) tuple.get("LOGGED_AT")).toInstant(), ((Timestamp) tuple.get("LOGGED_OUT_AT")).toInstant(), (String) tuple.get("PLATES_NUMBER"), CarClass.valueOf((String) tuple.get("CAR_CLASS")), (String) tuple.get("CAR_BRAND"));
     }
 
     private AddressDTO retrieveToAddress(Tuple tuple) {

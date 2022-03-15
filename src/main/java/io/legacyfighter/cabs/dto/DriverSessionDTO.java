@@ -1,6 +1,6 @@
 package io.legacyfighter.cabs.dto;
 
-import io.legacyfighter.cabs.entity.CarType;
+import io.legacyfighter.cabs.carfleet.CarClass;
 import io.legacyfighter.cabs.entity.DriverSession;
 
 import java.time.Instant;
@@ -14,11 +14,11 @@ public class DriverSessionDTO {
 
     private String platesNumber;
 
-    private CarType.CarClass carClass;
+    private CarClass carClass;
 
     private String carBrand;
 
-    public DriverSessionDTO(Instant loggedAt, Instant loggedOutAt, String platesNumber, CarType.CarClass carClass, String carBrand) {
+    public DriverSessionDTO(Instant loggedAt, Instant loggedOutAt, String platesNumber, CarClass carClass, String carBrand) {
         this.loggedAt = loggedAt;
         this.loggedOutAt = loggedOutAt;
         this.platesNumber = platesNumber;
@@ -70,11 +70,11 @@ public class DriverSessionDTO {
         this.platesNumber = platesNumber;
     }
 
-    public CarType.CarClass getCarClass() {
+    public CarClass getCarClass() {
         return carClass;
     }
 
-    public void setCarClass(CarType.CarClass carClass) {
+    public void setCarClass(CarClass carClass) {
         this.carClass = carClass;
     }
 

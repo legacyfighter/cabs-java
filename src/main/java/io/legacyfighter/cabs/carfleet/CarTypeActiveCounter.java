@@ -1,28 +1,26 @@
-package io.legacyfighter.cabs.entity;
-
-import io.legacyfighter.cabs.common.BaseEntity;
+package io.legacyfighter.cabs.carfleet;
 
 import javax.persistence.*;
 
 @Entity
-public class CarTypeActiveCounter  {
+class CarTypeActiveCounter {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Id
-    private CarType.CarClass carClass;
+    private CarClass carClass;
 
     @Column(nullable = false)
     private int activeCarsCounter;
 
-    public CarTypeActiveCounter(CarType.CarClass carClass) {
+    CarTypeActiveCounter(CarClass carClass) {
         this.carClass = carClass;
     }
 
-    public CarTypeActiveCounter() {
+    CarTypeActiveCounter() {
     }
 
-    public int getActiveCarsCounter() {
+    int getActiveCarsCounter() {
         return activeCarsCounter;
     }
 

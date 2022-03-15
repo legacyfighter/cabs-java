@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static io.legacyfighter.cabs.entity.CarType.CarClass.VAN;
+import static io.legacyfighter.cabs.carfleet.CarClass.VAN;
 import static java.time.Instant.now;
 import static java.time.LocalDateTime.of;
 import static java.time.ZoneOffset.UTC;

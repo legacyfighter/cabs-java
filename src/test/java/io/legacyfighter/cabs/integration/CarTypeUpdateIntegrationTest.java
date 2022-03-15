@@ -1,14 +1,14 @@
 package io.legacyfighter.cabs.integration;
 
-import io.legacyfighter.cabs.dto.CarTypeDTO;
-import io.legacyfighter.cabs.entity.CarType;
-import io.legacyfighter.cabs.service.CarTypeService;
+import io.legacyfighter.cabs.carfleet.CarClass;
+import io.legacyfighter.cabs.carfleet.CarTypeDTO;
+import io.legacyfighter.cabs.carfleet.CarTypeService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 
-import static io.legacyfighter.cabs.entity.CarType.CarClass.VAN;
+import static io.legacyfighter.cabs.carfleet.CarClass.VAN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
@@ -83,11 +83,11 @@ class CarTypeUpdateIntegrationTest {
     }
 
 
-    void registerActiveCar(CarType.CarClass carClass) {
+    void registerActiveCar(CarClass carClass) {
         carTypeService.registerActiveCar(carClass);
     }
 
-    void unregisterActiveCar(CarType.CarClass carClass) {
+    void unregisterActiveCar(CarClass carClass) {
         carTypeService.unregisterActiveCar(carClass);
     }
     
@@ -95,14 +95,14 @@ class CarTypeUpdateIntegrationTest {
         return carTypeService.loadDto(id);
     }
 
-    CarTypeDTO createCarClass(String desc, CarType.CarClass carClass) {
+    CarTypeDTO createCarClass(String desc, CarClass carClass) {
         CarTypeDTO carTypeDTO = new CarTypeDTO();
         carTypeDTO.setCarClass(carClass);
         carTypeDTO.setDescription(desc);
         return carTypeService.loadDto(carTypeService.create(carTypeDTO).getId());
     }
 
-    void thereIsNoCarClassInTheSystem(CarType.CarClass carClass) {
+    void thereIsNoCarClassInTheSystem(CarClass carClass) {
         carTypeService.removeCarType(carClass);
     }
 }

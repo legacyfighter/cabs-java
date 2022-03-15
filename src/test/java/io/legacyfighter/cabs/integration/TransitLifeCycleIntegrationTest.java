@@ -4,8 +4,6 @@ import io.legacyfighter.cabs.common.Fixtures;
 import io.legacyfighter.cabs.dto.AddressDTO;
 import io.legacyfighter.cabs.dto.TransitDTO;
 import io.legacyfighter.cabs.entity.*;
-import io.legacyfighter.cabs.service.DriverSessionService;
-import io.legacyfighter.cabs.service.DriverTrackingService;
 import io.legacyfighter.cabs.service.GeocodingService;
 import io.legacyfighter.cabs.service.TransitService;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +15,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.Instant;
 
-import static io.legacyfighter.cabs.entity.CarType.CarClass.VAN;
+import static io.legacyfighter.cabs.carfleet.CarClass.VAN;
 import static io.legacyfighter.cabs.entity.Transit.Status.*;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.*;

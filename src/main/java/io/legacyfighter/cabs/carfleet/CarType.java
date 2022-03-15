@@ -1,18 +1,14 @@
-package io.legacyfighter.cabs.entity;
+package io.legacyfighter.cabs.carfleet;
 
 import io.legacyfighter.cabs.common.BaseEntity;
 
 import javax.persistence.*;
 
 @Entity
-public class CarType extends BaseEntity {
+class CarType extends BaseEntity {
 
-    public enum Status {
+    enum Status {
         INACTIVE, ACTIVE
-    }
-
-    public enum CarClass {
-        ECO, REGULAR, VAN, PREMIUM
     }
 
     @Enumerated(EnumType.STRING)
@@ -30,62 +26,62 @@ public class CarType extends BaseEntity {
     @Column(nullable = false)
     private int minNoOfCarsToActivateClass;
 
-    public CarType(CarClass carClass, String description, int minNoOfCarsToActivateClass) {
+    CarType(CarClass carClass, String description, int minNoOfCarsToActivateClass) {
         this.carClass = carClass;
         this.description = description;
         this.minNoOfCarsToActivateClass = minNoOfCarsToActivateClass;
     }
 
-    public CarType() {
+    CarType() {
     }
 
-    public void registerCar() {
+    void registerCar() {
         carsCounter++;
     }
 
-    public void unregisterCar() {
+    void unregisterCar() {
         carsCounter--;
         if (carsCounter < 0) {
             throw new IllegalStateException();
         }
     }
 
-    public void activate() {
+    void activate() {
         if (carsCounter < minNoOfCarsToActivateClass) {
             throw new IllegalStateException("Cannot activate car class when less than " + minNoOfCarsToActivateClass + " cars in the fleet");
         }
         this.status = Status.ACTIVE;
     }
 
-    public void deactivate() {
+    void deactivate() {
         this.status = Status.INACTIVE;
     }
 
-    public CarClass getCarClass() {
+    CarClass getCarClass() {
         return carClass;
     }
 
-    public void setCarClass(CarClass carClass) {
+    void setCarClass(CarClass carClass) {
         this.carClass = carClass;
     }
 
-    public String getDescription() {
+    String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
+    void setDescription(String description) {
         this.description = description;
     }
 
-    public Status getStatus() {
+    Status getStatus() {
         return status;
     }
 
-    public int getCarsCounter() {
+    int getCarsCounter() {
         return carsCounter;
     }
 
-    public int getMinNoOfCarsToActivateClass() {
+    int getMinNoOfCarsToActivateClass() {
         return minNoOfCarsToActivateClass;
     }
 
