@@ -6,12 +6,13 @@ import io.legacyfighter.cabs.driverfleet.Driver;
 import io.legacyfighter.cabs.driverfleet.DriverFee;
 import io.legacyfighter.cabs.geolocation.GeocodingService;
 import io.legacyfighter.cabs.geolocation.address.Address;
+import io.legacyfighter.cabs.geolocation.address.AddressDTO;
 import io.legacyfighter.cabs.geolocation.address.AddressRepository;
 import io.legacyfighter.cabs.money.Money;
 import io.legacyfighter.cabs.ride.Transit;
 import io.legacyfighter.cabs.ride.TransitDTO;
+import io.legacyfighter.cabs.ride.RideService;
 import io.legacyfighter.cabs.ride.TransitRepository;
-import io.legacyfighter.cabs.ride.TransitService;
 import io.legacyfighter.cabs.ride.details.TransitDetailsFacade;
 import io.legacyfighter.cabs.tracking.DriverSessionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,7 @@ import static org.mockito.Mockito.when;
 public class RideFixture {
 
     @Autowired
-    TransitService transitService;
+    RideService rideService;
 
     @Autowired
     TransitDetailsFacade transitDetailsFacade;
@@ -56,12 +57,12 @@ public class RideFixture {
         from = addressRepository.save(from);
         destination = addressRepository.save(destination);
         carTypeFixture.anActiveCarCategory(VAN);
-        TransitDTO transitView = transitService.createTransit(client.getId(), from, destination, VAN);
-        transitService.publishTransit(transitView.getRequestId());
-        transitService.findDriversForTransit(transitView.getRequestId());
-        transitService.acceptTransit(driver.getId(), transitView.getRequestId());
-        transitService.startTransit(driver.getId(), transitView.getRequestId());
-        transitService.completeTransit(driver.getId(), transitView.getRequestId(), destination);
+        TransitDTO transitView = rideService.createTransit(client.getId(), new AddressDTO(from), new AddressDTO(destination), VAN);
+        rideService.publishTransit(transitView.getRequestId());
+        rideService.findDriversForTransit(transitView.getRequestId());
+        rideService.acceptTransit(driver.getId(), transitView.getRequestId());
+        rideService.startTransit(driver.getId(), transitView.getRequestId());
+        rideService.completeTransit(driver.getId(), transitView.getRequestId(), destination);
         Long transitID = transitDetailsFacade.find(transitView.getRequestId()).transitId;
         return transitRepository.getOne(transitID);
     }
@@ -78,14 +79,14 @@ public class RideFixture {
         stubbedPrice.stub(new Money(price));
 
         carTypeFixture.anActiveCarCategory(VAN);
-        TransitDTO transit = transitService.createTransit(client.getId(), from, destination, VAN);
-        transitService.publishTransit(transit.getRequestId());
-        transitService.findDriversForTransit(transit.getRequestId());
-        transitService.acceptTransit(driver.getId(), transit.getRequestId());
-        transitService.startTransit(driver.getId(), transit.getRequestId());
+        TransitDTO transit = rideService.createTransit(client.getId(), new AddressDTO(from), new AddressDTO(destination), VAN);
+        rideService.publishTransit(transit.getRequestId());
+        rideService.findDriversForTransit(transit.getRequestId());
+        rideService.acceptTransit(driver.getId(), transit.getRequestId());
+        rideService.startTransit(driver.getId(), transit.getRequestId());
         when(clock.instant()).thenReturn(completedAt);
-        transitService.completeTransit(driver.getId(), transit.getRequestId(), destination);
-        return transitService.loadTransit(transit.getRequestId());
+        rideService.completeTransit(driver.getId(), transit.getRequestId(), destination);
+        return rideService.loadTransit(transit.getRequestId());
     }
 
     public TransitDTO driverHasDoneSessionAndPicksSomeoneUpInCar(Driver driver, Client client, CarClass carClass, String plateNumber, String carBrand, Instant when,
