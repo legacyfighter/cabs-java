@@ -1,6 +1,4 @@
-package io.legacyfighter.cabs.dto;
-
-import io.legacyfighter.cabs.entity.Driver;
+package io.legacyfighter.cabs.driverfleet;
 
 public class DriverDTO {
     private Long id;

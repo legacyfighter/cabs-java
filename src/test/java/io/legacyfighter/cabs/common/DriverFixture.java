@@ -2,10 +2,10 @@ package io.legacyfighter.cabs.common;
 
 
 import io.legacyfighter.cabs.carfleet.CarClass;
+import io.legacyfighter.cabs.driverfleet.*;
 import io.legacyfighter.cabs.entity.*;
-import io.legacyfighter.cabs.entity.Driver.Status;
+import io.legacyfighter.cabs.driverfleet.Driver.Status;
 import io.legacyfighter.cabs.money.Money;
-import io.legacyfighter.cabs.repository.*;
 import io.legacyfighter.cabs.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -94,7 +94,7 @@ class DriverFixture {
         driverSessionService.logOutCurrentSession(driver.getId());
     }
 
-    void driverHasAttribute(Driver driver, DriverAttribute.DriverAttributeName name, String value) {
+    void driverHasAttribute(Driver driver, DriverAttributeName name, String value) {
         driverAttributeRepository.save(new DriverAttribute(driver, name, value));
     }
 }

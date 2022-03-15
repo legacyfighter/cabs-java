@@ -14,8 +14,7 @@ public class DriverSession extends BaseEntity {
 
     private Instant loggedOutAt;
 
-    @ManyToOne
-    private Driver driver;
+    private Long driverId;
 
     @Column(nullable = false)
     private String platesNumber;
@@ -49,12 +48,12 @@ public class DriverSession extends BaseEntity {
         this.loggedOutAt = loggedOutAt;
     }
 
-    public Driver getDriver() {
-        return driver;
+    public Long getDriverId() {
+        return driverId;
     }
 
-    public void setDriver(Driver driver) {
-        this.driver = driver;
+    public void setDriverId(Long driverId) {
+        this.driverId = driverId;
     }
 
     public String getPlatesNumber() {

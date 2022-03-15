@@ -1,4 +1,4 @@
-package io.legacyfighter.cabs.driverreport.travelleddistance;
+package io.legacyfighter.cabs.driverfleet.driverreport.travelleddistance;
 
 
 import io.legacyfighter.cabs.distance.Distance;
@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Clock;
 import java.time.Instant;
 
-import static io.legacyfighter.cabs.driverreport.travelleddistance.TimeSlot.slotThatContains;
+import static io.legacyfighter.cabs.driverfleet.driverreport.travelleddistance.TimeSlot.slotThatContains;
 
 @Service
 public class TravelledDistanceService {

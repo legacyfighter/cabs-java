@@ -7,7 +7,7 @@ import io.legacyfighter.cabs.crm.claims.Claim;
 import io.legacyfighter.cabs.crm.claims.ClaimService;
 import io.legacyfighter.cabs.entity.Address;
 import io.legacyfighter.cabs.entity.Client;
-import io.legacyfighter.cabs.entity.Driver;
+import io.legacyfighter.cabs.driverfleet.Driver;
 import io.legacyfighter.cabs.entity.Transit;
 import io.legacyfighter.cabs.service.AwardsService;
 import io.legacyfighter.cabs.notification.ClientNotificationService;

@@ -1,7 +1,7 @@
 package io.legacyfighter.cabs.repository;
 
 import io.legacyfighter.cabs.dto.DriverPositionDTOV2;
-import io.legacyfighter.cabs.entity.Driver;
+import io.legacyfighter.cabs.driverfleet.Driver;
 import io.legacyfighter.cabs.entity.DriverPosition;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

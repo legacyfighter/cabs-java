@@ -1,11 +1,11 @@
 package io.legacyfighter.cabs.service;
 
 import io.legacyfighter.cabs.distance.Distance;
-import io.legacyfighter.cabs.driverreport.travelleddistance.TravelledDistanceService;
-import io.legacyfighter.cabs.entity.Driver;
+import io.legacyfighter.cabs.driverfleet.driverreport.travelleddistance.TravelledDistanceService;
+import io.legacyfighter.cabs.driverfleet.Driver;
 import io.legacyfighter.cabs.entity.DriverPosition;
 import io.legacyfighter.cabs.repository.DriverPositionRepository;
-import io.legacyfighter.cabs.repository.DriverRepository;
+import io.legacyfighter.cabs.driverfleet.DriverRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,6 +1,7 @@
 package io.legacyfighter.cabs.entity;
 
 import io.legacyfighter.cabs.common.BaseEntity;
+import io.legacyfighter.cabs.driverfleet.Driver;
 
 import javax.persistence.*;
 import java.time.Instant;

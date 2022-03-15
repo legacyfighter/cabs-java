@@ -2,6 +2,7 @@ package io.legacyfighter.cabs.common;
 
 import io.legacyfighter.cabs.carfleet.CarClass;
 import io.legacyfighter.cabs.distance.Distance;
+import io.legacyfighter.cabs.driverfleet.Driver;
 import io.legacyfighter.cabs.dto.AddressDTO;
 import io.legacyfighter.cabs.dto.ClientDTO;
 import io.legacyfighter.cabs.dto.TransitDTO;

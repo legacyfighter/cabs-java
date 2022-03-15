@@ -1,6 +1,6 @@
 package io.legacyfighter.cabs.dto;
 
-import io.legacyfighter.cabs.entity.Driver;
+import io.legacyfighter.cabs.driverfleet.Driver;
 
 import java.time.Instant;
 

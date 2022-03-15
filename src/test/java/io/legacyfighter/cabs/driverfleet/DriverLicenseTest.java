@@ -1,9 +1,9 @@
-package io.legacyfighter.cabs.entity;
+package io.legacyfighter.cabs.driverfleet;
 
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DriverLicenseTest {
 

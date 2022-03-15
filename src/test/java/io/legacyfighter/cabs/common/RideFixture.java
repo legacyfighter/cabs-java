@@ -2,7 +2,7 @@ package io.legacyfighter.cabs.common;
 
 import io.legacyfighter.cabs.entity.Address;
 import io.legacyfighter.cabs.entity.Client;
-import io.legacyfighter.cabs.entity.Driver;
+import io.legacyfighter.cabs.driverfleet.Driver;
 import io.legacyfighter.cabs.entity.Transit;
 import io.legacyfighter.cabs.money.Money;
 import io.legacyfighter.cabs.repository.AddressRepository;

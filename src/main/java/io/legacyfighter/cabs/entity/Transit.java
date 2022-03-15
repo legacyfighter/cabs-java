@@ -2,6 +2,7 @@ package io.legacyfighter.cabs.entity;
 
 import io.legacyfighter.cabs.common.BaseEntity;
 import io.legacyfighter.cabs.distance.Distance;
+import io.legacyfighter.cabs.driverfleet.Driver;
 import io.legacyfighter.cabs.money.Money;
 
 import javax.persistence.*;

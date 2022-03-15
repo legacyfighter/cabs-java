@@ -1,7 +1,11 @@
-package io.legacyfighter.cabs.dto;
+package io.legacyfighter.cabs.driverfleet.driverreport;
 
 
-import io.legacyfighter.cabs.entity.DriverAttribute;
+import io.legacyfighter.cabs.driverfleet.DriverAttributeDTO;
+import io.legacyfighter.cabs.driverfleet.DriverDTO;
+import io.legacyfighter.cabs.dto.DriverSessionDTO;
+import io.legacyfighter.cabs.dto.TransitDTO;
+import io.legacyfighter.cabs.driverfleet.DriverAttributeName;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,7 +44,7 @@ public class DriverReport {
         this.sessions = sessions;
     }
 
-    public void addAttr(DriverAttribute.DriverAttributeName name, String value) {
+    public void addAttr(DriverAttributeName name, String value) {
         attributes.add(new DriverAttributeDTO(name, value));
     }
 }
