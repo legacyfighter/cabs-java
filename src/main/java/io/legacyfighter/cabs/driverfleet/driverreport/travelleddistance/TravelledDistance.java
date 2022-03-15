@@ -1,6 +1,6 @@
 package io.legacyfighter.cabs.driverfleet.driverreport.travelleddistance;
 
-import io.legacyfighter.cabs.distance.Distance;
+import io.legacyfighter.cabs.geolocation.Distance;
 
 import javax.persistence.*;
 import java.time.*;

@@ -1,4 +1,4 @@
-package io.legacyfighter.cabs.distance;
+package io.legacyfighter.cabs.geolocation;
 
 import javax.persistence.Embeddable;
 import java.util.Locale;

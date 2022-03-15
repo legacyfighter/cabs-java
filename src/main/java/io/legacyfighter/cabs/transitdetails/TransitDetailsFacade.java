@@ -2,8 +2,8 @@ package io.legacyfighter.cabs.transitdetails;
 
 
 import io.legacyfighter.cabs.carfleet.CarClass;
-import io.legacyfighter.cabs.distance.Distance;
-import io.legacyfighter.cabs.entity.Address;
+import io.legacyfighter.cabs.geolocation.Distance;
+import io.legacyfighter.cabs.geolocation.address.Address;
 import io.legacyfighter.cabs.entity.Client;
 import io.legacyfighter.cabs.entity.Tariff;
 import io.legacyfighter.cabs.entity.Transit;

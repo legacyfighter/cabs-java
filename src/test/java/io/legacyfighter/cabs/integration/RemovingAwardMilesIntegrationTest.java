@@ -6,7 +6,7 @@ import io.legacyfighter.cabs.loyalty.AwardedMiles;
 import io.legacyfighter.cabs.entity.Client;
 import io.legacyfighter.cabs.loyalty.AwardsAccountRepository;
 import io.legacyfighter.cabs.loyalty.AwardsService;
-import io.legacyfighter.cabs.service.GeocodingService;
+import io.legacyfighter.cabs.geolocation.GeocodingService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

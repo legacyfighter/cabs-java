@@ -1,10 +1,11 @@
 package io.legacyfighter.cabs.integration;
 
 import io.legacyfighter.cabs.common.Fixtures;
-import io.legacyfighter.cabs.dto.AddressDTO;
+import io.legacyfighter.cabs.geolocation.address.AddressDTO;
 import io.legacyfighter.cabs.dto.TransitDTO;
 import io.legacyfighter.cabs.entity.*;
-import io.legacyfighter.cabs.service.GeocodingService;
+import io.legacyfighter.cabs.geolocation.address.Address;
+import io.legacyfighter.cabs.geolocation.GeocodingService;
 import io.legacyfighter.cabs.service.TransitService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

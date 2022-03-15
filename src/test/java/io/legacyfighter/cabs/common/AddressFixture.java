@@ -2,8 +2,8 @@ package io.legacyfighter.cabs.common;
 
 
 
-import io.legacyfighter.cabs.entity.Address;
-import io.legacyfighter.cabs.repository.AddressRepository;
+import io.legacyfighter.cabs.geolocation.address.Address;
+import io.legacyfighter.cabs.geolocation.address.AddressRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

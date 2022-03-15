@@ -3,8 +3,9 @@ package io.legacyfighter.cabs.common;
 
 import io.legacyfighter.cabs.carfleet.CarClass;
 import io.legacyfighter.cabs.driverfleet.*;
-import io.legacyfighter.cabs.entity.*;
 import io.legacyfighter.cabs.driverfleet.Driver.Status;
+import io.legacyfighter.cabs.geolocation.GeocodingService;
+import io.legacyfighter.cabs.geolocation.address.Address;
 import io.legacyfighter.cabs.money.Money;
 import io.legacyfighter.cabs.service.*;
 import org.springframework.beans.factory.annotation.Autowired;

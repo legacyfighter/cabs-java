@@ -1,7 +1,8 @@
 package io.legacyfighter.cabs.entity;
 
 import io.legacyfighter.cabs.common.BaseEntity;
-import io.legacyfighter.cabs.distance.Distance;
+import io.legacyfighter.cabs.geolocation.address.Address;
+import io.legacyfighter.cabs.geolocation.Distance;
 import io.legacyfighter.cabs.driverfleet.Driver;
 import io.legacyfighter.cabs.money.Money;
 
@@ -10,7 +11,7 @@ import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
-import static io.legacyfighter.cabs.distance.Distance.ofKm;
+import static io.legacyfighter.cabs.geolocation.Distance.ofKm;
 
 @Entity
 public class Transit extends BaseEntity {

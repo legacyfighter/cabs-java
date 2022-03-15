@@ -1,23 +1,16 @@
-package io.legacyfighter.cabs.dto;
+package io.legacyfighter.cabs.geolocation.address;
 
-import io.legacyfighter.cabs.entity.Address;
+import io.legacyfighter.cabs.common.BaseEntity;
 
-public class AddressDTO  {
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import java.util.Objects;
 
-    public AddressDTO() {
+@Entity
+public class Address extends BaseEntity {
 
-    }
+    public Address() {
 
-    public AddressDTO(Address a) {
-        country = a.getCountry();
-        district = a.getDistrict();
-        city = a.getCity();
-        street = a.getStreet();
-        buildingNumber = a.getBuildingNumber();
-        additionalNumber = a.getAdditionalNumber();
-        postalCode = a.getPostalCode();
-        name = a.getName();
-        hash = a.getHash();
     }
 
     private String country;
@@ -36,10 +29,19 @@ public class AddressDTO  {
 
     private String name;
 
+    @Column(unique=true)
     private Integer hash;
 
-    public AddressDTO(String country, String city, String street, Integer buildingNumber) {
+    public Address(String country, String city, String street, int buildingNumber) {
         this.country = country;
+        this.city = city;
+        this.street = street;
+        this.buildingNumber = buildingNumber;
+    }
+
+    public Address(String country, String district, String city, String street, int buildingNumber) {
+        this.country = country;
+        this.district = district;
         this.city = city;
         this.street = street;
         this.buildingNumber = buildingNumber;
@@ -109,24 +111,39 @@ public class AddressDTO  {
         this.name = name;
     }
 
+    public void hash() {
+        hash = Objects.hash(country, district, city, street, buildingNumber, additionalNumber, postalCode, name);
+    }
+
     public Integer getHash() {
         return hash;
     }
 
-    public void setHash(Integer hash) {
-        this.hash = hash;
+    @Override
+    public String toString() {
+        return "Address{" +
+                "id='" + getId() + '\'' +
+                ", country='" + country + '\'' +
+                ", district='" + district + '\'' +
+                ", city='" + city + '\'' +
+                ", street='" + street + '\'' +
+                ", buildingNumber=" + buildingNumber +
+                ", additionalNumber=" + additionalNumber +
+                ", postalCode='" + postalCode + '\'' +
+                ", name='" + name + '\'' +
+                '}';
     }
 
-    public Address toAddressEntity() {
-        Address address = new Address();
-        address.setAdditionalNumber(this.getAdditionalNumber());
-        address.setBuildingNumber(this.getBuildingNumber());
-        address.setCity(this.getCity());
-        address.setName(this.getName());
-        address.setStreet(this.getStreet());
-        address.setCountry(this.getCountry());
-        address.setPostalCode(this.getPostalCode());
-        address.setDistrict(this.getDistrict());
-        return address;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (!(o instanceof Address))
+            return false;
+
+        Address other = (Address) o;
+
+        return this.getId() != null &&
+                this.getId().equals(other.getId());
     }
 }

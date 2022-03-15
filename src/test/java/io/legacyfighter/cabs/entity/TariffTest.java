@@ -1,11 +1,10 @@
 package io.legacyfighter.cabs.entity;
 
-import io.legacyfighter.cabs.distance.Distance;
 import io.legacyfighter.cabs.money.Money;
 import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 
-import static io.legacyfighter.cabs.distance.Distance.ofKm;
+import static io.legacyfighter.cabs.geolocation.Distance.ofKm;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TariffTest {
