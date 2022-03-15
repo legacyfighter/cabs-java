@@ -1,4 +1,4 @@
-package io.legacyfighter.cabs.transitanalyzer;
+package io.legacyfighter.cabs.crm.transitanalyzer;
 
 
 import io.legacyfighter.cabs.entity.events.TransitCompleted;

@@ -8,7 +8,7 @@ import io.legacyfighter.cabs.entity.Address;
 import io.legacyfighter.cabs.entity.Client;
 import io.legacyfighter.cabs.entity.Driver;
 import io.legacyfighter.cabs.service.GeocodingService;
-import io.legacyfighter.cabs.ui.TransitAnalyzerController;
+import io.legacyfighter.cabs.crm.transitanalyzer.TransitAnalyzerController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
