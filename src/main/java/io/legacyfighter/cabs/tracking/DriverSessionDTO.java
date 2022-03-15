@@ -1,7 +1,6 @@
-package io.legacyfighter.cabs.dto;
+package io.legacyfighter.cabs.tracking;
 
 import io.legacyfighter.cabs.carfleet.CarClass;
-import io.legacyfighter.cabs.entity.DriverSession;
 
 import java.time.Instant;
 

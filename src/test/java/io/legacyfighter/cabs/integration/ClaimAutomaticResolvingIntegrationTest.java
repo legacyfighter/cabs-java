@@ -264,7 +264,7 @@ class ClaimAutomaticResolvingIntegrationTest {
     }
 
     Transit aTransit(Address pickup, Client client, Driver driver, int price) {
-        return fixtures.aJourney(price, client, driver, pickup, fixtures.anAddress());
+        return fixtures.aRide(price, client, driver, pickup, fixtures.anAddress());
     }
 
     void lowCostThresholdIs(int price) {

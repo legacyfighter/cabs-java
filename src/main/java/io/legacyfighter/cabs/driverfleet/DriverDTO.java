@@ -15,6 +15,9 @@ public class DriverDTO {
 
     private Driver.Type type;
 
+    private boolean isOccupied;
+
+
     public DriverDTO(Long id, String firstName, String lastName, String driverLicense, String photo, Driver.Status status, Driver.Type type) {
         this.id = id;
         this.firstName = firstName;
@@ -33,7 +36,7 @@ public class DriverDTO {
         photo = driver.getPhoto();
         status = driver.getStatus();
         type = driver.getType();
-
+        isOccupied = driver.getOccupied();
     }
 
     public Long getId() {
@@ -93,4 +96,7 @@ public class DriverDTO {
     }
 
 
+    public boolean isOccupied() {
+        return isOccupied;
+    }
 }

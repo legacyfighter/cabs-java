@@ -1,16 +1,18 @@
 package io.legacyfighter.cabs.entity;
 
 import io.legacyfighter.cabs.common.BaseEntity;
+import io.legacyfighter.cabs.common.JsonToCollectionMapper;
 import io.legacyfighter.cabs.crm.Client;
-import io.legacyfighter.cabs.geolocation.address.Address;
 import io.legacyfighter.cabs.geolocation.Distance;
-import io.legacyfighter.cabs.driverfleet.Driver;
+import io.legacyfighter.cabs.geolocation.address.Address;
 import io.legacyfighter.cabs.money.Money;
 
 import javax.persistence.*;
-import java.time.*;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.EnumSet;
+import java.util.Set;
 
 import static io.legacyfighter.cabs.geolocation.Distance.ofKm;
 
@@ -45,14 +47,11 @@ public class Transit extends BaseEntity {
 
     public Integer pickupAddressChangeCounter = 0;
 
-    @ManyToOne
-    public Driver driver;
+    public Long driverId;
 
-    @ManyToMany
-    public Set<Driver> driversRejections = new HashSet<>();
+    public String driversRejections;
 
-    @ManyToMany
-    public Set<Driver> proposedDrivers = new HashSet<>();
+    public String proposedDrivers;
 
     public Integer awaitingDriversResponses = 0;
 
@@ -120,27 +119,33 @@ public class Transit extends BaseEntity {
             throw new IllegalStateException("Transit cannot be cancelled, id = " + getId());
         }
         this.status = Status.CANCELLED;
-        this.driver = null;
+        this.driverId = null;
         this.km = Distance.ZERO.toKmInFloat();
         this.awaitingDriversResponses = 0;
 
     }
 
-    public boolean canProposeTo(Driver driver) {
-        return !this.driversRejections
-                .contains(driver);
+    public boolean canProposeTo(Long driverId) {
+        return !getProposedDrivers()
+                .contains(driverId);
     }
 
-    public void proposeTo(Driver driver) {
-        if (canProposeTo(driver)) {
-            this.proposedDrivers.add(driver);
+    public void proposeTo(Long driverId) {
+        if (canProposeTo(driverId)) {
+            addDriverToProposed(driverId);
             this.awaitingDriversResponses++;
         }
     }
 
+    private void addDriverToProposed(Long driverId) {
+        Set<Long> proposedDriversSet = getProposedDrivers();
+        proposedDriversSet.add(driverId);
+        proposedDrivers = JsonToCollectionMapper.serialize(proposedDriversSet);
+    }
+
     public void failDriverAssignment() {
         this.status = Status.DRIVER_ASSIGNMENT_FAILED;
-        this.driver = null;
+        this.driverId = null;
         this.km = Distance.ZERO.toKmInFloat();
         this.awaitingDriversResponses = 0;
     }
@@ -149,19 +154,18 @@ public class Transit extends BaseEntity {
         return (status.equals(Transit.Status.CANCELLED) || published.plus(300, ChronoUnit.SECONDS).isBefore(date));
     }
 
-    public void acceptBy(Driver driver, Instant when) {
-        if (this.driver != null) {
+    public void acceptBy(Long driverId, Instant when) {
+        if (this.driverId != null) {
             throw new IllegalStateException("Transit already accepted, id = " + getId());
         } else {
-            if (!proposedDrivers.contains(driver)) {
+            if (!getProposedDrivers().contains(driverId)) {
                 throw new IllegalStateException("Driver out of possible drivers, id = " + getId());
             } else {
-                if (driversRejections.contains(driver)) {
+                if (getDriverRejections().contains(driverId)) {
                     throw new IllegalStateException("Driver out of possible drivers, id = " + getId());
                 }
             }
-            this.driver = driver;
-            this.driver.setOccupied(true);
+            this.driverId = driverId;
             this.awaitingDriversResponses = 0;
             this.status = Status.TRANSIT_TO_PASSENGER;
         }
@@ -174,9 +178,15 @@ public class Transit extends BaseEntity {
         this.status = Status.IN_TRANSIT;
     }
 
-    public void rejectBy(Driver driver) {
-        driversRejections.add(driver);
+    public void rejectBy(Long driverId) {
+        addToDriverRejections(driverId);
         awaitingDriversResponses--;
+    }
+
+    private void addToDriverRejections(Long driverId) {
+        Set<Long> driverRejectionSet = getDriverRejections();
+        driverRejectionSet.add(driverId);
+        driversRejections = JsonToCollectionMapper.serialize(driverRejectionSet);
     }
 
     public void publishAt(Instant when) {
@@ -195,8 +205,8 @@ public class Transit extends BaseEntity {
         }
     }
 
-    public Driver getDriver() {
-        return driver;
+    public Long getDriverId() {
+        return driverId;
     }
 
     public Money getPrice() {
@@ -256,8 +266,12 @@ public class Transit extends BaseEntity {
         return awaitingDriversResponses;
     }
 
-    public Set<Driver> getProposedDrivers() {
-        return proposedDrivers;
+    public Set<Long> getDriverRejections() {
+        return JsonToCollectionMapper.deserialize(driversRejections);
+    }
+
+    public Set<Long> getProposedDrivers() {
+        return JsonToCollectionMapper.deserialize(proposedDrivers);
     }
 
     @Override

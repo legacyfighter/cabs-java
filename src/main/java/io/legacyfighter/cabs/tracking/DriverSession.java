@@ -1,4 +1,4 @@
-package io.legacyfighter.cabs.entity;
+package io.legacyfighter.cabs.tracking;
 
 import io.legacyfighter.cabs.carfleet.CarClass;
 import io.legacyfighter.cabs.common.BaseEntity;
@@ -7,7 +7,8 @@ import javax.persistence.*;
 import java.time.Instant;
 
 @Entity
-public class DriverSession extends BaseEntity {
+public
+class DriverSession extends BaseEntity {
 
     @Column(nullable = false)
     private Instant loggedAt;
@@ -22,29 +23,29 @@ public class DriverSession extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private CarClass carClass;
 
-    public String getCarBrand() {
+    private String carBrand;
+
+    String getCarBrand() {
         return carBrand;
     }
 
-    public void setCarBrand(String carBrand) {
+    void setCarBrand(String carBrand) {
         this.carBrand = carBrand;
     }
 
-    private String carBrand;
-
-    public Instant getLoggedAt() {
+    Instant getLoggedAt() {
         return loggedAt;
     }
 
-    public void setLoggedAt(Instant loggedAt) {
+    void setLoggedAt(Instant loggedAt) {
         this.loggedAt = loggedAt;
     }
 
-    public Instant getLoggedOutAt() {
+    Instant getLoggedOutAt() {
         return loggedOutAt;
     }
 
-    public void setLoggedOutAt(Instant loggedOutAt) {
+    void setLoggedOutAt(Instant loggedOutAt) {
         this.loggedOutAt = loggedOutAt;
     }
 
@@ -52,23 +53,23 @@ public class DriverSession extends BaseEntity {
         return driverId;
     }
 
-    public void setDriverId(Long driverId) {
+    void setDriverId(Long driverId) {
         this.driverId = driverId;
     }
 
-    public String getPlatesNumber() {
+    String getPlatesNumber() {
         return platesNumber;
     }
 
-    public void setPlatesNumber(String platesNumber) {
+    void setPlatesNumber(String platesNumber) {
         this.platesNumber = platesNumber;
     }
 
-    public CarClass getCarClass() {
+    CarClass getCarClass() {
         return carClass;
     }
 
-    public void setCarClass(CarClass carClass) {
+    void setCarClass(CarClass carClass) {
         this.carClass = carClass;
     }
 

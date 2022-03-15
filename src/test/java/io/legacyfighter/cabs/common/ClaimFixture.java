@@ -4,6 +4,7 @@ package io.legacyfighter.cabs.common;
 import io.legacyfighter.cabs.crm.claims.ClaimDTO;
 import io.legacyfighter.cabs.crm.claims.Claim;
 import io.legacyfighter.cabs.crm.Client;
+import io.legacyfighter.cabs.dto.TransitDTO;
 import io.legacyfighter.cabs.entity.Transit;
 import io.legacyfighter.cabs.crm.claims.ClaimService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,7 @@ class ClaimFixture {
         return claim;
     }
 
-    Claim createClaim(Client client, Transit transit, String reason) {
+    Claim createClaim(Client client, TransitDTO transit, String reason) {
         ClaimDTO claimDTO = claimDto("Okradli mnie na hajs", reason, client.getId(), transit.getId());
         claimDTO.setDraft(false);
         return claimService.create(claimDTO);

@@ -1,16 +1,14 @@
-package io.legacyfighter.cabs.entity;
+package io.legacyfighter.cabs.tracking;
 
 import io.legacyfighter.cabs.common.BaseEntity;
-import io.legacyfighter.cabs.driverfleet.Driver;
 
 import javax.persistence.*;
 import java.time.Instant;
 
 @Entity
-public class DriverPosition extends BaseEntity {
+class DriverPosition extends BaseEntity {
 
-    @ManyToOne
-    private Driver driver;
+    private Long driverId;
 
     @Column(nullable = false)
     private double latitude;
@@ -21,45 +19,38 @@ public class DriverPosition extends BaseEntity {
     @Column(nullable = false)
     private Instant seenAt;
 
-    public DriverPosition() {
+    DriverPosition() {
     }
 
-    public DriverPosition(Driver driver, Instant seenAt, double latitude, double longitude) {
-        this.driver = driver;
-        this.seenAt = seenAt;
-        this.latitude = latitude;
-        this.longitude = longitude;
+    Long getDriverId() {
+        return driverId;
     }
 
-    public Driver getDriver() {
-        return driver;
+    void setDriverId(Long driverId) {
+        this.driverId = driverId;
     }
 
-    public void setDriver(Driver driver) {
-        this.driver = driver;
-    }
-
-    public double getLatitude() {
+    double getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(double latitude) {
+    void setLatitude(double latitude) {
         this.latitude = latitude;
     }
 
-    public double getLongitude() {
+    double getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(double longitude) {
+    void setLongitude(double longitude) {
         this.longitude = longitude;
     }
 
-    public Instant getSeenAt() {
+    Instant getSeenAt() {
         return seenAt;
     }
 
-    public void setSeenAt(Instant seenAt) {
+    void setSeenAt(Instant seenAt) {
         this.seenAt = seenAt;
     }
 

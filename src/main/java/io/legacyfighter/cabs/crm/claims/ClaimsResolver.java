@@ -1,16 +1,12 @@
 package io.legacyfighter.cabs.crm.claims;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.legacyfighter.cabs.common.BaseEntity;
+import io.legacyfighter.cabs.common.JsonToCollectionMapper;
 import io.legacyfighter.cabs.crm.Client;
 
 import javax.persistence.Entity;
-import java.util.HashSet;
 import java.util.Set;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.PropertyAccessor.FIELD;
 import static io.legacyfighter.cabs.crm.claims.ClaimsResolver.WhoToAsk.*;
 import static io.legacyfighter.cabs.crm.claims.Status.ESCALATED;
 import static io.legacyfighter.cabs.crm.claims.Status.REFUNDED;
@@ -75,11 +71,11 @@ class ClaimsResolver extends BaseEntity {
     private void addNewClaimFor(Long transitId) {
         Set<Long> transitsIds = getClaimedTransitsIds();
         transitsIds.add(transitId);
-        claimedTransitsIds = JsonMapper.serialize(transitsIds);
+        claimedTransitsIds = JsonToCollectionMapper.serialize(transitsIds);
     }
 
     private Set<Long> getClaimedTransitsIds() {
-        return JsonMapper.deserialize(claimedTransitsIds);
+        return JsonToCollectionMapper.deserialize(claimedTransitsIds);
     }
 
     private int numberOfClaims() {
@@ -88,31 +84,3 @@ class ClaimsResolver extends BaseEntity {
 
 }
 
-class JsonMapper {
-
-    private static ObjectMapper objectMapper;
-
-    static {
-        objectMapper = new ObjectMapper();
-        objectMapper.setVisibility(FIELD, ANY);
-    }
-
-    static Set<Long> deserialize(String json) {
-        if (json == null) {
-            return new HashSet<>();
-        }
-        try {
-            return objectMapper.readValue(json, objectMapper.getTypeFactory().constructCollectionType(Set.class, Long.class));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-    static String serialize(Set<Long> transitsIds) {
-        try {
-            return objectMapper.writeValueAsString(transitsIds);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-}

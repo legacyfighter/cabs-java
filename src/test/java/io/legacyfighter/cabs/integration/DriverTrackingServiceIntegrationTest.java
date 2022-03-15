@@ -3,7 +3,7 @@ package io.legacyfighter.cabs.integration;
 import io.legacyfighter.cabs.common.Fixtures;
 import io.legacyfighter.cabs.geolocation.Distance;
 import io.legacyfighter.cabs.driverfleet.Driver;
-import io.legacyfighter.cabs.service.DriverTrackingService;
+import io.legacyfighter.cabs.tracking.DriverTrackingService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

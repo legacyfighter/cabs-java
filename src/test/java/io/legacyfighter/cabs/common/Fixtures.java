@@ -55,12 +55,15 @@ public class Fixtures {
         return addressFixture.anAddress();
     }
 
+    public AddressDTO anAddress(GeocodingService geocodingService, String country, String city, String street, int buildingNumber) {
+        return addressFixture.anAddress(geocodingService, country, city, street, buildingNumber);
+    }
+
     public Client aClient() {
         return clientFixture.aClient();
     }
 
     public Client aClient(Client.Type type) {
-        ;
         return clientFixture.aClient(type);
     }
 
@@ -96,6 +99,10 @@ public class Fixtures {
         return driverFixture.aNearbyDriver(stubbedGeocodingService, pickup);
     }
 
+    public Driver aNearbyDriver(GeocodingService stubbedGeocodingService, Address pickup, double latitude, double longitude) {
+        return driverFixture.aNearbyDriver(stubbedGeocodingService, pickup, latitude, longitude);
+    }
+
     public Driver aNearbyDriver(String plateNumber, double latitude, double longitude, CarClass carClass, Instant when) {
         return driverFixture.aNearbyDriver(plateNumber, latitude, longitude, carClass, when, "brand");
     }
@@ -108,11 +115,11 @@ public class Fixtures {
         driverFixture.driverHasAttribute(driver, name, value);
     }
 
-    public Transit aJourney(int price, Client client, Driver driver, Address from, Address destination) {
+    public Transit aRide(int price, Client client, Driver driver, Address from, Address destination) {
         return rideFixture.aRide(price, client, driver, from, destination);
     }
 
-    public Transit aJourneyWithFixedClock(int price, Instant publishedAt, Instant completedAt, Client client, Driver driver, Address from, Address destination, Clock clock) {
+    public Transit aRideWithFixedClock(int price, Instant publishedAt, Instant completedAt, Client client, Driver driver, Address from, Address destination, Clock clock) {
         return rideFixture.aRideWithFixedClock(price, publishedAt, completedAt, client, driver, from, destination, clock);
     }
 
@@ -125,7 +132,7 @@ public class Fixtures {
                 .forEach(i -> {
                     Address pickup = anAddress();
                     Driver driver = aNearbyDriver(geocodingService, pickup);
-                    aJourney(10, client, driver, pickup, anAddress());
+                    aRide(10, client, driver, pickup, anAddress());
                 });
     }
 
@@ -133,7 +140,7 @@ public class Fixtures {
         return claimFixture.createClaim(client, transit);
     }
 
-    public Claim createClaim(Client client, Transit transit, String reason) {
+    public Claim createClaim(Client client, TransitDTO transit, String reason) {
         return claimFixture.createClaim(client, transit, reason);
     }
 

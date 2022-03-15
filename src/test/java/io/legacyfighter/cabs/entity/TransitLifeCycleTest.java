@@ -1,19 +1,20 @@
 package io.legacyfighter.cabs.entity;
 
-import io.legacyfighter.cabs.geolocation.address.Address;
 import io.legacyfighter.cabs.geolocation.Distance;
-import io.legacyfighter.cabs.driverfleet.Driver;
+import io.legacyfighter.cabs.geolocation.address.Address;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-
-import static io.legacyfighter.cabs.geolocation.Distance.ofKm;
 import static io.legacyfighter.cabs.entity.Transit.Status.*;
+import static io.legacyfighter.cabs.geolocation.Distance.ofKm;
 import static java.time.Instant.now;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TransitLifeCycleTest {
+
+    public static final long DRIVER_ID = 1L;
+    public static final long SECOND_DRIVER_ID = 2L;
 
     @Test
     void canCreateTransit() {
@@ -46,15 +47,13 @@ class TransitLifeCycleTest {
         //given
         Address destination = new Address("Polska", "Warszawa", "Żytnia", 25);
         //and
-        Driver driver = new Driver();
-        //and
         Transit transit = requestTransit();
         //and
         transit.publishAt(now());
         //and
-        transit.proposeTo(driver);
+        transit.proposeTo(DRIVER_ID);
         //and
-        transit.acceptBy(driver, now());
+        transit.acceptBy(DRIVER_ID, now());
         //and
         transit.start(now());
         //and
@@ -81,8 +80,6 @@ class TransitLifeCycleTest {
         //given
         Address destination = new Address("Polska", "Warszawa", "Żytnia", 25);
         //and
-        Driver driver = new Driver();
-        //and
         Transit transit = requestTransit();
 
         //and
@@ -90,9 +87,9 @@ class TransitLifeCycleTest {
         //and
         transit.publishAt(now());
         //and
-        transit.proposeTo(driver);
+        transit.proposeTo(DRIVER_ID);
         //and
-        transit.acceptBy(driver, now());
+        transit.acceptBy(DRIVER_ID, now());
 
         //expect
         assertThatExceptionOfType(IllegalStateException.class)
@@ -163,13 +160,11 @@ class TransitLifeCycleTest {
         //and
         Transit transit = requestTransit();
         //and
-        Driver driver = new Driver();
-        //and
         transit.publishAt(now());
         //and
-        transit.proposeTo(driver);
+        transit.proposeTo(DRIVER_ID);
         //and
-        transit.acceptBy(driver, now());
+        transit.acceptBy(DRIVER_ID, now());
 
         //and
         transit.start(now());
@@ -202,14 +197,12 @@ class TransitLifeCycleTest {
         //given
         Transit transit = requestTransit();
         //and
-        Driver driver = new Driver();
-        //and
         transit.publishAt(now());
         //and
-        transit.proposeTo(driver);
+        transit.proposeTo(DRIVER_ID);
 
         //when
-        transit.acceptBy(driver, now());
+        transit.acceptBy(DRIVER_ID, now());
         //then
         assertEquals(TRANSIT_TO_PASSENGER, transit.getStatus());
     }
@@ -219,19 +212,16 @@ class TransitLifeCycleTest {
         //given
         Transit transit = requestTransit();
         //and
-        Driver driver = new Driver();
-        //and
-        Driver secondDriver = new Driver();
         //and
         transit.publishAt(now());
         //and
-        transit.proposeTo(driver);
+        transit.proposeTo(DRIVER_ID);
         //and
-        transit.acceptBy(driver, now());
+        transit.acceptBy(DRIVER_ID, now());
 
         //expect
         assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> transit.acceptBy(secondDriver, now()));
+                .isThrownBy(() -> transit.acceptBy(SECOND_DRIVER_ID, now()));
     }
 
     @Test
@@ -239,15 +229,13 @@ class TransitLifeCycleTest {
         //given
         Transit transit = requestTransit();
         //and
-        Driver driver = new Driver();
-        //and
         transit.publishAt(now());
         //and
-        transit.rejectBy(driver);
+        transit.rejectBy(DRIVER_ID);
 
         //expect
         assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> transit.acceptBy(driver, now()));
+                .isThrownBy(() -> transit.acceptBy(DRIVER_ID, now()));
     }
 
     @Test
@@ -255,13 +243,11 @@ class TransitLifeCycleTest {
         //given
         Transit transit = requestTransit();
         //and
-        Driver driver = new Driver();
-        //and
         transit.publishAt(now());
 
         //expect
         assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> transit.acceptBy(driver, now()));
+                .isThrownBy(() -> transit.acceptBy(DRIVER_ID, now()));
     }
 
     @Test
@@ -269,13 +255,11 @@ class TransitLifeCycleTest {
         //given
         Transit transit = requestTransit();
         //and
-        Driver driver = new Driver();
-        //and
         transit.publishAt(now());
         //and
-        transit.proposeTo(driver);
+        transit.proposeTo(DRIVER_ID);
         //and
-        transit.acceptBy(driver, now());
+        transit.acceptBy(DRIVER_ID, now());
         //when
         transit.start(now());
 
@@ -303,13 +287,11 @@ class TransitLifeCycleTest {
         //and
         Transit transit = requestTransit();
         //and
-        Driver driver = new Driver();
-        //and
         transit.publishAt(now());
         //and
-        transit.proposeTo(driver);
+        transit.proposeTo(DRIVER_ID);
         //and
-        transit.acceptBy(driver, now());
+        transit.acceptBy(DRIVER_ID, now());
         //and
         transit.start(now());
 
@@ -331,13 +313,11 @@ class TransitLifeCycleTest {
         Transit transit = requestTransit();
 
         //and
-        Driver driver = new Driver();
-        //and
         transit.publishAt(now());
         //and
-        transit.proposeTo(driver);
+        transit.proposeTo(DRIVER_ID);
         //and
-        transit.acceptBy(driver, now());
+        transit.acceptBy(DRIVER_ID, now());
 
         //expect
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -349,12 +329,10 @@ class TransitLifeCycleTest {
         //given
         Transit transit = requestTransit();
         //and
-        Driver driver = new Driver();
-        //and
         transit.publishAt(now());
 
         //when
-        transit.rejectBy(driver);
+        transit.rejectBy(DRIVER_ID);
 
         //then
         assertEquals(WAITING_FOR_DRIVER_ASSIGNMENT, transit.getStatus());
