@@ -1,9 +1,9 @@
 package io.legacyfighter.cabs.common;
 
 
-import io.legacyfighter.cabs.entity.Client;
+import io.legacyfighter.cabs.crm.Client;
 
-import io.legacyfighter.cabs.repository.ClientRepository;
+import io.legacyfighter.cabs.crm.ClientRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

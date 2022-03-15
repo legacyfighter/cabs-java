@@ -2,6 +2,7 @@ package io.legacyfighter.cabs.transitdetails;
 
 import io.legacyfighter.cabs.carfleet.CarClass;
 import io.legacyfighter.cabs.common.BaseEntity;
+import io.legacyfighter.cabs.crm.Client;
 import io.legacyfighter.cabs.geolocation.address.Address;
 import io.legacyfighter.cabs.geolocation.Distance;
 import io.legacyfighter.cabs.entity.*;

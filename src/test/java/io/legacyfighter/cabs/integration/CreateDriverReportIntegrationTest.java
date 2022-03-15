@@ -11,7 +11,7 @@ import io.legacyfighter.cabs.driverfleet.driverreport.DriverReport;
 import io.legacyfighter.cabs.driverfleet.driverreport.DriverReportController;
 import io.legacyfighter.cabs.dto.TransitDTO;
 import io.legacyfighter.cabs.geolocation.address.Address;
-import io.legacyfighter.cabs.entity.Client;
+import io.legacyfighter.cabs.crm.Client;
 import io.legacyfighter.cabs.entity.Transit;
 import io.legacyfighter.cabs.geolocation.address.AddressRepository;
 import io.legacyfighter.cabs.service.DriverSessionService;

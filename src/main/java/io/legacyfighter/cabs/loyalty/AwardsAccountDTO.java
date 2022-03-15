@@ -1,6 +1,6 @@
 package io.legacyfighter.cabs.loyalty;
 
-import io.legacyfighter.cabs.dto.ClientDTO;
+import io.legacyfighter.cabs.crm.ClientDTO;
 
 import java.time.Instant;
 

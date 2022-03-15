@@ -1,4 +1,4 @@
-package io.legacyfighter.cabs.entity;
+package io.legacyfighter.cabs.crm;
 
 import io.legacyfighter.cabs.common.BaseEntity;
 

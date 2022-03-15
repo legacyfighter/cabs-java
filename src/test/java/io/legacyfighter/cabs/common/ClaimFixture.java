@@ -3,7 +3,7 @@ package io.legacyfighter.cabs.common;
 
 import io.legacyfighter.cabs.crm.claims.ClaimDTO;
 import io.legacyfighter.cabs.crm.claims.Claim;
-import io.legacyfighter.cabs.entity.Client;
+import io.legacyfighter.cabs.crm.Client;
 import io.legacyfighter.cabs.entity.Transit;
 import io.legacyfighter.cabs.crm.claims.ClaimService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -3,7 +3,7 @@ package io.legacyfighter.cabs.crm.claims;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.legacyfighter.cabs.common.BaseEntity;
-import io.legacyfighter.cabs.entity.Client;
+import io.legacyfighter.cabs.crm.Client;
 
 import javax.persistence.Entity;
 import java.util.HashSet;

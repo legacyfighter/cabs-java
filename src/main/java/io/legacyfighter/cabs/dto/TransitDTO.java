@@ -1,6 +1,7 @@
 package io.legacyfighter.cabs.dto;
 
 import io.legacyfighter.cabs.carfleet.CarClass;
+import io.legacyfighter.cabs.crm.ClientDTO;
 import io.legacyfighter.cabs.crm.claims.ClaimDTO;
 import io.legacyfighter.cabs.geolocation.address.AddressDTO;
 import io.legacyfighter.cabs.geolocation.Distance;

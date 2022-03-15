@@ -1,8 +1,5 @@
-package io.legacyfighter.cabs.ui;
+package io.legacyfighter.cabs.crm;
 
-import io.legacyfighter.cabs.dto.ClientDTO;
-import io.legacyfighter.cabs.entity.Client;
-import io.legacyfighter.cabs.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

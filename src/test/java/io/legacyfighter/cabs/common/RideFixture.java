@@ -1,7 +1,7 @@
 package io.legacyfighter.cabs.common;
 
 import io.legacyfighter.cabs.geolocation.address.Address;
-import io.legacyfighter.cabs.entity.Client;
+import io.legacyfighter.cabs.crm.Client;
 import io.legacyfighter.cabs.driverfleet.Driver;
 import io.legacyfighter.cabs.entity.Transit;
 import io.legacyfighter.cabs.money.Money;

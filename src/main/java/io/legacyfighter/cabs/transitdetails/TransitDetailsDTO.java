@@ -3,7 +3,7 @@ package io.legacyfighter.cabs.transitdetails;
 import io.legacyfighter.cabs.carfleet.CarClass;
 import io.legacyfighter.cabs.geolocation.Distance;
 import io.legacyfighter.cabs.geolocation.address.AddressDTO;
-import io.legacyfighter.cabs.dto.ClientDTO;
+import io.legacyfighter.cabs.crm.ClientDTO;
 import io.legacyfighter.cabs.entity.Tariff;
 import io.legacyfighter.cabs.entity.Transit;
 import io.legacyfighter.cabs.money.Money;
