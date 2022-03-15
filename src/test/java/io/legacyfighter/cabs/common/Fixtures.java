@@ -1,259 +1,160 @@
 package io.legacyfighter.cabs.common;
 
 
-import io.legacyfighter.cabs.distance.Distance;
 import io.legacyfighter.cabs.dto.*;
 import io.legacyfighter.cabs.entity.*;
 import io.legacyfighter.cabs.entity.Driver.Status;
 import io.legacyfighter.cabs.money.Money;
-import io.legacyfighter.cabs.repository.*;
 
 import io.legacyfighter.cabs.service.*;
-import io.legacyfighter.cabs.transitdetails.TransitDetailsFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.time.temporal.ChronoUnit;
 import java.util.stream.IntStream;
 
-import static io.legacyfighter.cabs.entity.CarType.CarClass.VAN;
 import static java.util.stream.IntStream.range;
-import static org.mockito.Mockito.when;
 
 
 @Component
 public class Fixtures {
 
     @Autowired
-    TransitRepository transitRepository;
+    AddressFixture addressFixture;
 
     @Autowired
-    DriverFeeRepository feeRepository;
+    ClaimFixture claimFixture;
 
     @Autowired
-    DriverService driverService;
+    DriverFixture driverFixture;
 
     @Autowired
-    ClientRepository clientRepository;
+    ClientFixture clientFixture;
 
     @Autowired
-    AddressRepository addressRepository;
+    TransitFixture transitFixture;
 
     @Autowired
-    CarTypeService carTypeService;
+    AwardsAccountFixture awardsAccountFixture;
 
     @Autowired
-    ClaimService claimService;
+    CarTypeFixture carTypeFixture;
 
     @Autowired
-    AwardsService awardsService;
+    RideFixture rideFixture;
 
-    @Autowired
-    TransitService transitService;
-
-    @Autowired
-    DriverAttributeRepository driverAttributeRepository;
-
-    @Autowired
-    DriverSessionService driverSessionService;
-
-    @Autowired
-    DriverTrackingService driverTrackingService;
-
-    @Autowired
-    TransitDetailsFacade transitDetailsFacade;
-
-    public Client aClient() {
-        return clientRepository.save(new Client());
+    public Address anAddress() {
+        return addressFixture.anAddress();
     }
 
-    public Client aClient(Client.Type type) {
-        Client client = new Client();
-        client.setType(type);
-        return clientRepository.save(client);
+    public Client aClient() {
+        return clientFixture.aClient();
+    }
+
+    public Client aClient(Client.Type type) { ;
+        return clientFixture.aClient(type);
     }
 
     public Transit aTransit(Driver driver, Integer price, LocalDateTime when, Client client) {
-        Instant dateTime = when.toInstant(ZoneOffset.UTC);
-        Transit transit = new Transit(dateTime, Distance.ZERO);
-        transit.setPrice(new Money(price));
-        transit.proposeTo(driver);
-        transit.acceptBy(driver, Instant.now());
-        transit = transitRepository.save(transit);
-        transitDetailsFacade.transitRequested(dateTime, transit.getId(), null, null, Distance.ZERO, client, null, new Money(price), transit.getTariff());
-        return transit;
+        return transitFixture.aTransit(driver, price, when, client);
     }
 
     public Transit aTransit(Money price) {
-        return aTransit(aDriver(), price.toInt());
+        return transitFixture.aTransit(driverFixture.aDriver(), price.toInt());
     }
 
     public Transit aTransit(Driver driver, Integer price, LocalDateTime when) {
-        return aTransit(driver, price, when, null);
+        return transitFixture.aTransit(driver, price, when, null);
     }
 
     public Transit aTransit(Driver driver, Integer price) {
-        return aTransit(driver, price, LocalDateTime.now(), null);
-    }
-
-    public DriverFee driverHasFee(Driver driver, DriverFee.FeeType feeType, int amount, Integer min) {
-        DriverFee driverFee = new DriverFee();
-        driverFee.setDriver(driver);
-        driverFee.setAmount(amount);
-        driverFee.setFeeType(feeType);
-        driverFee.setMin(new Money(min));
-        return feeRepository.save(driverFee);
-    }
-
-    public DriverFee driverHasFee(Driver driver, DriverFee.FeeType feeType, int amount) {
-        return driverHasFee(driver, feeType, amount, 0);
-    }
-
-    public Driver aDriver() {
-        return aDriver(Status.ACTIVE, "Janusz", "Kowalsi", "FARME100165AB5EW");
-    }
-
-    public Driver aDriver(Status status, String name, String lastName, String driverLicense) {
-        return driverService.createDriver(driverLicense, lastName, name, Driver.Type.REGULAR, status, "");
-    }
-
-    public Driver aNearbyDriver(String plateNumber) {
-        Driver driver = aDriver();
-        driverHasFee(driver, DriverFee.FeeType.FLAT, 10);
-        driverSessionService.logIn(driver.getId(), plateNumber, VAN, "BRAND");
-        driverTrackingService.registerPosition(driver.getId(), 1, 1, Instant.now());
-        return driver;
-    }
-
-    public Transit aCompletedTransitAt(int price, Instant when) {
-        return aCompletedTransitAt(price, when, aClient(), aDriver());
-    }
-
-    public Transit aRequestedAndCompletedTransit(int price, Instant publishedAt, Instant completedAt, Client client, Driver driver, Address from, Address destination) {
-        from = addressRepository.save(from);
-        destination = addressRepository.save(destination);
-        Transit transit = new Transit(publishedAt, Distance.ZERO);
-        transit.publishAt(publishedAt);
-        transit.proposeTo(driver);
-        transit.acceptBy(driver, publishedAt);
-        transit.start(publishedAt);
-        transit.completeAt(completedAt, destination, Distance.ofKm(1));
-        transit.setPrice(new Money(price));
-        transit = transitRepository.save(transit);
-        transitDetailsFacade.transitRequested(publishedAt, transit.getId(), from, destination, Distance.ZERO, client, null, new Money(price), transit.getTariff());
-        transitDetailsFacade.transitAccepted(transit.getId(), publishedAt, driver.getId());
-        transitDetailsFacade.transitStarted(transit.getId(), publishedAt);
-        transitDetailsFacade.transitCompleted(transit.getId(), publishedAt, new Money(price), new Money(0));
-        return transit;
-    }
-
-    public Transit aCompletedTransitAt(int price, Instant publishedAt, Instant completedAt, Client client, Driver driver) {
-        Address destination = new Address("Polska", "Warszawa", "Zytnia", 20);
-        Address from = new Address("Polska", "Warszawa", "Młynarska", 20);
-        return aRequestedAndCompletedTransit(price, publishedAt, completedAt, client, driver, from, destination);
-    }
-
-    public Transit aCompletedTransitAt(int price, Instant publishedAt, Client client, Driver driver) {
-        return aCompletedTransitAt(price, publishedAt, publishedAt.plus(10, ChronoUnit.MINUTES), client, driver);
-    }
-
-    public Transit aRequestedAndCompletedTransit(int price, Instant publishedAt, Instant completedAt, Client client, Driver driver, Address from, Address destination, Clock clock) {
-        from = addressRepository.save(from);
-        destination = addressRepository.save(destination);
-
-        when(clock.instant()).thenReturn(publishedAt);
-        Transit transit = transitService.createTransit(client.getId(), from, destination, VAN);
-        transitService.publishTransit(transit.getId());
-        transitService.findDriversForTransit(transit.getId());
-        transitService.acceptTransit(driver.getId(), transit.getId());
-        transitService.startTransit(driver.getId(), transit.getId());
-        when(clock.instant()).thenReturn(completedAt);
-        transitService.completeTransit(driver.getId(), transit.getId(), destination);
-
-        return transitRepository.getOne(transit.getId());
-    }
-
-    public CarType anActiveCarCategory(CarType.CarClass carClass) {
-        CarTypeDTO carTypeDTO = new CarTypeDTO();
-        carTypeDTO.setCarClass(carClass);
-        carTypeDTO.setDescription("opis");
-        CarType carType = carTypeService.create(carTypeDTO);
-        IntStream.range(1, carType.getMinNoOfCarsToActivateClass() + 1)
-                .forEach(i -> carTypeService.registerCar(carType.getCarClass()));
-        carTypeService.activate(carType.getId());
-        return carType;
-    }
-
-    public TransitDTO aTransitDTO(Client client, AddressDTO from, AddressDTO to) {
-        TransitDTO transitDTO = new TransitDTO();
-        transitDTO.setClientDTO(new ClientDTO(client));
-        transitDTO.setFrom(from);
-        transitDTO.setTo(to);
-        return transitDTO;
+        return transitFixture.aTransit(driver, price, LocalDateTime.now(), null);
     }
 
     public TransitDTO aTransitDTO(AddressDTO from, AddressDTO to) {
-        return aTransitDTO(aClient(), from, to);
+        return transitFixture.aTransitDTO(aClient(), from, to);
     }
 
-    public void clientHasDoneTransits(Client client, int noOfTransits) {
-        range(1, noOfTransits + 1)
-                .forEach(i -> transitRepository.save(aCompletedTransitAt(10, Instant.now(), client, aDriver())));
+    public DriverFee driverHasFee(Driver driver, DriverFee.FeeType feeType, int amount, Integer min) {
+        return driverFixture.driverHasFee(driver, feeType, amount, min);
     }
 
-    public Claim createClaim(Client client, Transit transit) {
-        ClaimDTO claimDTO = claimDto("Okradli mnie na hajs", "$$$", client.getId(), transit.getId());
-        claimDTO.setDraft(false);
-        Claim claim = claimService.create(claimDTO);
-        return claim;
+    public DriverFee driverHasFee(Driver driver, DriverFee.FeeType feeType, int amount) {
+        return driverFixture.driverHasFee(driver, feeType, amount, 0);
     }
 
-    public Claim createClaim(Client client, Transit transit, String reason) {
-        ClaimDTO claimDTO = claimDto("Okradli mnie na hajs", reason, client.getId(), transit.getId());
-        claimDTO.setDraft(false);
-        return claimService.create(claimDTO);
+    public Driver aDriver() {
+        return driverFixture.aDriver(Status.ACTIVE, "Janusz", "Kowalsi", "FARME100165AB5EW");
     }
 
-    public Claim createAndResolveClaim(Client client, Transit transit) {
-        Claim claim = createClaim(client, transit);
-        claim = claimService.tryToResolveAutomatically(claim.getId());
-        return claim;
+    public Driver aDriver(Status status, String name, String lastName, String driverLicense) {
+        return driverFixture.aDriver(status, name, lastName, driverLicense);
     }
 
-    public ClaimDTO claimDto(String desc, String reason, Long clientId, Long transitId) {
-        ClaimDTO claimDTO = new ClaimDTO();
-        claimDTO.setClientId(clientId);
-        claimDTO.setTransitId(transitId);
-        claimDTO.setIncidentDescription(desc);
-        claimDTO.setReason(reason);
-        return claimDTO;
+    public Driver aNearbyDriver(GeocodingService stubbedGeocodingService, Address pickup) {
+        return driverFixture.aNearbyDriver(stubbedGeocodingService, pickup);
     }
 
-    public void clientHasDoneClaims(Client client, int howMany) {
-        IntStream
-                .range(1, howMany + 1).forEach(i -> createAndResolveClaim(client, aTransit(aDriver(), 20, LocalDateTime.now(), client)));
+    public Driver aNearbyDriver(String plateNumber, double latitude, double longitude, CarType.CarClass carClass, Instant when) {
+        return driverFixture.aNearbyDriver(plateNumber, latitude, longitude, carClass, when, "brand");
     }
 
-    public Client aClientWithClaims(Client.Type type, int howManyClaims) {
-        Client client = aClient(type);
-        clientHasDoneClaims(client, howManyClaims);
-        return client;
-    }
-
-    public void awardsAccount(Client client) {
-        awardsService.registerToProgram(client.getId());
-    }
-
-    public void activeAwardsAccount(Client client) {
-        awardsAccount(client);
-        awardsService.activateAccount(client.getId());
+    public Driver aNearbyDriver(String plateNumber, double latitude, double longitude, CarType.CarClass carClass, Instant when, String carBrand) {
+        return driverFixture.aNearbyDriver(plateNumber, latitude, longitude, carClass, when, carBrand);
     }
 
     public void driverHasAttribute(Driver driver, DriverAttribute.DriverAttributeName name, String value) {
-        driverAttributeRepository.save(new DriverAttribute(driver, name, value));
+        driverFixture.driverHasAttribute(driver, name, value);
     }
+
+    public Transit aJourney(int price, Client client, Driver driver, Address from, Address destination) {
+        return rideFixture.aRide(price, client, driver, from, destination);
+    }
+
+    public Transit aJourneyWithFixedClock(int price, Instant publishedAt, Instant completedAt, Client client, Driver driver, Address from, Address destination, Clock clock) {
+        return rideFixture.aRideWithFixedClock(price, publishedAt, completedAt, client, driver, from, destination, clock);
+    }
+
+    public CarType anActiveCarCategory(CarType.CarClass carClass) {
+        return carTypeFixture.anActiveCarCategory(carClass);
+    }
+
+    public void clientHasDoneTransits(Client client, int noOfTransits, GeocodingService geocodingService) {
+        range(1, noOfTransits + 1)
+                .forEach(i -> {
+                    Address pickup = anAddress();
+                    Driver driver = aNearbyDriver(geocodingService, pickup);
+                    aJourney(10, client, driver, pickup, anAddress());
+                });
+    }
+
+    public Claim createClaim(Client client, Transit transit) {
+        return claimFixture.createClaim(client, transit);
+    }
+
+    public Claim createClaim(Client client, Transit transit, String reason) {
+        return claimFixture.createClaim(client, transit, reason);
+    }
+
+    public Claim createAndResolveClaim(Client client, Transit transit) {
+        return claimFixture.createAndResolveClaim(client, transit);
+    }
+
+    public void clientHasDoneClaimAfterCompletedTransit(Client client, int howMany) {
+        IntStream
+                .range(1, howMany + 1).forEach(i -> createAndResolveClaim(client, aTransit(driverFixture.aDriver(), 20, LocalDateTime.now(), client)));
+    }
+
+    public Client aClientWithClaims(Client.Type type, int howManyClaims) {
+        Client client = clientFixture.aClient(type);
+        clientHasDoneClaimAfterCompletedTransit(client, howManyClaims);
+        return client;
+    }
+
+    public void activeAwardsAccount(Client client) {
+        awardsAccountFixture.activeAwardsAccount(client);
+    }
+
 }

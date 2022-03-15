@@ -8,6 +8,7 @@ import io.legacyfighter.cabs.entity.Transit;
 import io.legacyfighter.cabs.money.Money;
 import io.legacyfighter.cabs.repository.AwardsAccountRepository;
 import io.legacyfighter.cabs.service.AwardsService;
+import io.legacyfighter.cabs.service.GeocodingService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -49,6 +50,9 @@ class RemovingAwardMilesIntegrationTest {
     @MockBean
     AppProperties appProperties;
 
+    @MockBean
+    GeocodingService geocodingService;
+
     @Test
     void byDefaultRemoveOldestFirstEvenWhenTheyAreNonExpiring() {
         //given
@@ -75,7 +79,7 @@ class RemovingAwardMilesIntegrationTest {
         //given
         Client client = clientWithAnActiveMilesProgram(NORMAL);
         //and
-        fixtures.clientHasDoneTransits(client, 15);
+        fixtures.clientHasDoneTransits(client, 15, geocodingService);
         //and
         Transit transit = fixtures.aTransit(new Money(80));
         //and
@@ -98,7 +102,7 @@ class RemovingAwardMilesIntegrationTest {
         //given
         Client client = clientWithAnActiveMilesProgram(NORMAL);
         //and
-        fixtures.clientHasDoneTransits(client, 15);
+        fixtures.clientHasDoneTransits(client, 15, geocodingService);
         //and
         Transit transit = fixtures.aTransit(new Money(80));
 
@@ -144,7 +148,7 @@ class RemovingAwardMilesIntegrationTest {
         //given
         Client client = clientWithAnActiveMilesProgram(NORMAL);
         //and
-        fixtures.clientHasDoneTransits(client, 15);
+        fixtures.clientHasDoneTransits(client, 15, geocodingService);
         //and
         Transit transit = fixtures.aTransit(new Money(80));
         //and
@@ -171,7 +175,7 @@ class RemovingAwardMilesIntegrationTest {
         //given
         Client client = clientWithAnActiveMilesProgram(NORMAL);
         //and
-        fixtures.clientHasDoneClaims(client, 3);
+        fixtures.clientHasDoneClaimAfterCompletedTransit(client, 3);
         //and
         Transit transit = fixtures.aTransit(new Money(80));
         //and
