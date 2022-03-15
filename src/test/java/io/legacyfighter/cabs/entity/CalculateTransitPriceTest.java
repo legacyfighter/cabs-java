@@ -120,7 +120,7 @@ class CalculateTransitPriceTest {
     }
 
     Transit transit(Status status, int km) {
-        return new Transit(status, null, null, null, null, Instant.now(), Distance.ofKm(km));
+        return new Transit(status, Instant.now(), Distance.ofKm(km));
     }
 
     void transitWasOnDoneOnFriday(Transit transit) {

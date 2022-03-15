@@ -4,6 +4,7 @@ import io.legacyfighter.cabs.distance.Distance;
 import io.legacyfighter.cabs.entity.CarType;
 import io.legacyfighter.cabs.entity.Driver;
 import io.legacyfighter.cabs.entity.Transit;
+import io.legacyfighter.cabs.transitdetails.TransitDetailsDTO;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -64,18 +65,18 @@ public class TransitDTO {
 
     }
 
-    public TransitDTO(Transit transit) {
-        this(transit.getId(), transit.getTariff().getName(),
-                transit.getStatus(), transit.getDriver() == null ? null : new DriverDTO(transit.getDriver()),
-                transit.getKm(), transit.getTariff().getKmRate(),
-                transit.getPrice() != null ? new BigDecimal(transit.getPrice().toInt()) : null,
-                transit.getDriversFee() != null ? new BigDecimal(transit.getDriversFee().toInt()) : null,
-                transit.getEstimatedPrice() != null ? new BigDecimal(transit.getEstimatedPrice().toInt()) : null,
-                new BigDecimal(transit.getTariff().getBaseFee()),
-                transit.getDateTime(), transit.getPublished(),
-                transit.getAcceptedAt(), transit.getStarted(), transit.getCompleteAt(),
-                null, new ArrayList<>(), new AddressDTO(transit.getFrom()),
-                new AddressDTO(transit.getTo()), transit.getCarType(), new ClientDTO(transit.getClient()));
+    public TransitDTO(Transit transit, TransitDetailsDTO transitDetails) {
+        this(transitDetails.transitId, transitDetails.tariffName,
+                transitDetails.status, transit.getDriver() == null ? null : new DriverDTO(transit.getDriver()),
+                transitDetails.distance, transitDetails.kmRate,
+                transitDetails.price != null ? new BigDecimal(transitDetails.price.toInt()) : null,
+                transitDetails.driverFee != null ? new BigDecimal(transitDetails.driverFee.toInt()) : null,
+                transitDetails.estimatedPrice != null ? new BigDecimal(transitDetails.estimatedPrice.toInt()) : null,
+                new BigDecimal(transitDetails.baseFee),
+                transitDetails.dateTime, transitDetails.publishedAt,
+                transitDetails.acceptedAt, transitDetails.started, transitDetails.completedAt,
+                null, new ArrayList<>(), transitDetails.from,
+                transitDetails.to, transitDetails.carType, transitDetails.client);
 
         for (Driver d : transit.getProposedDrivers()) {
             proposedDrivers.add(new DriverDTO(d));

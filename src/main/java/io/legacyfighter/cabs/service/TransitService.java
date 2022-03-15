@@ -9,6 +9,8 @@ import io.legacyfighter.cabs.entity.*;
 import io.legacyfighter.cabs.entity.events.TransitCompleted;
 import io.legacyfighter.cabs.money.Money;
 import io.legacyfighter.cabs.repository.*;
+import io.legacyfighter.cabs.transitdetails.TransitDetailsDTO;
+import io.legacyfighter.cabs.transitdetails.TransitDetailsFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,6 +68,9 @@ public class TransitService {
     private AwardsService awardsService;
 
     @Autowired
+    private TransitDetailsFacade transitDetailsFacade;
+
+    @Autowired
     private EventsPublisher eventsPublisher;
 
     @Transactional
@@ -93,23 +98,26 @@ public class TransitService {
         double[] geoFrom = geocodingService.geocodeAddress(from);
         double[] geoTo = geocodingService.geocodeAddress(to);
         Distance km = Distance.ofKm((float) distanceCalculator.calculateByMap(geoFrom[0], geoFrom[1], geoTo[0], geoTo[1]));
-        Transit transit = new Transit(from, to, client, carClass, Instant.now(clock), km);
-        transit.estimateCost();
-        return transitRepository.save(transit);
+        Instant now = Instant.now(clock);
+        Transit transit = new Transit(now, km);
+        Money estimatedPrice = transit.estimateCost();
+        transit = transitRepository.save(transit);
+        transitDetailsFacade.transitRequested(now, transit.getId(), from, to, km, client, carClass, estimatedPrice, transit.getTariff());
+        return transit;
     }
 
     @Transactional
     public void changeTransitAddressFrom(Long transitId, Address newAddress) {
         newAddress = addressRepository.save(newAddress);
         Transit transit = transitRepository.getOne(transitId);
-
+        TransitDetailsDTO transitDetails = findTransitDetails(transitId);
         if (transit == null) {
             throw new IllegalArgumentException("Transit does not exist, id = " + transitId);
         }
 
         // FIXME later: add some exceptions handling
         double[] geoFromNew = geocodingService.geocodeAddress(newAddress);
-        double[] geoFromOld = geocodingService.geocodeAddress(transit.getFrom());
+        double[] geoFromOld = geocodingService.geocodeAddress(transitDetails.from.toAddressEntity());
 
         // https://www.geeksforgeeks.org/program-distance-two-points-earth/
         // The math module contains a function
@@ -138,6 +146,7 @@ public class TransitService {
         Distance newDistance = Distance.ofKm((float) distanceCalculator.calculateByMap(geoFromNew[0], geoFromNew[1], geoFromOld[0], geoFromOld[1]));
         transit.changePickupTo(newAddress, newDistance, distanceInKMeters);
         transitRepository.save(transit);
+        transitDetailsFacade.pickupChangedTo(transit.getId(), newAddress, newDistance);
 
         for (Driver driver : transit.getProposedDrivers()) {
             notificationService.notifyAboutChangedTransitAddress(driver.getId(), transitId);
@@ -158,18 +167,18 @@ public class TransitService {
     public void changeTransitAddressTo(Long transitId, Address newAddress) {
         addressRepository.save(newAddress);
         Transit transit = transitRepository.getOne(transitId);
-
+        TransitDetailsDTO transitDetails = findTransitDetails(transitId);
         if (transit == null) {
             throw new IllegalArgumentException("Transit does not exist, id = " + transitId);
         }
 
         // FIXME later: add some exceptions handling
-        double[] geoFrom = geocodingService.geocodeAddress(transit.getFrom());
+        double[] geoFrom = geocodingService.geocodeAddress(transitDetails.from.toAddressEntity());
         double[] geoTo = geocodingService.geocodeAddress(newAddress);
 
         Distance newDistance = Distance.ofKm((float) distanceCalculator.calculateByMap(geoFrom[0], geoFrom[1], geoTo[0], geoTo[1]));
         transit.changeDestinationTo(newAddress, newDistance);
-
+        transitDetailsFacade.destinationChanged(transit.getId(), newAddress, newDistance);
         if (transit.getDriver() != null) {
             notificationService.notifyAboutChangedTransitAddress(transit.getDriver().getId(), transitId);
         }
@@ -188,6 +197,7 @@ public class TransitService {
         }
 
         transit.cancel();
+        transitDetailsFacade.transitCancelled(transitId);
         transitRepository.save(transit);
     }
 
@@ -199,8 +209,10 @@ public class TransitService {
             throw new IllegalArgumentException("Transit does not exist, id = " + transitId);
         }
 
-        transit.publishAt(Instant.now(clock));
+        Instant now = Instant.now(clock);
+        transit.publishAt(now);
         transitRepository.save(transit);
+        transitDetailsFacade.transitPublished(transitId, now);
         return findDriversForTransit(transitId);
     }
 
@@ -208,6 +220,7 @@ public class TransitService {
     @Transactional
     public Transit findDriversForTransit(Long transitId) {
         Transit transit = transitRepository.getOne(transitId);
+        TransitDetailsDTO transitDetails = findTransitDetails(transitId);
 
         if (transit != null) {
             if (transit.getStatus()
@@ -236,7 +249,7 @@ public class TransitService {
 
 
                     try {
-                        geocoded = geocodingService.geocodeAddress(transit.getFrom());
+                        geocoded = geocodingService.geocodeAddress(addressRepository.getByHash(transitDetails.from.getHash()));
                     } catch (Exception e) {
                         // Geocoding failed! Ask Jessica or Bryan for some help if needed.
                     }
@@ -281,11 +294,11 @@ public class TransitService {
                         if (activeCarClasses.isEmpty()) {
                             return transit;
                         }
-                        if (transit.getCarType()
+                        if (transitDetails.carType
 
                                 != null) {
-                            if (activeCarClasses.contains(transit.getCarType())) {
-                                carClasses.add(transit.getCarType());
+                            if (activeCarClasses.contains(transitDetails.carType)) {
+                                carClasses.add(transitDetails.carType);
                             } else {
                                 return transit;
                             }
@@ -346,7 +359,9 @@ public class TransitService {
             if (transit == null) {
                 throw new IllegalArgumentException("Transit does not exist, id = " + transitId);
             } else {
-                transit.acceptBy(driver, Instant.now(clock));
+                Instant now = Instant.now(clock);
+                transit.acceptBy(driver, now);
+                transitDetailsFacade.transitAccepted(transitId, now, driverId);
                 transitRepository.save(transit);
                 driverRepository.save(driver);
             }
@@ -367,7 +382,9 @@ public class TransitService {
         if (transit == null) {
             throw new IllegalArgumentException("Transit does not exist, id = " + transitId);
         }
-        transit.start(Instant.now(clock));
+        Instant now = Instant.now(clock);
+        transit.start(now);
+        transitDetailsFacade.transitStarted(transitId, now);
         transitRepository.save(transit);
     }
 
@@ -398,7 +415,7 @@ public class TransitService {
     public void completeTransit(Long driverId, Long transitId, Address destinationAddress) {
         destinationAddress = addressRepository.save(destinationAddress);
         Driver driver = driverRepository.getOne(driverId);
-
+        TransitDetailsDTO transitDetails = findTransitDetails(transitId);
         if (driver == null) {
             throw new IllegalArgumentException("Driver does not exist, id = " + driverId);
         }
@@ -411,25 +428,31 @@ public class TransitService {
 
 
         // FIXME later: add some exceptions handling
-        double[] geoFrom = geocodingService.geocodeAddress(transit.getFrom());
-        double[] geoTo = geocodingService.geocodeAddress(transit.getTo());
+        double[] geoFrom = geocodingService.geocodeAddress(addressRepository.getByHash(transitDetails.from.getHash()));
+        double[] geoTo = geocodingService.geocodeAddress(addressRepository.getByHash(transitDetails.to.getHash()));
         Distance distance = Distance.ofKm((float) distanceCalculator.calculateByMap(geoFrom[0], geoFrom[1], geoTo[0], geoTo[1]));
-        transit.completeAt(Instant.now(clock), destinationAddress, distance);
+        Instant now = Instant.now(clock);
+        transit.completeAt(now, destinationAddress, distance);
         Money driverFee = driverFeeService.calculateDriverFee(transitId);
         transit.setDriversFee(driverFee);
         driver.setOccupied(false);
         driverRepository.save(driver);
-        awardsService.registerMiles(transit.getClient().getId(), transitId);
+        awardsService.registerMiles(transitDetails.client.getId(), transitId);
         transitRepository.save(transit);
-        invoiceGenerator.generate(transit.getPrice().toInt(), transit.getClient().getName() + " " + transit.getClient().getLastName());
+        transitDetailsFacade.transitCompleted(transitId, now, transit.getPrice(), driverFee);
+        invoiceGenerator.generate(transit.getPrice().toInt(), transitDetails.client.getName() + " " + transitDetails.client.getLastName());
         eventsPublisher.publish(new TransitCompleted(
-                transit.getClient().getId(), transitId, transit.getFrom().getHash(), transit.getTo().getHash(), transit.getStarted(), transit.getCompleteAt(), Instant.now(clock))
+                transitDetails.client.getId(), transitId, transitDetails.from.getHash(), transitDetails.to.getHash(), transitDetails.started, now, Instant.now(clock))
         );
-
     }
 
     @Transactional
     public TransitDTO loadTransit(Long id) {
-        return new TransitDTO(transitRepository.getOne(id));
+        TransitDetailsDTO transitDetails = findTransitDetails(id);
+        return new TransitDTO(transitRepository.getOne(id), transitDetails);
+    }
+
+    private TransitDetailsDTO findTransitDetails(Long transitId) {
+        return transitDetailsFacade.find(transitId);
     }
 }

@@ -32,22 +32,22 @@ class SqlBasedDriverReportCreator {
             "WHERE d.id = :driverId AND attr.name <> :filteredAttr";
 
     private static final String QUERY_FOR_SESSIONS = "SELECT ds.logged_at, ds.logged_out_at, ds.plates_number, ds.car_class, ds.car_brand, " +
-            "t.id as TRANSIT_ID, t.name as TARIFF_NAME, t.status as TRANSIT_STATUS, t.km, t.km_rate, " +
-            "t.price, t.drivers_fee, t.estimated_price, t.base_fee, " +
-            "t.date_time, t.published, t.accepted_at, t.started, t.complete_at, t.car_type, " +
+            "td.transit_id as TRANSIT_ID, td.name as TARIFF_NAME, td.status as TRANSIT_STATUS, td.km, td.km_rate, " +
+            "td.price, td.drivers_fee, td.estimated_price, td.base_fee, " +
+            "td.date_time, td.published_at, td.accepted_at, td.started, td.complete_at, td.car_type, " +
             "cl.id as CLAIM_ID, cl.owner_id, cl.reason, cl.incident_description, cl.status as CLAIM_STATUS, cl.creation_date, " +
             "cl.completion_date, cl.change_date, cl.completion_mode, cl.claim_no, " +
             "af.country as AF_COUNTRY, af.city as AF_CITY, af.street AS AF_STREET, af.building_number AS AF_NUMBER, " +
             "ato.country as ATO_COUNTRY, ato.city as ATO_CITY, ato.street AS ATO_STREET, ato.building_number AS ATO_NUMBER, " +
             "FROM driver_session ds " +
-            "LEFT JOIN transit t ON t.driver_id = ds.driver_id " +
-            "LEFT JOIN Address af ON t.from_id = af.id " +
-            "LEFT JOIN Address ato ON t.to_id = ato.id " +
-            "LEFT JOIN claim cl ON cl.transit_id = t.id " +
-            "WHERE ds.driver_id = :driverId AND t.status = :transitStatus " +
+            "LEFT JOIN transit_details td ON ds.driver_id = td.driver_id " +
+            "LEFT JOIN Address af ON td.from_id = af.id " +
+            "LEFT JOIN Address ato ON td.to_id = ato.id " +
+            "LEFT JOIN claim cl ON cl.transit_id = td.transit_id " +
+            "WHERE ds.driver_id = :driverId AND td.status = :transitStatus " +
             "AND ds.logged_at >= :since " +
-            "AND t.complete_at >= ds.logged_at " +
-            "AND t.complete_at <= ds.logged_out_at GROUP BY ds.id";
+            "AND td.complete_at >= ds.logged_at " +
+            "AND td.complete_at <= ds.logged_out_at GROUP BY ds.id";
 
     private final EntityManager em;
 
@@ -99,7 +99,7 @@ class SqlBasedDriverReportCreator {
                 new BigDecimal(((Number) tuple.get("DRIVERS_FEE")).intValue()),
                 new BigDecimal(((Number) tuple.get("ESTIMATED_PRICE")).intValue()),
                 new BigDecimal(((Number) tuple.get("BASE_FEE")).intValue()),
-                ((Timestamp) tuple.get("DATE_TIME")).toInstant(), ((Timestamp) tuple.get("PUBLISHED")).toInstant(),
+                ((Timestamp) tuple.get("DATE_TIME")).toInstant(), ((Timestamp) tuple.get("PUBLISHED_AT")).toInstant(),
                 ((Timestamp) tuple.get("ACCEPTED_AT")).toInstant(), ((Timestamp) tuple.get("STARTED")).toInstant(),
                 ((Timestamp) tuple.get("COMPLETE_AT")).toInstant(), retrieveClaim(tuple), null, retrieveFromAddress(tuple), retrieveToAddress(tuple),
                 CarType.CarClass.valueOf((String) tuple.get("CAR_TYPE")), null);
