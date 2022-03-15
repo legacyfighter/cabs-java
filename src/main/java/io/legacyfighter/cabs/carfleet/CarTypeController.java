@@ -1,8 +1,5 @@
-package io.legacyfighter.cabs.ui;
+package io.legacyfighter.cabs.carfleet;
 
-import io.legacyfighter.cabs.dto.CarTypeDTO;
-import io.legacyfighter.cabs.entity.CarType;
-import io.legacyfighter.cabs.service.CarTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,18 +13,18 @@ public class CarTypeController {
 
     @PostMapping("/cartypes")
     ResponseEntity<CarTypeDTO> create(@RequestBody CarTypeDTO carTypeDTO) {
-        CarType created = carTypeService.create(carTypeDTO);
-        return ResponseEntity.ok(carTypeService.loadDto(created.getId()));
+        CarTypeDTO created = carTypeService.create(carTypeDTO);
+        return ResponseEntity.ok(created);
     }
 
     @PostMapping("/cartypes/{carClass}/registerCar")
-    ResponseEntity<CarTypeDTO> registerCar(@PathVariable CarType.CarClass carClass) {
+    ResponseEntity<CarTypeDTO> registerCar(@PathVariable CarClass carClass) {
         carTypeService.registerCar(carClass);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/cartypes/{carClass}/unregisterCar")
-    ResponseEntity<CarTypeDTO> unregisterCar(@PathVariable CarType.CarClass carClass) {
+    ResponseEntity<CarTypeDTO> unregisterCar(@PathVariable CarClass carClass) {
         carTypeService.unregisterCar(carClass);
         return ResponseEntity.ok().build();
     }

@@ -1,9 +1,9 @@
 package io.legacyfighter.cabs.transitdetails;
 
+import io.legacyfighter.cabs.carfleet.CarClass;
 import io.legacyfighter.cabs.distance.Distance;
 import io.legacyfighter.cabs.dto.AddressDTO;
 import io.legacyfighter.cabs.dto.ClientDTO;
-import io.legacyfighter.cabs.entity.CarType;
 import io.legacyfighter.cabs.entity.Tariff;
 import io.legacyfighter.cabs.entity.Transit;
 import io.legacyfighter.cabs.money.Money;
@@ -20,7 +20,7 @@ public class TransitDetailsDTO {
 
     public ClientDTO client;
 
-    public CarType.CarClass carType;
+    public CarClass carType;
 
     public AddressDTO from;
 
@@ -72,7 +72,7 @@ public class TransitDetailsDTO {
         tariffName = td.getTariffName();
     }
 
-    public TransitDetailsDTO(Long transitId, Instant dateTime, Instant completedAt, ClientDTO client, CarType.CarClass carType, AddressDTO from, AddressDTO to, Instant started, Instant acceptedAt, Distance distance, Tariff tariff) {
+    public TransitDetailsDTO(Long transitId, Instant dateTime, Instant completedAt, ClientDTO client, CarClass carType, AddressDTO from, AddressDTO to, Instant started, Instant acceptedAt, Distance distance, Tariff tariff) {
         this.transitId = transitId;
         this.dateTime = dateTime;
         this.completedAt = completedAt;

@@ -1,6 +1,7 @@
 package io.legacyfighter.cabs.common;
 
 
+import io.legacyfighter.cabs.carfleet.CarClass;
 import io.legacyfighter.cabs.crm.claims.Claim;
 import io.legacyfighter.cabs.dto.AddressDTO;
 import io.legacyfighter.cabs.dto.TransitDTO;
@@ -53,7 +54,8 @@ public class Fixtures {
         return clientFixture.aClient();
     }
 
-    public Client aClient(Client.Type type) { ;
+    public Client aClient(Client.Type type) {
+        ;
         return clientFixture.aClient(type);
     }
 
@@ -89,11 +91,11 @@ public class Fixtures {
         return driverFixture.aNearbyDriver(stubbedGeocodingService, pickup);
     }
 
-    public Driver aNearbyDriver(String plateNumber, double latitude, double longitude, CarType.CarClass carClass, Instant when) {
+    public Driver aNearbyDriver(String plateNumber, double latitude, double longitude, CarClass carClass, Instant when) {
         return driverFixture.aNearbyDriver(plateNumber, latitude, longitude, carClass, when, "brand");
     }
 
-    public Driver aNearbyDriver(String plateNumber, double latitude, double longitude, CarType.CarClass carClass, Instant when, String carBrand) {
+    public Driver aNearbyDriver(String plateNumber, double latitude, double longitude, CarClass carClass, Instant when, String carBrand) {
         return driverFixture.aNearbyDriver(plateNumber, latitude, longitude, carClass, when, carBrand);
     }
 
@@ -109,8 +111,8 @@ public class Fixtures {
         return rideFixture.aRideWithFixedClock(price, publishedAt, completedAt, client, driver, from, destination, clock);
     }
 
-    public CarType anActiveCarCategory(CarType.CarClass carClass) {
-        return carTypeFixture.anActiveCarCategory(carClass);
+    public void anActiveCarCategory(CarClass carClass) {
+        carTypeFixture.anActiveCarCategory(carClass);
     }
 
     public void clientHasDoneTransits(Client client, int noOfTransits, GeocodingService geocodingService) {

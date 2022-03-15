@@ -1,8 +1,8 @@
 package io.legacyfighter.cabs.dto;
 
+import io.legacyfighter.cabs.carfleet.CarClass;
 import io.legacyfighter.cabs.crm.claims.ClaimDTO;
 import io.legacyfighter.cabs.distance.Distance;
-import io.legacyfighter.cabs.entity.CarType;
 import io.legacyfighter.cabs.entity.Driver;
 import io.legacyfighter.cabs.entity.Transit;
 import io.legacyfighter.cabs.transitdetails.TransitDetailsDTO;
@@ -58,7 +58,7 @@ public class TransitDTO {
 
     private AddressDTO from;
 
-    private CarType.CarClass carClass;
+    private CarClass carClass;
 
     private ClientDTO clientDTO;
 
@@ -89,7 +89,7 @@ public class TransitDTO {
                       BigDecimal estimatedPrice, BigDecimal baseFee, Instant dateTime,
                       Instant published, Instant acceptedAt, Instant started, Instant completeAt,
                       ClaimDTO claimDTO, List<DriverDTO> proposedDrivers, AddressDTO from, AddressDTO to,
-                      CarType.CarClass carClass, ClientDTO clientDTO) {
+                      CarClass carClass, ClientDTO clientDTO) {
         this.id = id;
         this.factor = 1;
         this.tariff = tariff;
@@ -160,11 +160,11 @@ public class TransitDTO {
         this.from = from;
     }
 
-    public CarType.CarClass getCarClass() {
+    public CarClass getCarClass() {
         return carClass;
     }
 
-    public void setCarClass(CarType.CarClass carClass) {
+    public void setCarClass(CarClass carClass) {
         this.carClass = carClass;
     }
 

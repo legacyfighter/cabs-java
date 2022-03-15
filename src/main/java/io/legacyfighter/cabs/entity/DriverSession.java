@@ -1,5 +1,6 @@
 package io.legacyfighter.cabs.entity;
 
+import io.legacyfighter.cabs.carfleet.CarClass;
 import io.legacyfighter.cabs.common.BaseEntity;
 
 import javax.persistence.*;
@@ -20,7 +21,7 @@ public class DriverSession extends BaseEntity {
     private String platesNumber;
 
     @Enumerated(EnumType.STRING)
-    private CarType.CarClass carClass;
+    private CarClass carClass;
 
     public String getCarBrand() {
         return carBrand;
@@ -64,11 +65,11 @@ public class DriverSession extends BaseEntity {
         this.platesNumber = platesNumber;
     }
 
-    public CarType.CarClass getCarClass() {
+    public CarClass getCarClass() {
         return carClass;
     }
 
-    public void setCarClass(CarType.CarClass carClass) {
+    public void setCarClass(CarClass carClass) {
         this.carClass = carClass;
     }
 

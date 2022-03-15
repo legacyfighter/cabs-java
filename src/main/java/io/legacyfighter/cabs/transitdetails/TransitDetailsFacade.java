@@ -1,9 +1,9 @@
 package io.legacyfighter.cabs.transitdetails;
 
 
+import io.legacyfighter.cabs.carfleet.CarClass;
 import io.legacyfighter.cabs.distance.Distance;
 import io.legacyfighter.cabs.entity.Address;
-import io.legacyfighter.cabs.entity.CarType;
 import io.legacyfighter.cabs.entity.Client;
 import io.legacyfighter.cabs.entity.Tariff;
 import io.legacyfighter.cabs.money.Money;
@@ -28,7 +28,7 @@ public class TransitDetailsFacade {
         return new TransitDetailsDTO(load(transitId));
     }
 
-    public void transitRequested(Instant when, Long transitId, Address from, Address to, Distance distance, Client client, CarType.CarClass carClass, Money estimatedPrice, Tariff tariff) {
+    public void transitRequested(Instant when, Long transitId, Address from, Address to, Distance distance, Client client, CarClass carClass, Money estimatedPrice, Tariff tariff) {
         TransitDetails transitDetails = new TransitDetails(when, transitId, from, to, distance, client, carClass, estimatedPrice, tariff);
         transitDetailsRepository.save(transitDetails);
     }

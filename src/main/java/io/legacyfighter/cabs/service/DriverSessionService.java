@@ -1,7 +1,8 @@
 package io.legacyfighter.cabs.service;
 
-import io.legacyfighter.cabs.entity.CarType;
+import io.legacyfighter.cabs.carfleet.CarClass;
 import io.legacyfighter.cabs.entity.DriverSession;
+import io.legacyfighter.cabs.carfleet.CarTypeService;
 import io.legacyfighter.cabs.repository.DriverRepository;
 import io.legacyfighter.cabs.repository.DriverSessionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ public class DriverSessionService {
     @Autowired
     private Clock clock;
 
-    public DriverSession logIn(Long driverId, String plateNumber, CarType.CarClass carClass, String carBrand) {
+    public DriverSession logIn(Long driverId, String plateNumber, CarClass carClass, String carBrand) {
         DriverSession session = new DriverSession();
         session.setDriver(driverRepository.getOne(driverId));
         session.setLoggedAt(Instant.now(clock));

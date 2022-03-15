@@ -1,7 +1,5 @@
-package io.legacyfighter.cabs.repository;
+package io.legacyfighter.cabs.carfleet;
 
-import io.legacyfighter.cabs.entity.CarType;
-import io.legacyfighter.cabs.entity.CarTypeActiveCounter;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -12,47 +10,47 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public class CarTypeRepository {
+class CarTypeRepository {
 
     private final CarTypeEntityRepository carTypeEntityRepository;
     private final CarTypeActiveCounterRepository carTypeActiveCounterRepository;
 
-    public CarTypeRepository(CarTypeEntityRepository carTypeEntityRepository, CarTypeActiveCounterRepository carTypeActiveCounterRepository) {
+    CarTypeRepository(CarTypeEntityRepository carTypeEntityRepository, CarTypeActiveCounterRepository carTypeActiveCounterRepository) {
         this.carTypeEntityRepository = carTypeEntityRepository;
         this.carTypeActiveCounterRepository = carTypeActiveCounterRepository;
     }
 
-    public CarType findByCarClass(CarType.CarClass carClass) {
+    CarType findByCarClass(CarClass carClass) {
         return carTypeEntityRepository.findByCarClass(carClass);
     }
 
-    public CarTypeActiveCounter findActiveCounter(CarType.CarClass carClass) {
+    CarTypeActiveCounter findActiveCounter(CarClass carClass) {
         return carTypeActiveCounterRepository.findByCarClass(carClass);
     }
 
-    public List<CarType> findByStatus(CarType.Status status) {
+    List<CarType> findByStatus(CarType.Status status) {
         return carTypeEntityRepository.findByStatus(status);
     }
 
-    public CarType save(CarType carType) {
+    CarType save(CarType carType) {
         carTypeActiveCounterRepository.save(new CarTypeActiveCounter(carType.getCarClass()));
         return carTypeEntityRepository.save(carType);
     }
 
-    public CarType getOne(Long id) {
+    CarType getOne(Long id) {
         return carTypeEntityRepository.getOne(id);
     }
 
-    public void delete(CarType carType) {
+    void delete(CarType carType) {
         carTypeEntityRepository.delete(carType);
         carTypeActiveCounterRepository.delete(carTypeActiveCounterRepository.findByCarClass(carType.getCarClass()));
     }
 
-    public void incrementCounter(CarType.CarClass carClass) {
+    void incrementCounter(CarClass carClass) {
         carTypeActiveCounterRepository.incrementCounter(carClass);
     }
 
-    public void decrementCounter(CarType.CarClass carClass) {
+    void decrementCounter(CarClass carClass) {
         carTypeActiveCounterRepository.decrementCounter(carClass);
     }
 }
@@ -60,25 +58,25 @@ public class CarTypeRepository {
 
 interface CarTypeEntityRepository extends JpaRepository<CarType, Long> {
 
-    CarType findByCarClass(CarType.CarClass carClass);
+    CarType findByCarClass(CarClass carClass);
 
     List<CarType> findByStatus(CarType.Status status);
 }
 
 interface CarTypeActiveCounterRepository extends CrudRepository<CarTypeActiveCounter, Long> {
 
-    CarTypeActiveCounter findByCarClass(CarType.CarClass carClass);
+    CarTypeActiveCounter findByCarClass(CarClass carClass);
 
     @Modifying
     @Query(
             value = "UPDATE car_type_active_counter counter SET active_cars_counter = active_cars_counter + 1 where counter.car_class = :#{#carClass.name()}",
             nativeQuery = true)
-    int incrementCounter(@Param("carClass")CarType.CarClass carClass);
+    int incrementCounter(@Param("carClass") CarClass carClass);
 
     @Modifying
     @Query(
             value = "UPDATE car_type_active_counter counter SET active_cars_counter = active_cars_counter - 1 where counter.car_class = :#{#carClass.name()}",
             nativeQuery = true)
-    int decrementCounter(CarType.CarClass carClass);
+    int decrementCounter(CarClass carClass);
 }
 

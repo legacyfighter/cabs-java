@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 import java.time.Clock;
 import java.time.Instant;
 
-import static io.legacyfighter.cabs.entity.CarType.CarClass.VAN;
+import static io.legacyfighter.cabs.carfleet.CarClass.VAN;
 import static org.mockito.Mockito.when;
 
 @Component

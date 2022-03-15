@@ -1,11 +1,6 @@
-package io.legacyfighter.cabs.service;
+package io.legacyfighter.cabs.carfleet;
 
 import io.legacyfighter.cabs.config.AppProperties;
-import io.legacyfighter.cabs.dto.CarTypeDTO;
-import io.legacyfighter.cabs.entity.CarType;
-import io.legacyfighter.cabs.entity.CarType.CarClass;
-import io.legacyfighter.cabs.entity.CarTypeActiveCounter;
-import io.legacyfighter.cabs.repository.CarTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,14 +33,14 @@ public class CarTypeService {
     }
 
     @Transactional
-    public CarType create(CarTypeDTO carTypeDTO) {
+    public CarTypeDTO create(CarTypeDTO carTypeDTO) {
         CarType byCarClass = carTypeRepository.findByCarClass(carTypeDTO.getCarClass());
         if (byCarClass == null) {
             CarType type = new CarType(carTypeDTO.getCarClass(), carTypeDTO.getDescription(), getMinNumberOfCars(carTypeDTO.getCarClass()));
-            return carTypeRepository.save(type);
+            return loadDto(carTypeRepository.save(type).getId());
         } else {
             byCarClass.setDescription(carTypeDTO.getDescription());
-            return carTypeRepository.findByCarClass(carTypeDTO.getCarClass());
+            return loadDto(carTypeRepository.findByCarClass(carTypeDTO.getCarClass()).getId());
         }
     }
 

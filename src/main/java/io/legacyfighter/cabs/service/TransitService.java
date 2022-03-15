@@ -1,11 +1,16 @@
 package io.legacyfighter.cabs.service;
 
+import io.legacyfighter.cabs.carfleet.CarClass;
+import io.legacyfighter.cabs.carfleet.CarTypeService;
 import io.legacyfighter.cabs.common.EventsPublisher;
 import io.legacyfighter.cabs.distance.Distance;
 import io.legacyfighter.cabs.dto.AddressDTO;
 import io.legacyfighter.cabs.dto.DriverPositionDTOV2;
 import io.legacyfighter.cabs.dto.TransitDTO;
-import io.legacyfighter.cabs.entity.*;
+import io.legacyfighter.cabs.entity.Address;
+import io.legacyfighter.cabs.entity.Client;
+import io.legacyfighter.cabs.entity.Driver;
+import io.legacyfighter.cabs.entity.Transit;
 import io.legacyfighter.cabs.entity.events.TransitCompleted;
 import io.legacyfighter.cabs.money.Money;
 import io.legacyfighter.cabs.repository.*;
@@ -18,7 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
@@ -87,7 +94,7 @@ public class TransitService {
     }
 
     @Transactional
-    public Transit createTransit(Long clientId, Address from, Address to, CarType.CarClass carClass) {
+    public Transit createTransit(Long clientId, Address from, Address to, CarClass carClass) {
         Client client = clientRepository.getOne(clientId);
 
         if (client == null) {
@@ -289,8 +296,8 @@ public class TransitService {
                         driversAvgPositions.sort(comparator);
                         driversAvgPositions = driversAvgPositions.stream().limit(20).collect(toList());
 
-                        List<CarType.CarClass> carClasses = new ArrayList<>();
-                        List<CarType.CarClass> activeCarClasses = carTypeService.findActiveCarClasses();
+                        List<CarClass> carClasses = new ArrayList<>();
+                        List<CarClass> activeCarClasses = carTypeService.findActiveCarClasses();
                         if (activeCarClasses.isEmpty()) {
                             return transit;
                         }
