@@ -3,19 +3,13 @@ package io.legacyfighter.cabs.integration;
 import io.legacyfighter.cabs.common.Fixtures;
 import io.legacyfighter.cabs.entity.*;
 import io.legacyfighter.cabs.money.Money;
-import io.legacyfighter.cabs.repository.AddressRepository;
-import io.legacyfighter.cabs.repository.ClientRepository;
-import io.legacyfighter.cabs.repository.DriverFeeRepository;
-import io.legacyfighter.cabs.repository.TransitRepository;
 import io.legacyfighter.cabs.service.DriverService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.Month;
-import java.time.ZoneOffset;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,12 +28,12 @@ class CalculateDriverPeriodicPaymentsIntegrationTest {
         //given
         Driver driver = fixtures.aDriver();
         //and
-        fixtures.aTransit(driver, 60, LocalDateTime.of(2000, 10, 1, 6, 30));
-        fixtures.aTransit(driver, 70, LocalDateTime.of(2000, 10, 10, 2, 30));
-        fixtures.aTransit(driver, 80, LocalDateTime.of(2000, 10, 30, 6, 30));
-        fixtures.aTransit(driver, 60, LocalDateTime.of(2000, 11, 10, 1, 30));
-        fixtures.aTransit(driver, 30, LocalDateTime.of(2000, 11, 10, 1, 30));
-        fixtures.aTransit(driver, 15, LocalDateTime.of(2000, 12, 10, 2, 30));
+        fixtures.transitDetails(driver, 60, LocalDateTime.of(2000, 10, 1, 6, 30));
+        fixtures.transitDetails(driver, 70, LocalDateTime.of(2000, 10, 10, 2, 30));
+        fixtures.transitDetails(driver, 80, LocalDateTime.of(2000, 10, 30, 6, 30));
+        fixtures.transitDetails(driver, 60, LocalDateTime.of(2000, 11, 10, 1, 30));
+        fixtures.transitDetails(driver, 30, LocalDateTime.of(2000, 11, 10, 1, 30));
+        fixtures.transitDetails(driver, 15, LocalDateTime.of(2000, 12, 10, 2, 30));
         //and
         fixtures.driverHasFee(driver, DriverFee.FeeType.FLAT, 10);
 
@@ -64,12 +58,12 @@ class CalculateDriverPeriodicPaymentsIntegrationTest {
         //given
         Driver driver = fixtures.aDriver();
         //and
-        fixtures.aTransit(driver, 60, LocalDateTime.of(2000, 10, 1, 6, 30));
-        fixtures.aTransit(driver, 70, LocalDateTime.of(2000, 10, 10, 2, 30));
-        fixtures.aTransit(driver, 80, LocalDateTime.of(2000, 10, 30, 6, 30));
-        fixtures.aTransit(driver, 60, LocalDateTime.of(2000, 11, 10, 1, 30));
-        fixtures.aTransit(driver, 30, LocalDateTime.of(2000, 11, 10, 1, 30));
-        fixtures.aTransit(driver, 15, LocalDateTime.of(2000, 12, 10, 2, 30));
+        fixtures.transitDetails(driver, 60, LocalDateTime.of(2000, 10, 1, 6, 30));
+        fixtures.transitDetails(driver, 70, LocalDateTime.of(2000, 10, 10, 2, 30));
+        fixtures.transitDetails(driver, 80, LocalDateTime.of(2000, 10, 30, 6, 30));
+        fixtures.transitDetails(driver, 60, LocalDateTime.of(2000, 11, 10, 1, 30));
+        fixtures.transitDetails(driver, 30, LocalDateTime.of(2000, 11, 10, 1, 30));
+        fixtures.transitDetails(driver, 15, LocalDateTime.of(2000, 12, 10, 2, 30));
         //and
         fixtures.driverHasFee(driver, DriverFee.FeeType.FLAT, 10);
 

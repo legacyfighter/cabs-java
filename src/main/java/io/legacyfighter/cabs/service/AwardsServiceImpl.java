@@ -95,7 +95,7 @@ public class AwardsServiceImpl implements AwardsService {
             return null;
         } else {
             Instant expireAt = Instant.now(clock).plus(appProperties.getMilesExpirationInDays(), ChronoUnit.DAYS);
-            AwardedMiles miles = account.addExpiringMiles(appProperties.getDefaultMilesBonus(), expireAt, transit, Instant.now(clock));
+            AwardedMiles miles = account.addExpiringMiles(appProperties.getDefaultMilesBonus(), expireAt, transitId, Instant.now(clock));
             accountRepository.save(account);
             return miles;
         }

@@ -2,7 +2,6 @@ package io.legacyfighter.cabs.entity.miles;
 
 import io.legacyfighter.cabs.common.BaseEntity;
 import io.legacyfighter.cabs.entity.Client;
-import io.legacyfighter.cabs.entity.Transit;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -20,8 +19,7 @@ public class AwardedMiles extends BaseEntity {
 
     private String milesJson;
 
-    @ManyToOne
-    private Transit transit;
+    private Long transitId;
 
     @ManyToOne
     private AwardsAccount account;
@@ -29,9 +27,9 @@ public class AwardedMiles extends BaseEntity {
     public AwardedMiles() {
     }
 
-    public AwardedMiles(AwardsAccount awardsAccount, Transit transit, Client client, Instant when, Miles constantUntil) {
+    public AwardedMiles(AwardsAccount awardsAccount, Long transitId, Client client, Instant when, Miles constantUntil) {
         this.account = awardsAccount;
-        this.transit = transit;
+        this.transitId = transitId;
         this.client = client;
         this.date = when;
         setMiles(constantUntil);

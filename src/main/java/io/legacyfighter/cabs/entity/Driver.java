@@ -53,9 +53,6 @@ public class Driver extends BaseEntity {
     @OneToMany(mappedBy = "driver")
     private Set<DriverAttribute> attributes = new HashSet<>();
 
-    @OneToMany(mappedBy = "driver")
-    private Set<Transit> transits = new HashSet<>();
-
     public BigDecimal calculateEarningsForTransit(Transit transit) {
         return null;
         // zdublować kod wyliczenia kosztu przejazdu
@@ -139,7 +136,4 @@ public class Driver extends BaseEntity {
                 this.getId().equals(other.getId());
     }
 
-    public Set<Transit> getTransits() {
-        return transits;
-    }
 }

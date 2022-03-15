@@ -46,7 +46,7 @@ public class ClaimDTO {
     private String claimNo;
 
     public ClaimDTO(Claim claim) {
-        this(claim.getId(), claim.getOwner().getId(), claim.getTransit().getId(), claim.getReason(),
+        this(claim.getId(), claim.getOwner().getId(), claim.getTransitId(), claim.getReason(),
                 claim.getIncidentDescription(), claim.getCreationDate(),
                 claim.getCompletionDate(), claim.getChangeDate(), claim.getCompletionMode(), claim.getStatus(), claim.getClaimNo());
     }

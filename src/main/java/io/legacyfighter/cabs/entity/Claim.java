@@ -1,6 +1,7 @@
 package io.legacyfighter.cabs.entity;
 
 import io.legacyfighter.cabs.common.BaseEntity;
+import io.legacyfighter.cabs.money.Money;
 
 import javax.persistence.*;
 import java.time.Instant;
@@ -28,8 +29,7 @@ public class Claim extends BaseEntity {
     @ManyToOne
     private Client owner;
 
-    @OneToOne
-    private Transit transit;
+    private Long transitId;
 
     @Column(nullable = false)
     private Instant creationDate;
@@ -52,6 +52,9 @@ public class Claim extends BaseEntity {
 
     @Column(nullable = false)
     private String claimNo;
+
+    @Embedded
+    private Money transitPrice;
 
     public void escalate() {
         setStatus(ESCALATED);
@@ -84,13 +87,22 @@ public class Claim extends BaseEntity {
         this.owner = owner;
     }
 
-    public Transit getTransit() {
-        return transit;
+    public Long getTransitId() {
+        return transitId;
     }
 
-    public void setTransit(Transit transit) {
-        this.transit = transit;
+    public void setTransit(Long transitId) {
+        this.transitId = transitId;
     }
+
+    public Money getTransitPrice() {
+        return transitPrice;
+    }
+
+    public void setTransitPrice(Money transitPrice) {
+        this.transitPrice = transitPrice;
+    }
+
 
     public Instant getCreationDate() {
         return creationDate;

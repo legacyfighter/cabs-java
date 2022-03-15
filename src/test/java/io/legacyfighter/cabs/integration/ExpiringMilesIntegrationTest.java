@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 class ExpiringMilesIntegrationTest {
 
+    public static final long TRANSIT_ID = 1L;
     static Instant _1989_12_12 = LocalDateTime.of(1989, 12, 12, 12, 12).toInstant(ZoneOffset.UTC);
     static Instant _1989_12_13 = _1989_12_12.plus(1, ChronoUnit.DAYS);
     static Instant _1989_12_14 = _1989_12_13.plus(1, ChronoUnit.DAYS);
@@ -51,19 +52,17 @@ class ExpiringMilesIntegrationTest {
         defaultMilesExpirationInDaysIs(365);
         //and
         fixtures.activeAwardsAccount(client);
-        //and
-        Transit transit = fixtures.aTransit(new Money(80));
 
         //when
-        registerMilesAt(transit, client, _1989_12_12);
+        registerMilesAt(client, _1989_12_12);
         //then
         assertEquals(10, calculateBalanceAt(client, _1989_12_12));
         //when
-        registerMilesAt(transit, client, _1989_12_13);
+        registerMilesAt(client, _1989_12_13);
         //then
         assertEquals(20, calculateBalanceAt(client, _1989_12_12));
         //when
-        registerMilesAt(transit, client, _1989_12_14);
+        registerMilesAt(client, _1989_12_14);
         //then
         assertEquals(30, calculateBalanceAt(client, _1989_12_14));
         assertEquals(30, calculateBalanceAt(client, _1989_12_12.plus(300, ChronoUnit.DAYS)));
@@ -81,9 +80,9 @@ class ExpiringMilesIntegrationTest {
         when(appProperties.getMilesExpirationInDays()).thenReturn(days);
     }
 
-    void registerMilesAt(Transit transit, Client client, Instant when) {
+    void registerMilesAt(Client client, Instant when) {
         when(clock.instant()).thenReturn(when);
-        awardsService.registerMiles(client.getId(), transit.getId());
+        awardsService.registerMiles(client.getId(), TRANSIT_ID);
     }
 
     Integer calculateBalanceAt(Client client, Instant when) {

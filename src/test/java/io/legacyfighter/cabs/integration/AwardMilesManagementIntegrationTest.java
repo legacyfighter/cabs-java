@@ -29,6 +29,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 class AwardMilesManagementIntegrationTest {
 
+    public static final long TRANSIT_ID = 1L;
     static Instant NOW = LocalDateTime.of(1989, 12, 12, 12, 12).toInstant(ZoneOffset.UTC);
 
     @Autowired
@@ -100,11 +101,9 @@ class AwardMilesManagementIntegrationTest {
         Client client = fixtures.aClient();
         //and
         fixtures.activeAwardsAccount(client);
-        //and
-        Transit transit = fixtures.aTransit(new Money(80));
 
         //when
-        awardsService.registerMiles(client.getId(), transit.getId());
+        awardsService.registerMiles(client.getId(), TRANSIT_ID);
 
         //then
         AwardsAccountDTO account = awardsService.findBy(client.getId());
@@ -141,13 +140,10 @@ class AwardMilesManagementIntegrationTest {
         Client client = fixtures.aClient();
         //and
         fixtures.activeAwardsAccount(client);
-        //and
-        Transit transit = fixtures.aTransit(new Money(80));
-
         //when
         awardsService.registerNonExpiringMiles(client.getId(), 20);
-        awardsService.registerMiles(client.getId(), transit.getId());
-        awardsService.registerMiles(client.getId(), transit.getId());
+        awardsService.registerMiles(client.getId(), TRANSIT_ID);
+        awardsService.registerMiles(client.getId(), TRANSIT_ID);
 
         //then
         AwardsAccountDTO account = awardsService.findBy(client.getId());
@@ -241,11 +237,9 @@ class AwardMilesManagementIntegrationTest {
         //and
         fixtures.activeAwardsAccount(client);
         //and
-        Transit transit = fixtures.aTransit(new Money(80));
-        //and
-        awardsService.registerMiles(client.getId(), transit.getId());
-        awardsService.registerMiles(client.getId(), transit.getId());
-        awardsService.registerMiles(client.getId(), transit.getId());
+        awardsService.registerMiles(client.getId(), TRANSIT_ID);
+        awardsService.registerMiles(client.getId(), TRANSIT_ID);
+        awardsService.registerMiles(client.getId(), TRANSIT_ID);
 
         //when
         awardsService.removeMiles(client.getId(), 20);
@@ -261,13 +255,11 @@ class AwardMilesManagementIntegrationTest {
         Client client = fixtures.aClient(NORMAL);
         //and
         fixtures.activeAwardsAccount(client);
-        //and
-        Transit transit = fixtures.aTransit(new Money(80));
 
         //when
-        awardsService.registerMiles(client.getId(), transit.getId());
-        awardsService.registerMiles(client.getId(), transit.getId());
-        awardsService.registerMiles(client.getId(), transit.getId());
+        awardsService.registerMiles(client.getId(), TRANSIT_ID);
+        awardsService.registerMiles(client.getId(), TRANSIT_ID);
+        awardsService.registerMiles(client.getId(), TRANSIT_ID);
 
         //then
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> awardsService.removeMiles(client.getId(), 40));
@@ -280,12 +272,10 @@ class AwardMilesManagementIntegrationTest {
         //and
         awardsService.registerToProgram(client.getId());
         //and
-        Transit transit = fixtures.aTransit(new Money(80));
-        //and
         Integer currentMiles = awardsService.calculateBalance(client.getId());
 
         //when
-        awardsService.registerMiles(client.getId(), transit.getId());
+        awardsService.registerMiles(client.getId(), TRANSIT_ID);
 
         //then
         assertEquals(currentMiles, awardsService.calculateBalance(client.getId()));

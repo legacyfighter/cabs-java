@@ -30,6 +30,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 class RemovingAwardMilesIntegrationTest {
 
+    public static final long TRANSIT_ID = 1L;
     static Instant DAY_BEFORE_YESTERDAY = LocalDateTime.of(1989, 12, 12, 12, 12).toInstant(ZoneOffset.UTC);
     static Instant YESTERDAY = DAY_BEFORE_YESTERDAY.plus(1, ChronoUnit.DAYS);
     static Instant TODAY = YESTERDAY.plus(1, ChronoUnit.DAYS);
@@ -58,10 +59,8 @@ class RemovingAwardMilesIntegrationTest {
         //given
         Client client = clientWithAnActiveMilesProgram(NORMAL);
         //and
-        Transit transit = fixtures.aTransit(new Money(80));
-        //and
-        AwardedMiles middle = grantedMilesThatWillExpireInDays(10, 365, YESTERDAY, client, transit);
-        AwardedMiles youngest = grantedMilesThatWillExpireInDays(10, 365, TODAY, client, transit);
+        AwardedMiles middle = grantedMilesThatWillExpireInDays(10, 365, YESTERDAY, client);
+        AwardedMiles youngest = grantedMilesThatWillExpireInDays(10, 365, TODAY, client);
         AwardedMiles oldestNonExpiringMiles = grantedNonExpiringMiles(5, DAY_BEFORE_YESTERDAY, client);
 
         //when
@@ -81,11 +80,9 @@ class RemovingAwardMilesIntegrationTest {
         //and
         fixtures.clientHasDoneTransits(client, 15, geocodingService);
         //and
-        Transit transit = fixtures.aTransit(new Money(80));
-        //and
-        AwardedMiles oldest = grantedMilesThatWillExpireInDays(10, 60, DAY_BEFORE_YESTERDAY, client, transit);
-        AwardedMiles middle = grantedMilesThatWillExpireInDays(10, 365, YESTERDAY, client, transit);
-        AwardedMiles youngest = grantedMilesThatWillExpireInDays(10, 30, TODAY, client, transit);
+        AwardedMiles oldest = grantedMilesThatWillExpireInDays(10, 60, DAY_BEFORE_YESTERDAY, client);
+        AwardedMiles middle = grantedMilesThatWillExpireInDays(10, 365, YESTERDAY, client);
+        AwardedMiles youngest = grantedMilesThatWillExpireInDays(10, 30, TODAY, client);
 
         //when
         awardsService.removeMiles(client.getId(), 15);
@@ -104,9 +101,7 @@ class RemovingAwardMilesIntegrationTest {
         //and
         fixtures.clientHasDoneTransits(client, 15, geocodingService);
         //and
-        Transit transit = fixtures.aTransit(new Money(80));
-
-        AwardedMiles regularMiles = grantedMilesThatWillExpireInDays(10, 365, TODAY, client, transit);
+        AwardedMiles regularMiles = grantedMilesThatWillExpireInDays(10, 365, TODAY, client);
         AwardedMiles oldestNonExpiringMiles = grantedNonExpiringMiles(5, DAY_BEFORE_YESTERDAY, client);
 
         //when
@@ -124,11 +119,9 @@ class RemovingAwardMilesIntegrationTest {
         //given
         Client client = clientWithAnActiveMilesProgram(VIP);
         //and
-        Transit transit = fixtures.aTransit(new Money(80));
-        //and
-        AwardedMiles secondToExpire = grantedMilesThatWillExpireInDays(10, 60, YESTERDAY, client, transit);
-        AwardedMiles thirdToExpire = grantedMilesThatWillExpireInDays(5, 365, DAY_BEFORE_YESTERDAY, client, transit);
-        AwardedMiles firstToExpire = grantedMilesThatWillExpireInDays(15, 30, TODAY, client, transit);
+        AwardedMiles secondToExpire = grantedMilesThatWillExpireInDays(10, 60, YESTERDAY, client);
+        AwardedMiles thirdToExpire = grantedMilesThatWillExpireInDays(5, 365, DAY_BEFORE_YESTERDAY, client);
+        AwardedMiles firstToExpire = grantedMilesThatWillExpireInDays(15, 30, TODAY, client);
         AwardedMiles nonExpiring = grantedNonExpiringMiles(1, DAY_BEFORE_YESTERDAY, client);
 
 
@@ -150,11 +143,9 @@ class RemovingAwardMilesIntegrationTest {
         //and
         fixtures.clientHasDoneTransits(client, 15, geocodingService);
         //and
-        Transit transit = fixtures.aTransit(new Money(80));
-        //and
-        AwardedMiles secondToExpire = grantedMilesThatWillExpireInDays(10, 60, YESTERDAY, client, transit);
-        AwardedMiles thirdToExpire = grantedMilesThatWillExpireInDays(5, 365, DAY_BEFORE_YESTERDAY, client, transit);
-        AwardedMiles firstToExpire = grantedMilesThatWillExpireInDays(15, 10, TODAY, client, transit);
+        AwardedMiles secondToExpire = grantedMilesThatWillExpireInDays(10, 60, YESTERDAY, client);
+        AwardedMiles thirdToExpire = grantedMilesThatWillExpireInDays(5, 365, DAY_BEFORE_YESTERDAY, client);
+        AwardedMiles firstToExpire = grantedMilesThatWillExpireInDays(15, 10, TODAY, client);
         AwardedMiles nonExpiring = grantedNonExpiringMiles(100, YESTERDAY, client);
 
 
@@ -177,11 +168,9 @@ class RemovingAwardMilesIntegrationTest {
         //and
         fixtures.clientHasDoneClaimAfterCompletedTransit(client, 3);
         //and
-        Transit transit = fixtures.aTransit(new Money(80));
-        //and
-        AwardedMiles secondToExpire = grantedMilesThatWillExpireInDays(4, 60, YESTERDAY, client, transit);
-        AwardedMiles thirdToExpire = grantedMilesThatWillExpireInDays(10, 365, DAY_BEFORE_YESTERDAY, client, transit);
-        AwardedMiles firstToExpire = grantedMilesThatWillExpireInDays(5, 10, YESTERDAY, client, transit);
+        AwardedMiles secondToExpire = grantedMilesThatWillExpireInDays(4, 60, YESTERDAY, client);
+        AwardedMiles thirdToExpire = grantedMilesThatWillExpireInDays(10, 365, DAY_BEFORE_YESTERDAY, client);
+        AwardedMiles firstToExpire = grantedMilesThatWillExpireInDays(5, 10, YESTERDAY, client);
         AwardedMiles nonExpiring = grantedNonExpiringMiles(10, YESTERDAY, client);
 
         //when
@@ -195,10 +184,10 @@ class RemovingAwardMilesIntegrationTest {
         assertThatMilesWereReducedTo(firstToExpire, 5, awardedMiles);
     }
 
-    AwardedMiles grantedMilesThatWillExpireInDays(int miles, int expirationInDays, Instant when, Client client, Transit transit) {
+    AwardedMiles grantedMilesThatWillExpireInDays(int miles, int expirationInDays, Instant when, Client client) {
         milesWillExpireInDays(expirationInDays);
         defaultMilesBonusIs(miles);
-        return milesRegisteredAt(when, client, transit);
+        return milesRegisteredAt(when, client);
     }
 
     AwardedMiles grantedNonExpiringMiles(int miles, Instant when, Client client) {
@@ -214,9 +203,9 @@ class RemovingAwardMilesIntegrationTest {
         assertThat(actual.findFirst()).contains(milesAfterReduction);
     }
 
-    AwardedMiles milesRegisteredAt(Instant when, Client client, Transit transit) {
+    AwardedMiles milesRegisteredAt(Instant when, Client client) {
         when(clock.instant()).thenReturn(when);
-        return awardsService.registerMiles(client.getId(), transit.getId());
+        return awardsService.registerMiles(client.getId(), TRANSIT_ID);
     }
 
     Client clientWithAnActiveMilesProgram(Client.Type type) {

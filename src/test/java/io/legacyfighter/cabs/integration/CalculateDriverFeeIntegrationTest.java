@@ -3,7 +3,6 @@ package io.legacyfighter.cabs.integration;
 import io.legacyfighter.cabs.common.Fixtures;
 import io.legacyfighter.cabs.entity.Driver;
 import io.legacyfighter.cabs.entity.DriverFee;
-import io.legacyfighter.cabs.entity.Transit;
 
 import io.legacyfighter.cabs.money.Money;
 import io.legacyfighter.cabs.service.DriverFeeService;
@@ -27,12 +26,10 @@ class CalculateDriverFeeIntegrationTest {
         //given
         Driver driver = fixtures.aDriver();
         //and
-        Transit transit = fixtures.aTransit(driver, 60);
-        //and
         fixtures.driverHasFee(driver, DriverFee.FeeType.FLAT, 10);
 
         //when
-        Money fee = driverFeeService.calculateDriverFee(transit.getId());
+        Money fee = driverFeeService.calculateDriverFee(new Money(60), driver.getId());
 
         //then
         assertEquals(new Money(50), fee);
@@ -43,12 +40,10 @@ class CalculateDriverFeeIntegrationTest {
         //given
         Driver driver = fixtures.aDriver();
         //and
-        Transit transit = fixtures.aTransit(driver, 80);
-        //and
         fixtures.driverHasFee(driver, DriverFee.FeeType.PERCENTAGE, 50);
 
         //when
-        Money fee = driverFeeService.calculateDriverFee(transit.getId());
+        Money fee = driverFeeService.calculateDriverFee(new Money(80), driver.getId());
 
         //then
         assertEquals(new Money(40), fee);
@@ -59,12 +54,10 @@ class CalculateDriverFeeIntegrationTest {
         //given
         Driver driver = fixtures.aDriver();
         //and
-        Transit transit = fixtures.aTransit(driver, 10);
-        //and
         fixtures.driverHasFee(driver, DriverFee.FeeType.PERCENTAGE, 7, 5);
 
         //when
-        Money fee = driverFeeService.calculateDriverFee(transit.getId());
+        Money fee = driverFeeService.calculateDriverFee(new Money(10), driver.getId());
 
         //then
         assertEquals(new Money(5), fee);
