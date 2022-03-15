@@ -1,4 +1,4 @@
-package io.legacyfighter.cabs.entity.miles;
+package io.legacyfighter.cabs.loyalty;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -14,7 +14,7 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
         @JsonSubTypes.Type(value = ConstantUntil.class, name = "Expiring"),
         @JsonSubTypes.Type(value = TwoStepExpiringMiles.class, name = "TwoStep")
 })
-public interface Miles {
+interface Miles {
     Integer getAmountFor(Instant moment);
 
     Miles subtract(Integer amount, Instant moment);

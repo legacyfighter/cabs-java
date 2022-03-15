@@ -1,7 +1,5 @@
-package io.legacyfighter.cabs.ui;
+package io.legacyfighter.cabs.loyalty;
 
-import io.legacyfighter.cabs.dto.AwardsAccountDTO;
-import io.legacyfighter.cabs.service.AwardsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

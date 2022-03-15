@@ -16,6 +16,7 @@ import io.legacyfighter.cabs.entity.DriverSession;
 import io.legacyfighter.cabs.entity.Transit;
 import io.legacyfighter.cabs.entity.events.TransitCompleted;
 import io.legacyfighter.cabs.invocing.InvoiceGenerator;
+import io.legacyfighter.cabs.loyalty.AwardsService;
 import io.legacyfighter.cabs.money.Money;
 import io.legacyfighter.cabs.repository.*;
 import io.legacyfighter.cabs.notification.DriverNotificationService;

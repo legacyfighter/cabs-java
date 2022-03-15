@@ -1,11 +1,11 @@
-package io.legacyfighter.cabs.entity.miles;
+package io.legacyfighter.cabs.loyalty;
 
 import javax.persistence.Embeddable;
 import java.time.Instant;
 import java.util.Objects;
 
 @Embeddable
-public class TwoStepExpiringMiles implements Miles {
+class TwoStepExpiringMiles implements Miles {
 
     private Integer amount;
 

@@ -1,7 +1,7 @@
-package io.legacyfighter.cabs.repository;
+package io.legacyfighter.cabs.loyalty;
 
-import io.legacyfighter.cabs.entity.miles.AwardedMiles;
-import io.legacyfighter.cabs.entity.miles.AwardsAccount;
+import io.legacyfighter.cabs.loyalty.AwardedMiles;
+import io.legacyfighter.cabs.loyalty.AwardsAccount;
 import io.legacyfighter.cabs.entity.Client;
 import org.springframework.data.jpa.repository.JpaRepository;
 

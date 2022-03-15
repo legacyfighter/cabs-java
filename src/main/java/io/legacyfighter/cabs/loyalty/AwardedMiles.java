@@ -1,4 +1,4 @@
-package io.legacyfighter.cabs.entity.miles;
+package io.legacyfighter.cabs.loyalty;
 
 import io.legacyfighter.cabs.common.BaseEntity;
 
@@ -8,7 +8,8 @@ import javax.persistence.ManyToOne;
 import java.time.Instant;
 
 @Entity
-public class AwardedMiles extends BaseEntity {
+public
+class AwardedMiles extends BaseEntity {
 
     private Long clientId;
 
