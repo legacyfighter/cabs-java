@@ -1,4 +1,4 @@
-package io.legacyfighter.cabs.entity;
+package io.legacyfighter.cabs.crm.claims;
 
 import io.legacyfighter.cabs.common.BaseEntity;
 import io.legacyfighter.cabs.money.Money;
@@ -6,28 +6,23 @@ import io.legacyfighter.cabs.money.Money;
 import javax.persistence.*;
 import java.time.Instant;
 
-import static io.legacyfighter.cabs.entity.Claim.CompletionMode.AUTOMATIC;
-import static io.legacyfighter.cabs.entity.Claim.CompletionMode.MANUAL;
-import static io.legacyfighter.cabs.entity.Claim.Status.ESCALATED;
-import static io.legacyfighter.cabs.entity.Claim.Status.REFUNDED;
+import static io.legacyfighter.cabs.crm.claims.Claim.CompletionMode.AUTOMATIC;
+import static io.legacyfighter.cabs.crm.claims.Claim.CompletionMode.MANUAL;
+import static io.legacyfighter.cabs.crm.claims.Status.ESCALATED;
+import static io.legacyfighter.cabs.crm.claims.Status.REFUNDED;
+
 
 @Entity
 public class Claim extends BaseEntity {
-
-    public enum Status {
-        DRAFT, NEW, IN_PROCESS, REFUNDED, ESCALATED, REJECTED
-    }
 
     public enum CompletionMode {
         MANUAL, AUTOMATIC
     }
 
     public Claim() {
-
     }
 
-    @ManyToOne
-    private Client owner;
+    private Long ownerId;
 
     private Long transitId;
 
@@ -56,14 +51,14 @@ public class Claim extends BaseEntity {
     @Embedded
     private Money transitPrice;
 
-    public void escalate() {
+    void escalate() {
         setStatus(ESCALATED);
         setCompletionDate(Instant.now());
         setChangeDate(Instant.now());
         setCompletionMode(MANUAL);
     }
 
-    public void refund() {
+    void refund() {
         setStatus(REFUNDED);
         setCompletionDate(Instant.now());
         setChangeDate(Instant.now());
@@ -74,57 +69,57 @@ public class Claim extends BaseEntity {
         return claimNo;
     }
 
-    public void setClaimNo(String claimNo) {
+    void setClaimNo(String claimNo) {
         this.claimNo = claimNo;
     }
 
 
-    public Client getOwner() {
-        return owner;
+    public Long getOwnerId() {
+        return ownerId;
     }
 
-    public void setOwner(Client owner) {
-        this.owner = owner;
+    void setOwnerId(Long ownerId) {
+        this.ownerId = ownerId;
     }
 
     public Long getTransitId() {
         return transitId;
     }
 
-    public void setTransit(Long transitId) {
+    void setTransit(Long transitId) {
         this.transitId = transitId;
     }
 
-    public Money getTransitPrice() {
+    Money getTransitPrice() {
         return transitPrice;
     }
 
-    public void setTransitPrice(Money transitPrice) {
+    void setTransitPrice(Money transitPrice) {
         this.transitPrice = transitPrice;
     }
 
 
-    public Instant getCreationDate() {
+    Instant getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(Instant creationDate) {
+    void setCreationDate(Instant creationDate) {
         this.creationDate = creationDate;
     }
 
-    public Instant getCompletionDate() {
+    Instant getCompletionDate() {
         return completionDate;
     }
 
-    public void setCompletionDate(Instant completionDate) {
+    void setCompletionDate(Instant completionDate) {
         this.completionDate = completionDate;
     }
 
-    public String getIncidentDescription() {
+    String getIncidentDescription() {
         return incidentDescription;
     }
 
-    public void setIncidentDescription(String incidentDescription) {
+    void setIncidentDescription(String incidentDescription) {
         this.incidentDescription = incidentDescription;
     }
 
@@ -132,7 +127,7 @@ public class Claim extends BaseEntity {
         return completionMode;
     }
 
-    public void setCompletionMode(CompletionMode completionMode) {
+    void setCompletionMode(CompletionMode completionMode) {
         this.completionMode = completionMode;
     }
 
@@ -140,23 +135,23 @@ public class Claim extends BaseEntity {
         return status;
     }
 
-    public void setStatus(Status status) {
+    void setStatus(Status status) {
         this.status = status;
     }
 
-    public Instant getChangeDate() {
+    Instant getChangeDate() {
         return changeDate;
     }
 
-    public void setChangeDate(Instant changeDate) {
+    void setChangeDate(Instant changeDate) {
         this.changeDate = changeDate;
     }
 
-    public String getReason() {
+    String getReason() {
         return reason;
     }
 
-    public void setReason(String reason) {
+    void setReason(String reason) {
         this.reason = reason;
     }
 

@@ -16,6 +16,8 @@ public class ClientDTO  {
 
     private Client.ClientType clientType;
 
+    private Integer numberOfClaims;
+
     public ClientDTO() {
 
     }

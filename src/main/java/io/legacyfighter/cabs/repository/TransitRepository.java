@@ -1,6 +1,5 @@
 package io.legacyfighter.cabs.repository;
 
-import io.legacyfighter.cabs.entity.Client;
 import io.legacyfighter.cabs.entity.Driver;
 import io.legacyfighter.cabs.entity.Transit;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,6 +15,6 @@ public interface TransitRepository extends JpaRepository<Transit, Long> {
 
     List<Transit> findAllByStatus(Transit.Status status);
 
-    @Query("select T from Transit T join TransitDetails TD ON T.id = TD.transitId where TD.client = ?1")
-    List<Transit> findByClient(Client client);
+    @Query("select T from Transit T join TransitDetails TD ON T.id = TD.transitId where TD.client.id = ?1")
+    List<Transit> findByClientId(Long id);
 }

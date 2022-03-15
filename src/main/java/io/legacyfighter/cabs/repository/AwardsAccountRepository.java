@@ -8,10 +8,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface AwardsAccountRepository extends JpaRepository<AwardsAccount, Long> {
-    AwardsAccount findByClient(Client client);
+
+    AwardsAccount findByClientId(Long clientId);
 
     default List<AwardedMiles> findAllMilesBy(Client client) {
-        return findByClient(client).getMiles();
+        return findByClientId(client.getId()).getMiles();
     }
 
 }

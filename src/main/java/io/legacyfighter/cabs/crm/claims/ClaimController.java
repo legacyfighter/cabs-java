@@ -1,8 +1,5 @@
-package io.legacyfighter.cabs.ui;
+package io.legacyfighter.cabs.crm.claims;
 
-import io.legacyfighter.cabs.dto.ClaimDTO;
-import io.legacyfighter.cabs.entity.Claim;
-import io.legacyfighter.cabs.service.ClaimService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +28,7 @@ public class ClaimController {
 
     @PostMapping("/claims/{id}/markInProcess")
     ResponseEntity<ClaimDTO> markAsInProcess(@PathVariable Long id) {
-        Claim claim = claimService.setStatus(Claim.Status.IN_PROCESS, id);
+        Claim claim = claimService.setStatus(Status.IN_PROCESS, id);
         return ResponseEntity.ok(toDto(claim));
     }
 

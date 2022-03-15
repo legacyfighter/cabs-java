@@ -1,22 +1,30 @@
 package io.legacyfighter.cabs.integration;
 
+
 import io.legacyfighter.cabs.common.Fixtures;
 import io.legacyfighter.cabs.config.AppProperties;
-import io.legacyfighter.cabs.entity.*;
-import io.legacyfighter.cabs.service.*;
+import io.legacyfighter.cabs.crm.claims.Claim;
+import io.legacyfighter.cabs.crm.claims.ClaimService;
+import io.legacyfighter.cabs.entity.Address;
+import io.legacyfighter.cabs.entity.Client;
+import io.legacyfighter.cabs.entity.Driver;
+import io.legacyfighter.cabs.entity.Transit;
+import io.legacyfighter.cabs.service.AwardsService;
+import io.legacyfighter.cabs.service.ClientNotificationService;
+import io.legacyfighter.cabs.service.DriverNotificationService;
+import io.legacyfighter.cabs.service.GeocodingService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import static io.legacyfighter.cabs.entity.Claim.CompletionMode.AUTOMATIC;
-import static io.legacyfighter.cabs.entity.Claim.CompletionMode.MANUAL;
-import static io.legacyfighter.cabs.entity.Claim.Status.ESCALATED;
-import static io.legacyfighter.cabs.entity.Claim.Status.REFUNDED;
+import static io.legacyfighter.cabs.crm.claims.Claim.CompletionMode.AUTOMATIC;
+import static io.legacyfighter.cabs.crm.claims.Claim.CompletionMode.MANUAL;
+import static io.legacyfighter.cabs.crm.claims.Status.ESCALATED;
+import static io.legacyfighter.cabs.crm.claims.Status.REFUNDED;
 import static io.legacyfighter.cabs.entity.Client.Type.NORMAL;
 import static io.legacyfighter.cabs.entity.Client.Type.VIP;
-import static java.time.Instant.now;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
@@ -95,8 +103,8 @@ class ClaimAutomaticResolvingIntegrationTest {
         //then
         assertEquals(REFUNDED, claim.getStatus());
         assertEquals(AUTOMATIC, claim.getCompletionMode());
-        verify(clientNotificationService).notifyClientAboutRefund(claim.getClaimNo(), claim.getOwner().getId());
-        verify(awardsService).registerNonExpiringMiles(claim.getOwner().getId(), 10);
+        verify(clientNotificationService).notifyClientAboutRefund(claim.getClaimNo(), claim.getOwnerId());
+        verify(awardsService).registerNonExpiringMiles(claim.getOwnerId(), 10);
     }
 
     @Test

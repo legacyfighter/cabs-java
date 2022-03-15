@@ -1,22 +1,20 @@
-package io.legacyfighter.cabs.service;
+package io.legacyfighter.cabs.crm.claims;
 
-import io.legacyfighter.cabs.entity.Claim;
-import io.legacyfighter.cabs.repository.ClaimRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 @Service
-public class ClaimNumberGenerator {
+class ClaimNumberGenerator {
 
     private final ClaimRepository claimRepository;
 
-    public ClaimNumberGenerator(ClaimRepository claimRepository) {
+    ClaimNumberGenerator(ClaimRepository claimRepository) {
         this.claimRepository = claimRepository;
     }
 
-    public String generate(Claim claim) {
+    String generate(Claim claim) {
         Long count = claimRepository.count();
         Long prefix = count;
         if (count == 0) {

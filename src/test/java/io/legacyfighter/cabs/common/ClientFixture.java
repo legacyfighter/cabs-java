@@ -1,7 +1,7 @@
 package io.legacyfighter.cabs.common;
 
 
-import io.legacyfighter.cabs.entity.*;
+import io.legacyfighter.cabs.entity.Client;
 
 import io.legacyfighter.cabs.repository.ClientRepository;
 

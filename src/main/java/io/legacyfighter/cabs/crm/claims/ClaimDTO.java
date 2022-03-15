@@ -1,6 +1,4 @@
-package io.legacyfighter.cabs.dto;
-
-import io.legacyfighter.cabs.entity.Claim;
+package io.legacyfighter.cabs.crm.claims;
 
 import java.time.Instant;
 
@@ -26,15 +24,15 @@ public class ClaimDTO {
 
     private Claim.CompletionMode completionMode;
 
-    private Claim.Status status;
+    private Status status;
 
-    public ClaimDTO(Long claimID, Long clientId, Long transitId, String reason, String incidentDescription, Instant creationDate, Instant completionDate, Instant changeDate, Claim.CompletionMode completionMode, Claim.Status status, String claimNo) {
+    public ClaimDTO(Long claimID, Long clientId, Long transitId, String reason, String incidentDescription, Instant creationDate, Instant completionDate, Instant changeDate, Claim.CompletionMode completionMode, Status status, String claimNo) {
         this.claimID = claimID;
         this.clientId = clientId;
         this.transitId = transitId;
         this.reason = reason;
         this.incidentDescription = incidentDescription;
-        this.isDraft = status.equals(Claim.Status.DRAFT);
+        this.isDraft = status.equals(Status.DRAFT);
         this.creationDate = creationDate;
         this.completionDate = completionDate;
         this.changeDate = changeDate;
@@ -46,7 +44,7 @@ public class ClaimDTO {
     private String claimNo;
 
     public ClaimDTO(Claim claim) {
-        this(claim.getId(), claim.getOwner().getId(), claim.getTransitId(), claim.getReason(),
+        this(claim.getId(), claim.getOwnerId(), claim.getTransitId(), claim.getReason(),
                 claim.getIncidentDescription(), claim.getCreationDate(),
                 claim.getCompletionDate(), claim.getChangeDate(), claim.getCompletionMode(), claim.getStatus(), claim.getClaimNo());
     }
@@ -87,11 +85,11 @@ public class ClaimDTO {
         this.completionMode = completionMode;
     }
 
-    public Claim.Status getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(Claim.Status status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 

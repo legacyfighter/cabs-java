@@ -1,12 +1,12 @@
 package io.legacyfighter.cabs.common;
 
 
-import io.legacyfighter.cabs.dto.*;
+import io.legacyfighter.cabs.crm.claims.Claim;
+import io.legacyfighter.cabs.dto.AddressDTO;
+import io.legacyfighter.cabs.dto.TransitDTO;
 import io.legacyfighter.cabs.entity.*;
 import io.legacyfighter.cabs.entity.Driver.Status;
-import io.legacyfighter.cabs.money.Money;
-
-import io.legacyfighter.cabs.service.*;
+import io.legacyfighter.cabs.service.GeocodingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

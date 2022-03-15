@@ -1,8 +1,14 @@
 package io.legacyfighter.cabs.driverreport;
 
+import io.legacyfighter.cabs.crm.claims.Claim;
+import io.legacyfighter.cabs.crm.claims.ClaimDTO;
+import io.legacyfighter.cabs.crm.claims.Status;
 import io.legacyfighter.cabs.distance.Distance;
 import io.legacyfighter.cabs.dto.*;
-import io.legacyfighter.cabs.entity.*;
+import io.legacyfighter.cabs.entity.CarType;
+import io.legacyfighter.cabs.entity.Driver;
+import io.legacyfighter.cabs.entity.DriverAttribute;
+import io.legacyfighter.cabs.entity.Transit;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
@@ -126,7 +132,7 @@ class SqlBasedDriverReportCreator {
                 (String) tuple.get("REASON"), (String) tuple.get("INCIDENT_DESCRIPTION"), ((Timestamp) tuple.get("CREATION_DATE")).toInstant(),
                 tuple.get("COMPLETION_DATE") == null ? null : ((Timestamp) tuple.get("COMPLETION_DATE")).toInstant(),
                 tuple.get("CHANGE_DATE") == null ? null : ((Timestamp) tuple.get("CHANGE_DATE")).toInstant(), tuple.get("COMPLETION_MODE") == null? null : Claim.CompletionMode.valueOf((String) tuple.get("COMPLETION_MODE")),
-                Claim.Status.valueOf((String) tuple.get("CLAIM_STATUS")), (String) tuple.get("CLAIM_NO"));
+                Status.valueOf((String) tuple.get("CLAIM_STATUS")), (String) tuple.get("CLAIM_NO"));
     }
 
     private Instant calculateStartingPoint(int lastDays) {

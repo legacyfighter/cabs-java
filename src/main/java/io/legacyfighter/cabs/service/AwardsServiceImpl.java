@@ -1,13 +1,14 @@
 package io.legacyfighter.cabs.service;
 
 import io.legacyfighter.cabs.config.AppProperties;
+import io.legacyfighter.cabs.crm.claims.ClaimService;
 import io.legacyfighter.cabs.dto.AwardsAccountDTO;
-import io.legacyfighter.cabs.entity.miles.AwardedMiles;
-import io.legacyfighter.cabs.entity.miles.AwardsAccount;
+import io.legacyfighter.cabs.dto.ClientDTO;
 import io.legacyfighter.cabs.entity.Client;
 import io.legacyfighter.cabs.entity.Transit;
+import io.legacyfighter.cabs.entity.miles.AwardedMiles;
+import io.legacyfighter.cabs.entity.miles.AwardsAccount;
 import io.legacyfighter.cabs.repository.AwardsAccountRepository;
-import io.legacyfighter.cabs.repository.ClientRepository;
 import io.legacyfighter.cabs.repository.TransitRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,35 +31,37 @@ public class AwardsServiceImpl implements AwardsService {
     @Autowired
     private AwardsAccountRepository accountRepository;
     @Autowired
-    private ClientRepository clientRepository;
-    @Autowired
     private TransitRepository transitRepository;
     @Autowired
     private Clock clock;
     @Autowired
     private AppProperties appProperties;
+    @Autowired
+    private ClientService clientService;
+    @Autowired
+    private ClaimService claimService;
 
     @Override
     public AwardsAccountDTO findBy(Long clientId) {
-        return new AwardsAccountDTO(accountRepository.findByClient(clientRepository.getOne(clientId)));
+        return new AwardsAccountDTO(accountRepository.findByClientId(clientId), clientService.load(clientId));
     }
 
     @Override
     public void registerToProgram(Long clientId) {
-        Client client = clientRepository.getOne(clientId);
+        ClientDTO client = clientService.load(clientId);
 
         if (client == null) {
             throw new IllegalArgumentException("Client does not exists, id = " + clientId);
         }
 
-        AwardsAccount account = notActiveAccount(client, Instant.now(clock));
+        AwardsAccount account = notActiveAccount(clientId, Instant.now(clock));
         accountRepository.save(account);
     }
 
     @Override
     @Transactional
     public void activateAccount(Long clientId) {
-        AwardsAccount account = accountRepository.findByClient(clientRepository.getOne(clientId));
+        AwardsAccount account = accountRepository.findByClientId(clientId);
 
         if (account == null) {
             throw new IllegalArgumentException("Account does not exists, id = " + clientId);
@@ -72,7 +75,7 @@ public class AwardsServiceImpl implements AwardsService {
     @Override
     @Transactional
     public void deactivateAccount(Long clientId) {
-        AwardsAccount account = accountRepository.findByClient(clientRepository.getOne(clientId));
+        AwardsAccount account = accountRepository.findByClientId(clientId);
 
         if (account == null) {
             throw new IllegalArgumentException("Account does not exists, id = " + clientId);
@@ -85,7 +88,7 @@ public class AwardsServiceImpl implements AwardsService {
 
     @Override
     public AwardedMiles registerMiles(Long clientId, Long transitId) {
-        AwardsAccount account = accountRepository.findByClient(clientRepository.getOne(clientId));
+        AwardsAccount account = accountRepository.findByClientId(clientId);
         Transit transit = transitRepository.getOne(transitId);
         if (transit == null) {
             throw new IllegalArgumentException("transit does not exists, id = " + transitId);
@@ -107,7 +110,7 @@ public class AwardsServiceImpl implements AwardsService {
 
     @Override
     public AwardedMiles registerNonExpiringMiles(Long clientId, Integer miles) {
-        AwardsAccount account = accountRepository.findByClient(clientRepository.getOne(clientId));
+        AwardsAccount account = accountRepository.findByClientId(clientId);
 
         if (account == null) {
             throw new IllegalArgumentException("Account does not exists, id = " + clientId);
@@ -121,12 +124,14 @@ public class AwardsServiceImpl implements AwardsService {
     @Override
     @Transactional
     public void removeMiles(Long clientId, Integer miles) {
-        Client client = clientRepository.getOne(clientId);
-        AwardsAccount account = accountRepository.findByClient(client);
+        AwardsAccount account = accountRepository.findByClientId(clientId);
+        ClientDTO client = clientService.load(clientId);
+
         if (account == null) {
             throw new IllegalArgumentException("Account does not exists, id = " + clientId);
         } else {
-            account.remove(miles, Instant.now(clock), chooseStrategy(transitRepository.findByClient(client).size(), client.getClaims().size(), client.getType(), isSunday()));
+            Integer numberOfClaims = claimService.getNumberOfClaims(clientId);
+            account.remove(miles, Instant.now(clock), chooseStrategy(transitRepository.findByClientId(clientId).size(), numberOfClaims, client.getType(), isSunday()));
         }
 
     }
@@ -147,16 +152,14 @@ public class AwardsServiceImpl implements AwardsService {
 
     @Override
     public Integer calculateBalance(Long clientId) {
-        Client client = clientRepository.getOne(clientId);
-        AwardsAccount account = accountRepository.findByClient(client);
+        AwardsAccount account = accountRepository.findByClientId(clientId);
         return account.calculateBalance(Instant.now(clock));
     }
 
     @Override
     public void transferMiles(Long fromClientId, Long toClientId, Integer miles) {
-        Client fromClient = clientRepository.getOne(fromClientId);
-        AwardsAccount accountFrom = accountRepository.findByClient(fromClient);
-        AwardsAccount accountTo = accountRepository.findByClient(clientRepository.getOne(toClientId));
+        AwardsAccount accountFrom = accountRepository.findByClientId(fromClientId);
+        AwardsAccount accountTo = accountRepository.findByClientId(toClientId);
         if (accountFrom == null) {
             throw new IllegalArgumentException("Account does not exists, id = " + fromClientId);
         }

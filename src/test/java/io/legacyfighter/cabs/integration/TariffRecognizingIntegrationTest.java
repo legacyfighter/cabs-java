@@ -4,14 +4,9 @@ import io.legacyfighter.cabs.common.Fixtures;
 import io.legacyfighter.cabs.dto.AddressDTO;
 import io.legacyfighter.cabs.dto.ClientDTO;
 import io.legacyfighter.cabs.dto.TransitDTO;
-import io.legacyfighter.cabs.entity.Address;
 import io.legacyfighter.cabs.entity.Client;
-import io.legacyfighter.cabs.entity.Transit;
-import io.legacyfighter.cabs.ui.ClientController;
 import io.legacyfighter.cabs.ui.TransitController;
-import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,7 +14,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.Clock;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
 import static java.time.LocalDateTime.*;

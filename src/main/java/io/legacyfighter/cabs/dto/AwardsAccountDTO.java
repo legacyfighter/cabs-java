@@ -18,9 +18,9 @@ public class AwardsAccountDTO {
     public AwardsAccountDTO() {
     }
 
-    public AwardsAccountDTO(AwardsAccount account) {
+    public AwardsAccountDTO(AwardsAccount account, ClientDTO clientDTO) {
         this.isActive = account.isActive();
-        this.client = new ClientDTO(account.getClient());
+        this.client = clientDTO;
         this.transactions = account.getTransactions();
         this.date = account.getDate();
     }

@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ClientService {
+
     @Autowired
     private ClientRepository clientRepository;
 
