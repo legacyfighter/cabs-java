@@ -1,6 +1,5 @@
-package io.legacyfighter.cabs.repository;
+package io.legacyfighter.cabs.crm;
 
-import io.legacyfighter.cabs.entity.Client;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ClientRepository extends JpaRepository<Client, Long> {

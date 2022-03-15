@@ -1,7 +1,7 @@
 package io.legacyfighter.cabs.common;
 
 
-import io.legacyfighter.cabs.entity.Client;
+import io.legacyfighter.cabs.crm.Client;
 import io.legacyfighter.cabs.loyalty.AwardsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

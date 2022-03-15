@@ -2,9 +2,9 @@ package io.legacyfighter.cabs.integration;
 
 import io.legacyfighter.cabs.common.Fixtures;
 import io.legacyfighter.cabs.geolocation.address.AddressDTO;
-import io.legacyfighter.cabs.dto.ClientDTO;
+import io.legacyfighter.cabs.crm.ClientDTO;
 import io.legacyfighter.cabs.dto.TransitDTO;
-import io.legacyfighter.cabs.entity.Client;
+import io.legacyfighter.cabs.crm.Client;
 import io.legacyfighter.cabs.ui.TransitController;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

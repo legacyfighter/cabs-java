@@ -2,7 +2,7 @@ package io.legacyfighter.cabs.integration;
 
 import io.legacyfighter.cabs.common.Fixtures;
 import io.legacyfighter.cabs.config.AppProperties;
-import io.legacyfighter.cabs.entity.Client;
+import io.legacyfighter.cabs.crm.Client;
 import io.legacyfighter.cabs.loyalty.AwardsService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

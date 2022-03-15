@@ -1,8 +1,5 @@
-package io.legacyfighter.cabs.service;
+package io.legacyfighter.cabs.crm;
 
-import io.legacyfighter.cabs.dto.ClientDTO;
-import io.legacyfighter.cabs.entity.Client;
-import io.legacyfighter.cabs.repository.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

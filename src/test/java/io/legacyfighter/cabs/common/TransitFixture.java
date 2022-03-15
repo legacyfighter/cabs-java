@@ -1,11 +1,12 @@
 package io.legacyfighter.cabs.common;
 
 import io.legacyfighter.cabs.carfleet.CarClass;
+import io.legacyfighter.cabs.crm.Client;
 import io.legacyfighter.cabs.geolocation.address.Address;
 import io.legacyfighter.cabs.geolocation.Distance;
 import io.legacyfighter.cabs.driverfleet.Driver;
 import io.legacyfighter.cabs.geolocation.address.AddressDTO;
-import io.legacyfighter.cabs.dto.ClientDTO;
+import io.legacyfighter.cabs.crm.ClientDTO;
 import io.legacyfighter.cabs.dto.TransitDTO;
 import io.legacyfighter.cabs.entity.*;
 import io.legacyfighter.cabs.money.Money;

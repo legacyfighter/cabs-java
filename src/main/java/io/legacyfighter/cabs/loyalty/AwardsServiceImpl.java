@@ -2,11 +2,11 @@ package io.legacyfighter.cabs.loyalty;
 
 import io.legacyfighter.cabs.config.AppProperties;
 import io.legacyfighter.cabs.crm.claims.ClaimService;
-import io.legacyfighter.cabs.dto.ClientDTO;
-import io.legacyfighter.cabs.entity.Client;
+import io.legacyfighter.cabs.crm.ClientDTO;
+import io.legacyfighter.cabs.crm.Client;
 import io.legacyfighter.cabs.entity.Transit;
 import io.legacyfighter.cabs.repository.TransitRepository;
-import io.legacyfighter.cabs.service.ClientService;
+import io.legacyfighter.cabs.crm.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

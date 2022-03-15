@@ -3,7 +3,7 @@ package io.legacyfighter.cabs.integration;
 import io.legacyfighter.cabs.common.Fixtures;
 import io.legacyfighter.cabs.config.AppProperties;
 import io.legacyfighter.cabs.loyalty.AwardedMiles;
-import io.legacyfighter.cabs.entity.Client;
+import io.legacyfighter.cabs.crm.Client;
 import io.legacyfighter.cabs.loyalty.AwardsAccountRepository;
 import io.legacyfighter.cabs.loyalty.AwardsService;
 import io.legacyfighter.cabs.geolocation.GeocodingService;
@@ -20,8 +20,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static io.legacyfighter.cabs.entity.Client.Type.NORMAL;
-import static io.legacyfighter.cabs.entity.Client.Type.VIP;
+import static io.legacyfighter.cabs.crm.Client.Type.NORMAL;
+import static io.legacyfighter.cabs.crm.Client.Type.VIP;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 

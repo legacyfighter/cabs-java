@@ -1,6 +1,4 @@
-package io.legacyfighter.cabs.dto;
-
-import io.legacyfighter.cabs.entity.Client;
+package io.legacyfighter.cabs.crm;
 
 public class ClientDTO  {
 

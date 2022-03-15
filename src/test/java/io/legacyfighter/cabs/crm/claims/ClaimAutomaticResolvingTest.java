@@ -1,7 +1,7 @@
 package io.legacyfighter.cabs.crm.claims;
 
 import io.legacyfighter.cabs.crm.claims.ClaimsResolver.Result;
-import io.legacyfighter.cabs.entity.Client;
+import io.legacyfighter.cabs.crm.Client;
 import io.legacyfighter.cabs.entity.Transit;
 import io.legacyfighter.cabs.money.Money;
 import org.junit.jupiter.api.Test;
@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 import static io.legacyfighter.cabs.crm.claims.ClaimsResolver.WhoToAsk.*;
 import static io.legacyfighter.cabs.crm.claims.Status.ESCALATED;
 import static io.legacyfighter.cabs.crm.claims.Status.REFUNDED;
-import static io.legacyfighter.cabs.entity.Client.Type.NORMAL;
-import static io.legacyfighter.cabs.entity.Client.Type.VIP;
+import static io.legacyfighter.cabs.crm.Client.Type.NORMAL;
+import static io.legacyfighter.cabs.crm.Client.Type.VIP;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ClaimAutomaticResolvingTest {

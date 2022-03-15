@@ -10,7 +10,7 @@ import io.legacyfighter.cabs.driverfleet.DriverFee;
 import io.legacyfighter.cabs.geolocation.address.AddressDTO;
 import io.legacyfighter.cabs.dto.TransitDTO;
 import io.legacyfighter.cabs.geolocation.address.Address;
-import io.legacyfighter.cabs.entity.Client;
+import io.legacyfighter.cabs.crm.Client;
 import io.legacyfighter.cabs.entity.Transit;
 import io.legacyfighter.cabs.geolocation.GeocodingService;
 import org.springframework.beans.factory.annotation.Autowired;

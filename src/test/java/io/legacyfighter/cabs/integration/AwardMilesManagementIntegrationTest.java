@@ -3,7 +3,7 @@ package io.legacyfighter.cabs.integration;
 import io.legacyfighter.cabs.common.Fixtures;
 import io.legacyfighter.cabs.loyalty.AwardsAccountDTO;
 import io.legacyfighter.cabs.loyalty.AwardedMiles;
-import io.legacyfighter.cabs.entity.Client;
+import io.legacyfighter.cabs.crm.Client;
 import io.legacyfighter.cabs.loyalty.AwardsAccountRepository;
 import io.legacyfighter.cabs.loyalty.AwardsService;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
-import static io.legacyfighter.cabs.entity.Client.Type.NORMAL;
+import static io.legacyfighter.cabs.crm.Client.Type.NORMAL;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;

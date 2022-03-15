@@ -2,8 +2,8 @@ package io.legacyfighter.cabs.crm.claims;
 
 
 import io.legacyfighter.cabs.config.AppProperties;
-import io.legacyfighter.cabs.entity.Client;
-import io.legacyfighter.cabs.repository.ClientRepository;
+import io.legacyfighter.cabs.crm.Client;
+import io.legacyfighter.cabs.crm.ClientRepository;
 import io.legacyfighter.cabs.loyalty.AwardsService;
 import io.legacyfighter.cabs.notification.ClientNotificationService;
 import io.legacyfighter.cabs.notification.DriverNotificationService;
