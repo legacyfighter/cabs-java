@@ -137,8 +137,18 @@ public class DriverService {
         return new DriverDTO(driver);
     }
 
+    public Set<DriverDTO> loadDrivers(Collection<Long> ids) {
+        return driverRepository.findAllById(ids)
+                .stream()
+                .map(DriverDTO::new)
+                .collect(Collectors.toSet());
+    }
+
     public void addAttribute(Long driverId, DriverAttributeName attr, String value) {
         Driver driver = driverRepository.getOne(driverId);
+        if (driver == null) {
+            throw new IllegalArgumentException("Driver does not exists, id = " + driverId);
+        }
         if (driver == null) {
             throw new IllegalArgumentException("Driver does not exists, id = " + driverId);
         }
@@ -147,10 +157,19 @@ public class DriverService {
     }
 
 
-    public Set<DriverDTO> loadDrivers(Collection<Long> ids) {
-        return driverRepository.findAllById(ids)
-                .stream()
-                .map(DriverDTO::new)
-                .collect(Collectors.toSet());
+    public boolean exists(Long driverId) {
+        return driverRepository.findById(driverId).isPresent();
+    }
+
+    @Transactional
+    public void markOccupied(Long driverId) {
+        Driver driver = driverRepository.getOne(driverId);
+        driver.setOccupied(true);
+    }
+
+    @Transactional
+    public void markNotOccupied(Long driverId) {
+        Driver driver = driverRepository.getOne(driverId);
+        driver.setOccupied(false);
     }
 }

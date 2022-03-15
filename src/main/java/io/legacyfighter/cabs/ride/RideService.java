@@ -6,17 +6,16 @@ import io.legacyfighter.cabs.carfleet.CarClass;
 import io.legacyfighter.cabs.common.EventsPublisher;
 import io.legacyfighter.cabs.crm.Client;
 import io.legacyfighter.cabs.crm.ClientRepository;
-import io.legacyfighter.cabs.driverfleet.*;
+import io.legacyfighter.cabs.driverfleet.DriverDTO;
+import io.legacyfighter.cabs.driverfleet.DriverFeeService;
+import io.legacyfighter.cabs.driverfleet.DriverService;
 import io.legacyfighter.cabs.geolocation.Distance;
-import io.legacyfighter.cabs.geolocation.DistanceCalculator;
-import io.legacyfighter.cabs.geolocation.GeocodingService;
 import io.legacyfighter.cabs.geolocation.address.Address;
 import io.legacyfighter.cabs.geolocation.address.AddressDTO;
 import io.legacyfighter.cabs.geolocation.address.AddressRepository;
 import io.legacyfighter.cabs.invocing.InvoiceGenerator;
 import io.legacyfighter.cabs.loyalty.AwardsService;
 import io.legacyfighter.cabs.money.Money;
-import io.legacyfighter.cabs.pricing.Tariffs;
 import io.legacyfighter.cabs.ride.details.TransitDetailsDTO;
 import io.legacyfighter.cabs.ride.details.TransitDetailsFacade;
 import io.legacyfighter.cabs.ride.events.TransitCompleted;
@@ -30,6 +29,7 @@ import java.util.Set;
 import java.util.UUID;
 
 // If this class will still be here in 2022 I will quit.
+// 20.01.22 - It's a bit better now.
 @Service
 public class RideService {
 
@@ -43,22 +43,19 @@ public class RideService {
     private ChangeDestinationService changeDestinationService;
 
     @Autowired
-    private DriverRepository driverRepository;
+    private DemandService demandService;
 
     @Autowired
-    private TransitRepository transitRepository;
+    private CompleteTransitService completeTransitService;
+
+    @Autowired
+    private StartTransitService startTransitService;
 
     @Autowired
     private ClientRepository clientRepository;
 
     @Autowired
     private InvoiceGenerator invoiceGenerator;
-
-    @Autowired
-    private DistanceCalculator distanceCalculator;
-
-    @Autowired
-    private GeocodingService geocodingService;
 
     @Autowired
     private AddressRepository addressRepository;
@@ -80,15 +77,6 @@ public class RideService {
 
     @Autowired
     private DriverAssignmentFacade driverAssignmentFacade;
-
-    @Autowired
-    private RequestForTransitRepository requestForTransitRepository;
-
-    @Autowired
-    private TransitDemandRepository transitDemandRepository;
-
-    @Autowired
-    private Tariffs tariffs;
 
     @Autowired
     private DriverService driverService;
@@ -127,24 +115,6 @@ public class RideService {
         changeTransitAddressFrom(requestUUID, newAddress.toAddressEntity());
     }
 
-    private Client findClient(Long clientId) {
-        Client client = clientRepository.getOne(clientId);
-        if (client == null) {
-            throw new IllegalArgumentException("Client does not exist, id = " + clientId);
-        }
-        return client;
-    }
-
-    private Address addressFromDto(AddressDTO addressDTO) {
-        Address address = addressDTO.toAddressEntity();
-        return addressRepository.save(address);
-    }
-
-    @Transactional
-    public void changeTransitAddressTo(UUID requestUUID, AddressDTO newAddress) {
-        changeTransitAddressTo(requestUUID, newAddress.toAddressEntity());
-    }
-
     @Transactional
     public void changeTransitAddressTo(UUID requestUUID, Address newAddress) {
         newAddress = addressRepository.save(newAddress);
@@ -159,95 +129,90 @@ public class RideService {
     }
 
     @Transactional
-    public void cancelTransit(UUID requestUUID) {
-        RequestForTransit transit = requestForTransitRepository.findByRequestUUID(requestUUID);
-        if (transit == null) {
+    public void changeTransitAddressTo(UUID requestUUID, AddressDTO newAddress) {
+        changeTransitAddressTo(requestUUID, newAddress.toAddressEntity());
+    }
+
+    private Client findClient(Long clientId) {
+        Client client = clientRepository.getOne(clientId);
+        if (client == null) {
+            throw new IllegalArgumentException("Client does not exist, id = " + clientId);
+        }
+        return client;
+    }
+
+    private Address addressFromDto(AddressDTO addressDTO) {
+        Address address = addressDTO.toAddressEntity();
+        return addressRepository.save(address);
+    }
+
+    @Transactional
+    public void publishTransit(UUID requestUUID) {
+        TransitDetailsDTO transitDetailsDTO = transitDetailsFacade.find(requestUUID);
+        if (transitDetailsDTO == null) {
             throw new IllegalArgumentException("Transit does not exist, id = " + requestUUID);
         }
-        TransitDemand transitDemand = transitDemandRepository.findByTransitRequestUUID(requestUUID);
-        if (transitDemand != null) {
-            transitDemand.cancel();
-            driverAssignmentFacade.cancel(requestUUID);
+        demandService.publishDemand(requestUUID);
+        driverAssignmentFacade.startAssigningDrivers(requestUUID, transitDetailsDTO.from, transitDetailsDTO.carType, Instant.now(clock));
+        transitDetailsFacade.transitPublished(requestUUID, Instant.now(clock));
+    }
+
+    @Transactional
+    public void cancelTransit(UUID requestUUID) {
+        TransitDetailsDTO transitDetailsDTO = transitDetailsFacade.find(requestUUID);
+        if (transitDetailsDTO == null) {
+            throw new IllegalArgumentException("Transit does not exist, id = " + requestUUID);
         }
+        demandService.cancelDemand(requestUUID);
+        driverAssignmentFacade.cancel(requestUUID);
         transitDetailsFacade.transitCancelled(requestUUID);
     }
 
     @Transactional
-    public Transit publishTransit(UUID requestUUID) {
-        RequestForTransit requestFor = requestForTransitRepository.findByRequestUUID(requestUUID);
-        TransitDetailsDTO transitDetailsDTO = transitDetailsFacade.find(requestUUID);
-
-        if (requestFor == null) {
-            throw new IllegalArgumentException("Transit does not exist, id = " + requestUUID);
-        }
-
-        Instant now = Instant.now(clock);
-        transitDemandRepository.save(new TransitDemand(requestFor.getRequestUUID()));
-        driverAssignmentFacade.createAssignment(requestUUID, transitDetailsDTO.from, transitDetailsDTO.carType, now);
-        transitDetailsFacade.transitPublished(requestUUID, now);
-        return transitRepository.findByTransitRequestUUID(requestUUID);
-    }
-
-    // Abandon hope all ye who enter here...
-    @Transactional
-    public Transit findDriversForTransit(UUID requestUUID) {
+    public TransitDetailsDTO findDriversForTransit(UUID requestUUID) {
         TransitDetailsDTO transitDetailsDTO = transitDetailsFacade.find(requestUUID);
         InvolvedDriversSummary involvedDriversSummary = driverAssignmentFacade.searchForPossibleDrivers(requestUUID, transitDetailsDTO.from, transitDetailsDTO.carType);
         transitDetailsFacade.driversAreInvolved(requestUUID, involvedDriversSummary);
-        return transitRepository.findByTransitRequestUUID(requestUUID);
+        return transitDetailsFacade.find(requestUUID);
     }
 
     @Transactional
     public void acceptTransit(Long driverId, UUID requestUUID) {
-        Driver driver = driverRepository.getOne(driverId);
-        TransitDemand transitDemand = transitDemandRepository.findByTransitRequestUUID(requestUUID);
-        if (driver == null) {
+        if (!driverService.exists(driverId)) {
             throw new IllegalArgumentException("Driver does not exist, id = " + driverId);
         } else {
             if (driverAssignmentFacade.isDriverAssigned(requestUUID)) {
                 throw new IllegalStateException("Driver already assigned, requestUUID = " + requestUUID);
             }
-            if (transitDemand == null) {
-                throw new IllegalArgumentException("Transit does not exist, id = " + requestUUID);
-            } else {
-                Instant now = Instant.now(clock);
-                transitDemand.accepted();
-                driverAssignmentFacade.acceptTransit(requestUUID, driver);
-                transitDetailsFacade.transitAccepted(requestUUID, driverId, now);
-                driverRepository.save(driver);
-            }
+            demandService.acceptDemand(requestUUID);
+            driverAssignmentFacade.acceptTransit(requestUUID, driverId);
+            driverService.markOccupied(driverId);
+            transitDetailsFacade.transitAccepted(requestUUID, driverId, Instant.now(clock));
         }
     }
 
     @Transactional
     public void startTransit(Long driverId, UUID requestUUID) {
-        Driver driver = driverRepository.getOne(driverId);
-
-        if (driver == null) {
+        if (!driverService.exists(driverId)) {
             throw new IllegalArgumentException("Driver does not exist, id = " + driverId);
         }
-        TransitDemand transitDemand = transitDemandRepository.findByTransitRequestUUID(requestUUID);
 
-        if (transitDemand == null) {
+        if (!demandService.existsFor(requestUUID)) {
             throw new IllegalArgumentException("Transit does not exist, id = " + requestUUID);
         }
         if (!driverAssignmentFacade.isDriverAssigned(requestUUID)) {
             throw new IllegalStateException("Driver not assigned, requestUUID = " + requestUUID);
         }
         Instant now = Instant.now(clock);
-        Transit transit = new Transit(tariffs.choose(now), requestUUID);
-        transitRepository.save(transit);
+        Transit transit = startTransitService.start(requestUUID);
         transitDetailsFacade.transitStarted(requestUUID, transit.getId(), now);
     }
 
     @Transactional
     public void rejectTransit(Long driverId, UUID requestUUID) {
-        Driver driver = driverRepository.getOne(driverId);
-
-        if (driver == null) {
+        if (!driverService.exists(driverId)) {
             throw new IllegalArgumentException("Driver does not exist, id = " + driverId);
         }
-
         driverAssignmentFacade.rejectTransit(requestUUID, driverId);
     }
 
@@ -259,35 +224,20 @@ public class RideService {
     @Transactional
     public void completeTransit(Long driverId, UUID requestUUID, Address destinationAddress) {
         destinationAddress = addressRepository.save(destinationAddress);
-        Driver driver = driverRepository.getOne(driverId);
         TransitDetailsDTO transitDetails = transitDetailsFacade.find(requestUUID);
-        if (driver == null) {
+        if (!driverService.exists(driverId)) {
             throw new IllegalArgumentException("Driver does not exist, id = " + driverId);
         }
-
-        Transit transit = transitRepository.findByTransitRequestUUID(requestUUID);
-
-        if (transit == null) {
-            throw new IllegalArgumentException("Transit does not exist, id = " + requestUUID);
-        }
-
-
-        // FIXME later: add some exceptions handling
-        double[] geoFrom = geocodingService.geocodeAddress(addressRepository.getByHash(transitDetails.from.getHash()));
-        double[] geoTo = geocodingService.geocodeAddress(addressRepository.getByHash(destinationAddress.getHash()));
-        Distance distance = Distance.ofKm((float) distanceCalculator.calculateByMap(geoFrom[0], geoFrom[1], geoTo[0], geoTo[1]));
-        Instant now = Instant.now(clock);
-        Money finalPrice = transit.completeAt(distance);
-
+        Address from = addressRepository.getByHash(transitDetails.from.getHash());
+        Address to = addressRepository.getByHash(destinationAddress.getHash());
+        Money finalPrice = completeTransitService.completeTransit(driverId, requestUUID, from, to);
         Money driverFee = driverFeeService.calculateDriverFee(finalPrice, driverId);
-        driver.setOccupied(false);
-        driverRepository.save(driver);
-        awardsService.registerMiles(transitDetails.client.getId(), transit.getId());
-        transitRepository.save(transit);
-        transitDetailsFacade.transitCompleted(requestUUID, now, finalPrice, driverFee);
+        driverService.markNotOccupied(driverId);
+        transitDetailsFacade.transitCompleted(requestUUID, Instant.now(clock), finalPrice, driverFee);
+        awardsService.registerMiles(transitDetails.client.getId(), transitDetails.transitId);
         invoiceGenerator.generate(finalPrice.toInt(), transitDetails.client.getName() + " " + transitDetails.client.getLastName());
         eventsPublisher.publish(new TransitCompleted(
-                transitDetails.client.getId(), transit.getId(), transitDetails.from.getHash(), destinationAddress.getHash(), transitDetails.started, now, Instant.now(clock))
+                transitDetails.client.getId(), transitDetails.transitId, transitDetails.from.getHash(), destinationAddress.getHash(), transitDetails.started, Instant.now(clock), Instant.now(clock))
         );
     }
 
@@ -306,7 +256,7 @@ public class RideService {
         return loadTransit(requestUUID);
     }
 
-    public UUID getRequestUUID(Long requestUUID) {
-        return requestForTransitRepository.getOne(requestUUID).getRequestUUID();
+    public UUID getRequestUUID(Long requestId) {
+        return requestTransitService.findCalculationUUID(requestId);
     }
 }

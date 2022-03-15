@@ -13,7 +13,7 @@ import java.util.UUID;
 @Entity
 class DriverAssignment extends BaseEntity {
 
-    private UUID requestId;
+    private UUID requestUUID;
 
     private Instant publishedAt;
 
@@ -30,8 +30,8 @@ class DriverAssignment extends BaseEntity {
     public DriverAssignment() {
     }
 
-    DriverAssignment(UUID requestId, Instant publishedAt) {
-        this.requestId = requestId;
+    DriverAssignment(UUID requestUUID, Instant publishedAt) {
+        this.requestUUID = requestUUID;
         this.publishedAt = publishedAt;
     }
 
@@ -121,8 +121,8 @@ class DriverAssignment extends BaseEntity {
         return awaitingDriversResponses;
     }
 
-    UUID getRequestId() {
-        return requestId;
+    UUID getRequestUUID() {
+        return requestUUID;
     }
 
     @Override

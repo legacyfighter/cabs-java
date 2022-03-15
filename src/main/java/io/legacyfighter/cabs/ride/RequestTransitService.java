@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.util.UUID;
 
 @Service
 public class RequestTransitService {
@@ -46,4 +47,11 @@ public class RequestTransitService {
     }
 
 
+    public UUID findCalculationUUID(Long requestId) {
+        return requestForTransitRepository.getOne(requestId).getRequestUUID();
+    }
+
+    public Tariff findTariff(UUID requestUUID) {
+        return requestForTransitRepository.findByRequestUUID(requestUUID).getTariff();
+    }
 }
