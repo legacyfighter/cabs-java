@@ -1,8 +1,8 @@
 package io.legacyfighter.cabs.driverfleet.driverreport.travelleddistance;
 
 
-import io.legacyfighter.cabs.distance.Distance;
-import io.legacyfighter.cabs.service.DistanceCalculator;
+import io.legacyfighter.cabs.geolocation.Distance;
+import io.legacyfighter.cabs.geolocation.DistanceCalculator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

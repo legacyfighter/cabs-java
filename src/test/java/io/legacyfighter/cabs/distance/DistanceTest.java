@@ -1,6 +1,6 @@
 package io.legacyfighter.cabs.distance;
 
-import io.legacyfighter.cabs.money.Money;
+import io.legacyfighter.cabs.geolocation.Distance;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;

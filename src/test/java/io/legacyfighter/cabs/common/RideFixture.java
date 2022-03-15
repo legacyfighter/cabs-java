@@ -1,11 +1,11 @@
 package io.legacyfighter.cabs.common;
 
-import io.legacyfighter.cabs.entity.Address;
+import io.legacyfighter.cabs.geolocation.address.Address;
 import io.legacyfighter.cabs.entity.Client;
 import io.legacyfighter.cabs.driverfleet.Driver;
 import io.legacyfighter.cabs.entity.Transit;
 import io.legacyfighter.cabs.money.Money;
-import io.legacyfighter.cabs.repository.AddressRepository;
+import io.legacyfighter.cabs.geolocation.address.AddressRepository;
 import io.legacyfighter.cabs.repository.TransitRepository;
 import io.legacyfighter.cabs.service.DriverSessionService;
 import io.legacyfighter.cabs.service.TransitService;

@@ -2,10 +2,10 @@ package io.legacyfighter.cabs.integration;
 
 import io.legacyfighter.cabs.common.Fixtures;
 import io.legacyfighter.cabs.common.TestWithGraphDB;
-import io.legacyfighter.cabs.entity.Address;
+import io.legacyfighter.cabs.geolocation.address.Address;
 import io.legacyfighter.cabs.entity.Client;
 import io.legacyfighter.cabs.driverfleet.Driver;
-import io.legacyfighter.cabs.service.GeocodingService;
+import io.legacyfighter.cabs.geolocation.GeocodingService;
 import io.legacyfighter.cabs.crm.transitanalyzer.GraphTransitAnalyzer;
 import io.legacyfighter.cabs.crm.transitanalyzer.PopulateGraphService;
 import org.junit.jupiter.api.Test;

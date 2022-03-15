@@ -1,6 +1,5 @@
-package io.legacyfighter.cabs.service;
+package io.legacyfighter.cabs.geolocation;
 
-import io.legacyfighter.cabs.entity.Address;
 import org.springframework.stereotype.Service;
 
 @Service

@@ -1,6 +1,6 @@
 package io.legacyfighter.cabs.dto;
 
-import io.legacyfighter.cabs.entity.Transit;
+import io.legacyfighter.cabs.geolocation.address.AddressDTO;
 
 import java.util.List;
 

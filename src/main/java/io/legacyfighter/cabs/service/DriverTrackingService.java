@@ -1,6 +1,6 @@
 package io.legacyfighter.cabs.service;
 
-import io.legacyfighter.cabs.distance.Distance;
+import io.legacyfighter.cabs.geolocation.Distance;
 import io.legacyfighter.cabs.driverfleet.driverreport.travelleddistance.TravelledDistanceService;
 import io.legacyfighter.cabs.driverfleet.Driver;
 import io.legacyfighter.cabs.entity.DriverPosition;

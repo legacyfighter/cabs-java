@@ -1,12 +1,13 @@
 package io.legacyfighter.cabs.entity;
 
-import io.legacyfighter.cabs.distance.Distance;
+import io.legacyfighter.cabs.geolocation.address.Address;
+import io.legacyfighter.cabs.geolocation.Distance;
 import io.legacyfighter.cabs.driverfleet.Driver;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 
-import static io.legacyfighter.cabs.distance.Distance.ofKm;
+import static io.legacyfighter.cabs.geolocation.Distance.ofKm;
 import static io.legacyfighter.cabs.entity.Transit.Status.*;
 import static java.time.Instant.now;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
