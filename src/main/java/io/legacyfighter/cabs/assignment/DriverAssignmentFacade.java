@@ -2,7 +2,6 @@ package io.legacyfighter.cabs.assignment;
 
 import io.legacyfighter.cabs.carfleet.CarClass;
 import io.legacyfighter.cabs.carfleet.CarTypeService;
-import io.legacyfighter.cabs.driverfleet.Driver;
 import io.legacyfighter.cabs.geolocation.Distance;
 import io.legacyfighter.cabs.geolocation.address.AddressDTO;
 import io.legacyfighter.cabs.notification.DriverNotificationService;
@@ -40,7 +39,7 @@ public class DriverAssignmentFacade {
     }
 
     @Transactional
-    public InvolvedDriversSummary createAssignment(UUID transitRequestUUID, AddressDTO from, CarClass carClass, Instant when) {
+    public InvolvedDriversSummary startAssigningDrivers(UUID transitRequestUUID, AddressDTO from, CarClass carClass, Instant when) {
         driverAssignmentRepository.save(new DriverAssignment(transitRequestUUID, when));
         return searchForPossibleDrivers(transitRequestUUID, from, carClass);
     }
@@ -115,10 +114,9 @@ public class DriverAssignmentFacade {
     }
 
     @Transactional
-    public InvolvedDriversSummary acceptTransit(UUID transitRequestUUID, Driver driver) {
+    public InvolvedDriversSummary acceptTransit(UUID transitRequestUUID, Long driverId) {
         DriverAssignment driverAssignment = find(transitRequestUUID);
-        driverAssignment.acceptBy(driver.getId());
-        driver.setOccupied(true);
+        driverAssignment.acceptBy(driverId);
         return loadInvolvedDrivers(driverAssignment);
     }
 
@@ -133,7 +131,7 @@ public class DriverAssignmentFacade {
     }
 
     public boolean isDriverAssigned(UUID transitRequestUUID) {
-        return driverAssignmentRepository.findByRequestIdAndStatus(transitRequestUUID, AssignmentStatus.ON_THE_WAY) != null;
+        return driverAssignmentRepository.findByRequestUUIDAndStatus(transitRequestUUID, AssignmentStatus.ON_THE_WAY) != null;
     }
 
     private InvolvedDriversSummary loadInvolvedDrivers(DriverAssignment driverAssignment) {
@@ -158,7 +156,7 @@ public class DriverAssignmentFacade {
     }
 
     private DriverAssignment find(UUID transitRequestUUID) {
-        return driverAssignmentRepository.findByRequestId(transitRequestUUID);
+        return driverAssignmentRepository.findByRequestUUID(transitRequestUUID);
     }
 
     public void notifyAssignedDriverAboutChangedDestination(UUID transitRequestUUID) {

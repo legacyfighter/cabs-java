@@ -26,7 +26,7 @@ class TransitDemandTest {
         //given
         TransitDemand transitDemand = transitDemand();
         //and
-        transitDemand.accepted();
+        transitDemand.accept();
 
         //expect
         assertThatExceptionOfType(IllegalStateException.class)

@@ -41,7 +41,7 @@ public class TransitDemand extends BaseEntity {
         this.pickupAddressChangeCounter = pickupAddressChangeCounter + 1;
     }
 
-    public void accepted() {
+    public void accept() {
         status = Status.TRANSIT_TO_PASSENGER;
     }
 

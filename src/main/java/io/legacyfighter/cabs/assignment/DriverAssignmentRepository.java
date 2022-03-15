@@ -6,8 +6,8 @@ import java.util.UUID;
 
 interface DriverAssignmentRepository extends JpaRepository<DriverAssignment, Long> {
 
-    DriverAssignment findByRequestId(UUID requestId);
+    DriverAssignment findByRequestUUID(UUID transitRequestUUID);
 
-    DriverAssignment findByRequestIdAndStatus(UUID transitId, AssignmentStatus status);
+    DriverAssignment findByRequestUUIDAndStatus(UUID transitRequestUUID, AssignmentStatus status);
 
 }
