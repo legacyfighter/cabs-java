@@ -1,4 +1,4 @@
-package io.legacyfighter.cabs.service;
+package io.legacyfighter.cabs.notification;
 
 import org.springframework.stereotype.Service;
 

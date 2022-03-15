@@ -15,6 +15,7 @@ import io.legacyfighter.cabs.entity.events.TransitCompleted;
 import io.legacyfighter.cabs.invocing.InvoiceGenerator;
 import io.legacyfighter.cabs.money.Money;
 import io.legacyfighter.cabs.repository.*;
+import io.legacyfighter.cabs.notification.DriverNotificationService;
 import io.legacyfighter.cabs.transitdetails.TransitDetailsDTO;
 import io.legacyfighter.cabs.transitdetails.TransitDetailsFacade;
 import org.springframework.beans.factory.annotation.Autowired;
