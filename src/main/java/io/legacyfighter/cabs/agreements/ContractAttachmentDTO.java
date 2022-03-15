@@ -1,7 +1,4 @@
-package io.legacyfighter.cabs.dto;
-
-import io.legacyfighter.cabs.entity.ContractAttachment;
-import io.legacyfighter.cabs.entity.ContractAttachmentData;
+package io.legacyfighter.cabs.agreements;
 
 import java.time.Instant;
 
@@ -24,7 +21,7 @@ public class ContractAttachmentDTO {
 
     private Instant changeDate;
 
-    private ContractAttachment.Status status;
+    private ContractAttachmentStatus status;
 
 
     public ContractAttachmentDTO(ContractAttachment attachment , ContractAttachmentData data) {
@@ -95,11 +92,11 @@ public class ContractAttachmentDTO {
         this.changeDate = changeDate;
     }
 
-    public ContractAttachment.Status getStatus() {
+    public ContractAttachmentStatus getStatus() {
         return status;
     }
 
-    public void setStatus(ContractAttachment.Status status) {
+    public void setStatus(ContractAttachmentStatus status) {
         this.status = status;
     }
 

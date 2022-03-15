@@ -1,4 +1,4 @@
-package io.legacyfighter.cabs.entity;
+package io.legacyfighter.cabs.agreements;
 
 import io.legacyfighter.cabs.common.BaseEntity;
 
@@ -7,11 +7,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-public class ContractAttachment extends BaseEntity {
-
-    public enum Status {
-        PROPOSED, ACCEPTED_BY_ONE_SIDE, ACCEPTED_BY_BOTH_SIDES, REJECTED
-    }
+class ContractAttachment extends BaseEntity {
 
     @Column(nullable = false)
     private UUID contractAttachmentNo = UUID.randomUUID();
@@ -23,52 +19,52 @@ public class ContractAttachment extends BaseEntity {
     private Instant changeDate;
 
     @Enumerated(EnumType.STRING)
-    private Status status = Status.PROPOSED;
+    private ContractAttachmentStatus status = ContractAttachmentStatus.PROPOSED;
 
     @ManyToOne
     private Contract contract;
 
-    public Instant getAcceptedAt() {
+    Instant getAcceptedAt() {
         return acceptedAt;
     }
 
-    public void setAcceptedAt(Instant acceptedAt) {
+    void setAcceptedAt(Instant acceptedAt) {
         this.acceptedAt = acceptedAt;
     }
 
-    public Instant getRejectedAt() {
+    Instant getRejectedAt() {
         return rejectedAt;
     }
 
-    public void setRejectedAt(Instant rejectedAt) {
+    void setRejectedAt(Instant rejectedAt) {
         this.rejectedAt = rejectedAt;
     }
 
-    public Instant getChangeDate() {
+    Instant getChangeDate() {
         return changeDate;
     }
 
-    public void setChangeDate(Instant changeDate) {
+    void setChangeDate(Instant changeDate) {
         this.changeDate = changeDate;
     }
 
-    public Status getStatus() {
+    ContractAttachmentStatus getStatus() {
         return status;
     }
 
-    public void setStatus(Status status) {
+    void setStatus(ContractAttachmentStatus status) {
         this.status = status;
     }
 
-    public Contract getContract() {
+    Contract getContract() {
         return contract;
     }
 
-    public void setContract(Contract contract) {
+    void setContract(Contract contract) {
         this.contract = contract;
     }
 
-    public UUID getContractAttachmentNo() {
+    UUID getContractAttachmentNo() {
         return contractAttachmentNo;
     }
 

@@ -1,8 +1,8 @@
-package io.legacyfighter.cabs.entity;
+package io.legacyfighter.cabs.agreements;
 
 import org.junit.jupiter.api.Test;
 
-import static io.legacyfighter.cabs.entity.ContractAttachment.Status.*;
+import static io.legacyfighter.cabs.agreements.ContractAttachmentStatus.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ContractLifecycleTest {
@@ -15,7 +15,7 @@ class ContractLifecycleTest {
         //then
         assertEquals("partnerNameVeryUnique", contract.getPartnerName());
         assertEquals("umowa o cenę", contract.getSubject());
-        assertEquals(Contract.Status.NEGOTIATIONS_IN_PROGRESS, contract.getStatus());
+        assertEquals(ContractStatus.NEGOTIATIONS_IN_PROGRESS, contract.getStatus());
         assertNotNull(contract.getCreationDate());
         assertNotNull(contract.getCreationDate());
         assertNull(contract.getChangeDate());
@@ -111,7 +111,7 @@ class ContractLifecycleTest {
         contract.accept();
 
         //then
-        assertEquals(Contract.Status.ACCEPTED, contract.getStatus());
+        assertEquals(ContractStatus.ACCEPTED, contract.getStatus());
     }
 
     @Test
@@ -128,7 +128,7 @@ class ContractLifecycleTest {
         contract.reject();
 
         //then
-        assertEquals(Contract.Status.REJECTED, contract.getStatus());
+        assertEquals(ContractStatus.REJECTED, contract.getStatus());
     }
 
     @Test
@@ -142,7 +142,7 @@ class ContractLifecycleTest {
 
         //expect
         assertThrows(IllegalStateException.class, contract::accept);
-        assertNotEquals(Contract.Status.ACCEPTED, contract.getStatus());
+        assertNotEquals(ContractStatus.ACCEPTED, contract.getStatus());
     }
 
 
