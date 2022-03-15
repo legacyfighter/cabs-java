@@ -36,9 +36,8 @@ class DriverFixture {
     @Autowired
     DriverFeeService driverFeeService;
 
-
     DriverFee driverHasFee(Driver driver, DriverFee.FeeType feeType, int amount, Integer min) {
-        DriverFee driverFee = feeRepository.findByDriver(driver);
+        DriverFee driverFee = feeRepository.findByDriverId(driver.getId());
         if (driverFee == null) {
             driverFee = new DriverFee();
         }
@@ -60,6 +59,7 @@ class DriverFixture {
     Driver aDriver(Status status, String name, String lastName, String driverLicense) {
         return driverService.createDriver(driverLicense, lastName, name, Driver.Type.REGULAR, status, "");
     }
+
 
     Driver aNearbyDriver(GeocodingService stubbedGeocodingService, Address pickup) {
         Random random = new Random();

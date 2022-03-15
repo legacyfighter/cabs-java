@@ -2,10 +2,8 @@ package io.legacyfighter.cabs.entity.miles;
 
 import io.legacyfighter.cabs.common.BaseEntity;
 import io.legacyfighter.cabs.entity.Client;
-import io.legacyfighter.cabs.entity.Transit;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
-import org.springframework.util.comparator.Comparators;
 
 import javax.persistence.*;
 import java.time.Instant;
@@ -46,8 +44,8 @@ public class AwardsAccount extends BaseEntity {
         return new AwardsAccount(client, false, date);
     }
 
-    public AwardedMiles addExpiringMiles(Integer amount, Instant expireAt, Transit transit, Instant when) {
-        AwardedMiles expiringMiles = new AwardedMiles(this, transit, client, when, constantUntil(amount, expireAt));
+    public AwardedMiles addExpiringMiles(Integer amount, Instant expireAt, Long transitId, Instant when) {
+        AwardedMiles expiringMiles = new AwardedMiles(this, transitId, client, when, constantUntil(amount, expireAt));
         this.miles.add(expiringMiles);
         transactions++;
         return expiringMiles;

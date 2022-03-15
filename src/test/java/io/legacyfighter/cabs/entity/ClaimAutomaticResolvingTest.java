@@ -174,13 +174,15 @@ class ClaimAutomaticResolvingTest {
 
     Claim createClaim(Transit transit) {
         Claim claim = new Claim();
-        claim.setTransit(transit);
+        claim.setTransit(transit.getId());
+        claim.setTransitPrice(transit.getPrice());
         return claim;
     }
 
     Claim createClaim(Transit transit, Client client) {
         Claim claim = new Claim();
-        claim.setTransit(transit);
+        claim.setTransit(transit.getId());
+        claim.setTransitPrice(transit.getPrice());
         claim.setOwner(client);
         return claim;
     }

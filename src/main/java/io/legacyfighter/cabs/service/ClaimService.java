@@ -6,11 +6,11 @@ import io.legacyfighter.cabs.dto.ClaimDTO;
 import io.legacyfighter.cabs.entity.Claim;
 import io.legacyfighter.cabs.entity.ClaimsResolver;
 import io.legacyfighter.cabs.entity.Client;
-import io.legacyfighter.cabs.entity.Transit;
 import io.legacyfighter.cabs.repository.ClaimRepository;
 import io.legacyfighter.cabs.repository.ClaimsResolverRepository;
 import io.legacyfighter.cabs.repository.ClientRepository;
-import io.legacyfighter.cabs.repository.TransitRepository;
+import io.legacyfighter.cabs.transitdetails.TransitDetailsDTO;
+import io.legacyfighter.cabs.transitdetails.TransitDetailsFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +30,7 @@ public class ClaimService {
     @Autowired
     private ClientRepository clientRepository;
     @Autowired
-    private TransitRepository transitRepository;
+    private TransitDetailsFacade transitDetailsFacade;
     @Autowired
     private ClaimRepository claimRepository;
     @Autowired
@@ -66,7 +66,7 @@ public class ClaimService {
 
     public Claim update(ClaimDTO claimDTO, Claim claim) {
         Client client = clientRepository.getOne(claimDTO.getClientId());
-        Transit transit = transitRepository.getOne(claimDTO.getTransitId());
+        TransitDetailsDTO transit = transitDetailsFacade.find(claimDTO.getTransitId());
         if (client == null) {
             throw new IllegalStateException("Client does not exists");
         }
@@ -79,7 +79,8 @@ public class ClaimService {
             claim.setStatus(Claim.Status.NEW);
         }
         claim.setOwner(client);
-        claim.setTransit(transit);
+        claim.setTransit(transit.transitId);
+        claim.setTransitPrice(transit.price);
         claim.setCreationDate(Instant.now(clock));
         claim.setReason(claimDTO.getReason());
         claim.setIncidentDescription(claimDTO.getIncidentDescription());
@@ -99,7 +100,7 @@ public class ClaimService {
         Claim claim = find(id);
 
         ClaimsResolver claimsResolver = findOrCreateResolver(claim.getOwner());
-        List<Transit> transitsDoneByClient = transitRepository.findByClient(claim.getOwner());
+        List<TransitDetailsDTO> transitsDoneByClient = transitDetailsFacade.findByClient(claim.getOwner().getId());
         ClaimsResolver.Result result = claimsResolver.resolve(claim, appProperties.getAutomaticRefundForVipThreshold(), transitsDoneByClient.size(), appProperties.getNoOfTransitsForClaimAutomaticRefund());
 
         if (result.decision == REFUNDED) {
@@ -113,7 +114,8 @@ public class ClaimService {
             claim.escalate();
         }
         if (result.whoToAsk == ClaimsResolver.WhoToAsk.ASK_DRIVER) {
-            driverNotificationService.askDriverForDetailsAboutClaim(claim.getClaimNo(), claim.getTransit().getDriver().getId());
+            TransitDetailsDTO transitDetailsDTO = transitDetailsFacade.find(claim.getTransitId());
+            driverNotificationService.askDriverForDetailsAboutClaim(claim.getClaimNo(), transitDetailsDTO.driverId);
         }
         if (result.whoToAsk == ClaimsResolver.WhoToAsk.ASK_CLIENT) {
             clientNotificationService.askForMoreInformation(claim.getClaimNo(), claim.getOwner().getId());

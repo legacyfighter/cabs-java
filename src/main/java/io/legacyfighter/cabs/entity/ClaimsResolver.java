@@ -42,23 +42,23 @@ public class ClaimsResolver extends BaseEntity {
     private String claimedTransitsIds;
 
     public Result resolve(Claim claim, double automaticRefundForVipThreshold, int numberOfTransits, double noOfTransitsForClaimAutomaticRefund) {
-        Long transitId = claim.getTransit().getId();
+        Long transitId = claim.getTransitId();
         if (getClaimedTransitsIds().contains(transitId)) {
             return new Result(ASK_NOONE, Claim.Status.ESCALATED);
         }
-        addNewClaimFor(claim.getTransit());
+        addNewClaimFor(claim.getTransitId());
         if (numberOfClaims() <= 3) {
             return new Result(ASK_NOONE, Claim.Status.REFUNDED);
         }
         if (claim.getOwner().getType().equals(Client.Type.VIP)) {
-            if (claim.getTransit().getPrice().toInt() < automaticRefundForVipThreshold) {
+            if (claim.getTransitPrice().toInt() < automaticRefundForVipThreshold) {
                 return new Result(ASK_NOONE, Claim.Status.REFUNDED);
             } else {
                 return new Result(ASK_DRIVER, Claim.Status.ESCALATED);
             }
         } else {
             if (numberOfTransits >= noOfTransitsForClaimAutomaticRefund) {
-                if (claim.getTransit().getPrice().toInt() < automaticRefundForVipThreshold) {
+                if (claim.getTransitPrice().toInt() < automaticRefundForVipThreshold) {
                     return new Result(ASK_NOONE, Claim.Status.REFUNDED);
                 } else {
                     return new Result(ASK_CLIENT, Claim.Status.ESCALATED);
@@ -69,9 +69,9 @@ public class ClaimsResolver extends BaseEntity {
         }
     }
 
-    private void addNewClaimFor(Transit transit) {
+    private void addNewClaimFor(Long transitId) {
         Set<Long> transitsIds = getClaimedTransitsIds();
-        transitsIds.add(transit.getId());
+        transitsIds.add(transitId);
         claimedTransitsIds = JsonMapper.serialize(transitsIds);
     }
 

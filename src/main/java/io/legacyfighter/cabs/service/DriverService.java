@@ -9,6 +9,8 @@ import io.legacyfighter.cabs.money.Money;
 import io.legacyfighter.cabs.repository.DriverAttributeRepository;
 import io.legacyfighter.cabs.repository.DriverRepository;
 import io.legacyfighter.cabs.repository.TransitRepository;
+import io.legacyfighter.cabs.transitdetails.TransitDetailsDTO;
+import io.legacyfighter.cabs.transitdetails.TransitDetailsFacade;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,8 +29,6 @@ import static io.legacyfighter.cabs.entity.DriverLicense.withLicense;
 @Service
 public class DriverService {
 
-    public static final String DRIVER_LICENSE_REGEX = "^[A-Z9]{5}\\d{6}[A-Z9]{2}\\d[A-Z]{2}$";
-
     @Autowired
     private DriverRepository driverRepository;
 
@@ -36,7 +36,7 @@ public class DriverService {
     private DriverAttributeRepository driverAttributeRepository;
 
     @Autowired
-    private TransitRepository transitRepository;
+    private TransitDetailsFacade transitDetailsFacade;
 
     @Autowired
     private DriverFeeService driverFeeService;
@@ -73,10 +73,7 @@ public class DriverService {
         if (!driver.getStatus().equals(Driver.Status.ACTIVE)) {
             throw new IllegalStateException("Driver is not active, cannot change license");
         }
-
-
     }
-
 
     @Transactional
     public void changeDriverStatus(Long driverId, Driver.Status status) {
@@ -112,9 +109,9 @@ public class DriverService {
 
     public Money calculateDriverMonthlyPayment(Long driverId, int year, int month) {
         Driver driver = driverRepository.getOne(driverId);
-        if (driver == null)
+        if (driver == null) {
             throw new IllegalArgumentException("Driver does not exists, id = " + driverId);
-
+        }
         YearMonth yearMonth = YearMonth.of(year, month);
         Instant from = yearMonth
                 .atDay(1).atStartOfDay(ZoneId.systemDefault())
@@ -124,10 +121,10 @@ public class DriverService {
 
                 .atEndOfMonth().plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant();
 
-        List<Transit> transitsList = transitRepository.findAllByDriverAndDateTimeBetween(driver, from, to);
+        List<TransitDetailsDTO> transitsList = transitDetailsFacade.findByDriver(driverId, from, to);
 
         Money sum = transitsList.stream()
-                .map(t -> driverFeeService.calculateDriverFee(t.getId())).reduce(Money.ZERO, Money::add);
+                .map(t -> driverFeeService.calculateDriverFee(t.price, driverId)).reduce(Money.ZERO, Money::add);
 
         return sum;
     }

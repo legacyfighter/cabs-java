@@ -1,12 +1,15 @@
 package io.legacyfighter.cabs.common;
 
-import io.legacyfighter.cabs.entity.*;
+import io.legacyfighter.cabs.entity.Address;
+import io.legacyfighter.cabs.entity.Client;
+import io.legacyfighter.cabs.entity.Driver;
+import io.legacyfighter.cabs.entity.Transit;
 import io.legacyfighter.cabs.money.Money;
 import io.legacyfighter.cabs.repository.AddressRepository;
 import io.legacyfighter.cabs.repository.TransitRepository;
 import io.legacyfighter.cabs.service.DriverSessionService;
-import io.legacyfighter.cabs.service.GeocodingService;
 import io.legacyfighter.cabs.service.TransitService;
+import io.legacyfighter.cabs.transitdetails.TransitDetailsFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +24,9 @@ public class RideFixture {
 
     @Autowired
     TransitService transitService;
+
+    @Autowired
+    TransitDetailsFacade transitDetailsFacade;
 
     @Autowired
     TransitRepository transitRepository;
@@ -50,8 +56,14 @@ public class RideFixture {
         transitService.acceptTransit(driver.getId(), transit.getId());
         transitService.startTransit(driver.getId(), transit.getId());
         transitService.completeTransit(driver.getId(), transit.getId(), destination);
-        stubbedPrice.stub(transit.getId(), new Money(price));
+        stubPrice(price, transit);
         return transitRepository.getOne(transit.getId());
+    }
+
+    private void stubPrice(int price, Transit transit) {
+        Money fakePrice = new Money(price);
+        stubbedPrice.stub(transit.getId(), fakePrice);
+        transitDetailsFacade.transitCompleted(transit.getId(), Instant.now(), fakePrice, fakePrice);
     }
 
     public Transit aRideWithFixedClock(int price, Instant publishedAt, Instant completedAt, Client client, Driver driver, Address from, Address destination, Clock clock) {

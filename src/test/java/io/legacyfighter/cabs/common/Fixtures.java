@@ -57,20 +57,12 @@ public class Fixtures {
         return clientFixture.aClient(type);
     }
 
-    public Transit aTransit(Driver driver, Integer price, LocalDateTime when, Client client) {
-        return transitFixture.aTransit(driver, price, when, client);
+    public Transit transitDetails(Driver driver, Integer price, LocalDateTime when, Client client) {
+        return transitFixture.transitDetails(driver, price, when, client, anAddress(), anAddress());
     }
 
-    public Transit aTransit(Money price) {
-        return transitFixture.aTransit(driverFixture.aDriver(), price.toInt());
-    }
-
-    public Transit aTransit(Driver driver, Integer price, LocalDateTime when) {
-        return transitFixture.aTransit(driver, price, when, null);
-    }
-
-    public Transit aTransit(Driver driver, Integer price) {
-        return transitFixture.aTransit(driver, price, LocalDateTime.now(), null);
+    public Transit transitDetails(Driver driver, Integer price, LocalDateTime when) {
+        return transitFixture.transitDetails(driver, price, when, aClient(), anAddress(), anAddress());
     }
 
     public TransitDTO aTransitDTO(AddressDTO from, AddressDTO to) {
@@ -144,7 +136,7 @@ public class Fixtures {
 
     public void clientHasDoneClaimAfterCompletedTransit(Client client, int howMany) {
         IntStream
-                .range(1, howMany + 1).forEach(i -> createAndResolveClaim(client, aTransit(driverFixture.aDriver(), 20, LocalDateTime.now(), client)));
+                .range(1, howMany + 1).forEach(i -> createAndResolveClaim(client, transitDetails(driverFixture.aDriver(), 20, LocalDateTime.now(), client)));
     }
 
     public Client aClientWithClaims(Client.Type type, int howManyClaims) {

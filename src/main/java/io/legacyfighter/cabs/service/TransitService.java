@@ -433,8 +433,7 @@ public class TransitService {
         Distance distance = Distance.ofKm((float) distanceCalculator.calculateByMap(geoFrom[0], geoFrom[1], geoTo[0], geoTo[1]));
         Instant now = Instant.now(clock);
         transit.completeAt(now, destinationAddress, distance);
-        Money driverFee = driverFeeService.calculateDriverFee(transitId);
-        transit.setDriversFee(driverFee);
+        Money driverFee = driverFeeService.calculateDriverFee(transit.getPrice(), driverId);
         driver.setOccupied(false);
         driverRepository.save(driver);
         awardsService.registerMiles(transitDetails.client.getId(), transitId);

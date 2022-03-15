@@ -72,12 +72,6 @@ public class Transit extends BaseEntity {
 
     private Instant published;
 
-    @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name="value", column=@Column(name="driversFee")),
-    })
-    private Money driversFee;
-
     public Transit() {
     }
 
@@ -276,13 +270,6 @@ public class Transit extends BaseEntity {
                 this.getId().equals(other.getId());
     }
 
-    public Money getDriversFee() {
-        return driversFee;
-    }
-
-    public void setDriversFee(Money driversFee) {
-        this.driversFee = driversFee;
-    }
 
     public Money getEstimatedPrice() {
         return estimatedPrice;

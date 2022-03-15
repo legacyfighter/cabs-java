@@ -2,12 +2,18 @@ package io.legacyfighter.cabs.transitdetails;
 
 
 import io.legacyfighter.cabs.distance.Distance;
-import io.legacyfighter.cabs.entity.*;
+import io.legacyfighter.cabs.entity.Address;
+import io.legacyfighter.cabs.entity.CarType;
+import io.legacyfighter.cabs.entity.Client;
+import io.legacyfighter.cabs.entity.Tariff;
 import io.legacyfighter.cabs.money.Money;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 public class TransitDetailsFacade {
@@ -66,6 +72,19 @@ public class TransitDetailsFacade {
     public void transitCompleted(Long transitId, Instant when, Money price, Money driverFee) {
         TransitDetails details = load(transitId);
         details.completedAt(when, price, driverFee);
+    }
+
+    public List<TransitDetailsDTO> findByClient(Long clientId) {
+        return transitDetailsRepository.findByClientId(clientId)
+                .stream()
+                .map(TransitDetailsDTO::new)
+                .collect(toList());
+    }
+    public List<TransitDetailsDTO> findByDriver(Long driverId, Instant from, Instant to) {
+        return transitDetailsRepository.findAllByDriverAndDateTimeBetween(driverId, from, to)
+                .stream()
+                .map(TransitDetailsDTO::new)
+                .collect(toList());
     }
 
     private TransitDetails load(Long transitId) {

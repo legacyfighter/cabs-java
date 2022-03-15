@@ -1,6 +1,5 @@
 package io.legacyfighter.cabs.common;
 
-
 import io.legacyfighter.cabs.distance.Distance;
 import io.legacyfighter.cabs.dto.AddressDTO;
 import io.legacyfighter.cabs.dto.ClientDTO;
@@ -29,19 +28,18 @@ class TransitFixture {
     @Autowired
     TransitDetailsFacade transitDetailsFacade;
 
-    Transit aTransit(Driver driver, Integer price, LocalDateTime when, Client client) {
-        Instant dateTime = when.toInstant(ZoneOffset.UTC);
-        Transit transit = new Transit(dateTime, Distance.ZERO);
-        transit.setPrice(new Money(price));
-        transit.proposeTo(driver);
-        transit.acceptBy(driver, Instant.now());
-        transit = transitRepository.save(transit);
-        transitDetailsFacade.transitRequested(when.toInstant(ZoneOffset.UTC), transit.getId(), null, null, Distance.ofKm(20), client, CarType.CarClass.VAN, new Money(price), Tariff.ofTime(when));
-        return transit;
-    }
+    @Autowired
+    StubbedTransitPrice stubbedTransitPrice;
 
-    Transit aTransit(Driver driver, Integer price) {
-        return aTransit(driver, price, LocalDateTime.now(), null);
+    Transit transitDetails(Driver driver, Integer price, LocalDateTime when, Client client, Address from, Address to) {
+        Transit transit = transitRepository.save(new Transit());
+        stubbedTransitPrice.stub(transit.getId(), new Money(price));
+        Long transitId = transit.getId();
+        transitDetailsFacade.transitRequested(when.toInstant(ZoneOffset.UTC), transitId, from, to, Distance.ZERO, client, CarType.CarClass.VAN, new Money(price), Tariff.ofTime(when));
+        transitDetailsFacade.transitAccepted(transitId, when.toInstant(ZoneOffset.UTC), driver.getId());
+        transitDetailsFacade.transitStarted(transitId, when.toInstant(ZoneOffset.UTC));
+        transitDetailsFacade.transitCompleted(transitId, when.toInstant(ZoneOffset.UTC), new Money(price), null);
+        return transit;
     }
 
     TransitDTO aTransitDTO(Client client, AddressDTO from, AddressDTO to) {

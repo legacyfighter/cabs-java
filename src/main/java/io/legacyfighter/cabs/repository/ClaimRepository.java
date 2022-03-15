@@ -9,8 +9,4 @@ import java.util.List;
 
 public interface ClaimRepository extends JpaRepository<Claim, Long> {
 
-    List<Claim> findByOwner(Client owner);
-
-    List<Claim> findByOwnerAndTransit(Client owner, Transit transit);
-
 }
