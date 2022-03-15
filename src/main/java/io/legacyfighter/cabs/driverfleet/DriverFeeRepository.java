@@ -1,6 +1,5 @@
-package io.legacyfighter.cabs.repository;
+package io.legacyfighter.cabs.driverfleet;
 
-import io.legacyfighter.cabs.entity.DriverFee;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface DriverFeeRepository extends JpaRepository<DriverFee, Long> {

@@ -1,8 +1,6 @@
-package io.legacyfighter.cabs.service;
+package io.legacyfighter.cabs.driverfleet;
 
 import io.legacyfighter.cabs.money.Money;
-import io.legacyfighter.cabs.repository.DriverFeeRepository;
-import io.legacyfighter.cabs.entity.DriverFee;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

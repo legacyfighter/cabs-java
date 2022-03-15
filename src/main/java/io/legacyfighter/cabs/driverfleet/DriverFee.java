@@ -1,4 +1,4 @@
-package io.legacyfighter.cabs.entity;
+package io.legacyfighter.cabs.driverfleet;
 
 import io.legacyfighter.cabs.common.BaseEntity;
 import io.legacyfighter.cabs.money.Money;

@@ -1,14 +1,6 @@
-package io.legacyfighter.cabs.service;
+package io.legacyfighter.cabs.driverfleet;
 
-import io.legacyfighter.cabs.dto.DriverDTO;
-import io.legacyfighter.cabs.entity.Driver;
-import io.legacyfighter.cabs.entity.DriverAttribute;
-import io.legacyfighter.cabs.entity.DriverLicense;
-import io.legacyfighter.cabs.entity.Transit;
 import io.legacyfighter.cabs.money.Money;
-import io.legacyfighter.cabs.repository.DriverAttributeRepository;
-import io.legacyfighter.cabs.repository.DriverRepository;
-import io.legacyfighter.cabs.repository.TransitRepository;
 import io.legacyfighter.cabs.transitdetails.TransitDetailsDTO;
 import io.legacyfighter.cabs.transitdetails.TransitDetailsFacade;
 import org.apache.commons.codec.binary.Base64;
@@ -24,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static io.legacyfighter.cabs.entity.DriverLicense.withLicense;
+import static io.legacyfighter.cabs.driverfleet.DriverLicense.withLicense;
 
 @Service
 public class DriverService {
@@ -146,7 +138,7 @@ public class DriverService {
         return new DriverDTO(driver);
     }
 
-    public void addAttribute(Long driverId, DriverAttribute.DriverAttributeName attr, String value) {
+    public void addAttribute(Long driverId, DriverAttributeName attr, String value) {
         Driver driver = driverRepository.getOne(driverId);
         if (driver == null) {
             throw new IllegalArgumentException("Driver does not exists, id = " + driverId);

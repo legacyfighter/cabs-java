@@ -1,12 +1,10 @@
-package io.legacyfighter.cabs.dto;
-
-import io.legacyfighter.cabs.entity.DriverAttribute;
+package io.legacyfighter.cabs.driverfleet;
 
 import java.util.Objects;
 
 public class DriverAttributeDTO {
 
-    private DriverAttribute.DriverAttributeName name;
+    private DriverAttributeName name;
 
     private String value;
 
@@ -15,7 +13,7 @@ public class DriverAttributeDTO {
         this.value = driverAttribute.getValue();
     }
 
-    public DriverAttributeDTO(DriverAttribute.DriverAttributeName name, String value) {
+    public DriverAttributeDTO(DriverAttributeName name, String value) {
         this.name = name;
         this.value = value;
     }
@@ -24,11 +22,11 @@ public class DriverAttributeDTO {
 
     }
 
-    public DriverAttribute.DriverAttributeName getName() {
+    public DriverAttributeName getName() {
         return name;
     }
 
-    public void setName(DriverAttribute.DriverAttributeName name) {
+    public void setName(DriverAttributeName name) {
         this.name = name;
     }
 

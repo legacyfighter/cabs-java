@@ -1,4 +1,4 @@
-package io.legacyfighter.cabs.driverreport.travelleddistance;
+package io.legacyfighter.cabs.driverfleet.driverreport.travelleddistance;
 
 import org.junit.jupiter.api.Test;
 
@@ -6,7 +6,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
-import static io.legacyfighter.cabs.driverreport.travelleddistance.TimeSlot.slotThatContains;
+import static io.legacyfighter.cabs.driverfleet.driverreport.travelleddistance.TimeSlot.slotThatContains;
 import static java.time.temporal.ChronoUnit.MINUTES;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.*;

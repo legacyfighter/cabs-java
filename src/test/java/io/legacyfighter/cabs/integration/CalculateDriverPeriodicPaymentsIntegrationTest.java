@@ -1,9 +1,10 @@
 package io.legacyfighter.cabs.integration;
 
 import io.legacyfighter.cabs.common.Fixtures;
-import io.legacyfighter.cabs.entity.*;
+import io.legacyfighter.cabs.driverfleet.Driver;
+import io.legacyfighter.cabs.driverfleet.DriverFee;
 import io.legacyfighter.cabs.money.Money;
-import io.legacyfighter.cabs.service.DriverService;
+import io.legacyfighter.cabs.driverfleet.DriverService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -1,4 +1,4 @@
-package io.legacyfighter.cabs.driverreport.travelleddistance;
+package io.legacyfighter.cabs.driverfleet.driverreport.travelleddistance;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

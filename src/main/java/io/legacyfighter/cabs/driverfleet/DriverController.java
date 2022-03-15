@@ -1,9 +1,5 @@
-package io.legacyfighter.cabs.ui;
+package io.legacyfighter.cabs.driverfleet;
 
-import io.legacyfighter.cabs.dto.DriverDTO;
-import io.legacyfighter.cabs.entity.Driver;
-import io.legacyfighter.cabs.repository.DriverRepository;
-import io.legacyfighter.cabs.service.DriverService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

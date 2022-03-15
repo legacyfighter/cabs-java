@@ -1,16 +1,15 @@
 package io.legacyfighter.cabs.integration;
 
-import io.legacyfighter.cabs.dto.DriverDTO;
-import io.legacyfighter.cabs.entity.Driver;
-import io.legacyfighter.cabs.service.DriverService;
-import org.assertj.core.api.Assertions;
+import io.legacyfighter.cabs.driverfleet.DriverDTO;
+import io.legacyfighter.cabs.driverfleet.Driver;
+import io.legacyfighter.cabs.driverfleet.DriverService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static io.legacyfighter.cabs.entity.Driver.Status.ACTIVE;
-import static io.legacyfighter.cabs.entity.Driver.Status.INACTIVE;
-import static io.legacyfighter.cabs.entity.Driver.Type.REGULAR;
+import static io.legacyfighter.cabs.driverfleet.Driver.Status.ACTIVE;
+import static io.legacyfighter.cabs.driverfleet.Driver.Status.INACTIVE;
+import static io.legacyfighter.cabs.driverfleet.Driver.Type.REGULAR;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.*;
 

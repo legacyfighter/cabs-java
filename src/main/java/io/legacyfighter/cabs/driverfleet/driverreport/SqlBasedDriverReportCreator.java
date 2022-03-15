@@ -1,13 +1,16 @@
-package io.legacyfighter.cabs.driverreport;
+package io.legacyfighter.cabs.driverfleet.driverreport;
 
 import io.legacyfighter.cabs.carfleet.CarClass;
 import io.legacyfighter.cabs.crm.claims.Claim;
 import io.legacyfighter.cabs.crm.claims.ClaimDTO;
 import io.legacyfighter.cabs.crm.claims.Status;
 import io.legacyfighter.cabs.distance.Distance;
-import io.legacyfighter.cabs.dto.*;
-import io.legacyfighter.cabs.entity.Driver;
-import io.legacyfighter.cabs.entity.DriverAttribute;
+import io.legacyfighter.cabs.driverfleet.Driver;
+import io.legacyfighter.cabs.driverfleet.DriverAttributeName;
+import io.legacyfighter.cabs.driverfleet.DriverDTO;
+import io.legacyfighter.cabs.dto.AddressDTO;
+import io.legacyfighter.cabs.dto.DriverSessionDTO;
+import io.legacyfighter.cabs.dto.TransitDTO;
 import io.legacyfighter.cabs.entity.Transit;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +28,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static io.legacyfighter.cabs.entity.DriverAttribute.DriverAttributeName.MEDICAL_EXAMINATION_REMARKS;
+import static io.legacyfighter.cabs.driverfleet.DriverAttributeName.MEDICAL_EXAMINATION_REMARKS;
 
 @Service
 class SqlBasedDriverReportCreator {
@@ -53,7 +56,7 @@ class SqlBasedDriverReportCreator {
             "WHERE ds.driver_id = :driverId AND td.status = :transitStatus " +
             "AND ds.logged_at >= :since " +
             "AND td.complete_at >= ds.logged_at " +
-            "AND td.complete_at <= ds.logged_out_at GROUP BY ds.id";
+            "AND td.complete_at <= ds.logged_out_at GROUP BY ds.logged_at";
 
     private final EntityManager em;
 
@@ -147,6 +150,6 @@ class SqlBasedDriverReportCreator {
     }
 
     private void addAttrToReport(DriverReport driverReport, Tuple tuple) {
-        driverReport.addAttr(DriverAttribute.DriverAttributeName.valueOf((String) tuple.get("NAME")), (String) tuple.get(8));
+        driverReport.addAttr(DriverAttributeName.valueOf((String) tuple.get("NAME")), (String) tuple.get(8));
     }
 }

@@ -1,6 +1,5 @@
-package io.legacyfighter.cabs.driverreport;
+package io.legacyfighter.cabs.driverfleet.driverreport;
 
-import io.legacyfighter.cabs.dto.*;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

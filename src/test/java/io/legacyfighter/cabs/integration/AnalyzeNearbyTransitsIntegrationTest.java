@@ -6,7 +6,7 @@ import io.legacyfighter.cabs.dto.AddressDTO;
 import io.legacyfighter.cabs.dto.AnalyzedAddressesDTO;
 import io.legacyfighter.cabs.entity.Address;
 import io.legacyfighter.cabs.entity.Client;
-import io.legacyfighter.cabs.entity.Driver;
+import io.legacyfighter.cabs.driverfleet.Driver;
 import io.legacyfighter.cabs.service.GeocodingService;
 import io.legacyfighter.cabs.crm.transitanalyzer.TransitAnalyzerController;
 import org.junit.jupiter.api.BeforeEach;

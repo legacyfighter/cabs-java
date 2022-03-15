@@ -3,10 +3,15 @@ package io.legacyfighter.cabs.common;
 
 import io.legacyfighter.cabs.carfleet.CarClass;
 import io.legacyfighter.cabs.crm.claims.Claim;
+import io.legacyfighter.cabs.driverfleet.Driver;
+import io.legacyfighter.cabs.driverfleet.Driver.Status;
+import io.legacyfighter.cabs.driverfleet.DriverAttributeName;
+import io.legacyfighter.cabs.driverfleet.DriverFee;
 import io.legacyfighter.cabs.dto.AddressDTO;
 import io.legacyfighter.cabs.dto.TransitDTO;
-import io.legacyfighter.cabs.entity.*;
-import io.legacyfighter.cabs.entity.Driver.Status;
+import io.legacyfighter.cabs.entity.Address;
+import io.legacyfighter.cabs.entity.Client;
+import io.legacyfighter.cabs.entity.Transit;
 import io.legacyfighter.cabs.service.GeocodingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -99,7 +104,7 @@ public class Fixtures {
         return driverFixture.aNearbyDriver(plateNumber, latitude, longitude, carClass, when, carBrand);
     }
 
-    public void driverHasAttribute(Driver driver, DriverAttribute.DriverAttributeName name, String value) {
+    public void driverHasAttribute(Driver driver, DriverAttributeName name, String value) {
         driverFixture.driverHasAttribute(driver, name, value);
     }
 

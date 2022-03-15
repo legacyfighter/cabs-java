@@ -4,12 +4,15 @@ import io.legacyfighter.cabs.carfleet.CarClass;
 import io.legacyfighter.cabs.carfleet.CarTypeService;
 import io.legacyfighter.cabs.common.EventsPublisher;
 import io.legacyfighter.cabs.distance.Distance;
+import io.legacyfighter.cabs.driverfleet.DriverFeeService;
+import io.legacyfighter.cabs.driverfleet.DriverRepository;
 import io.legacyfighter.cabs.dto.AddressDTO;
 import io.legacyfighter.cabs.dto.DriverPositionDTOV2;
 import io.legacyfighter.cabs.dto.TransitDTO;
 import io.legacyfighter.cabs.entity.Address;
 import io.legacyfighter.cabs.entity.Client;
-import io.legacyfighter.cabs.entity.Driver;
+import io.legacyfighter.cabs.driverfleet.Driver;
+import io.legacyfighter.cabs.entity.DriverSession;
 import io.legacyfighter.cabs.entity.Transit;
 import io.legacyfighter.cabs.entity.events.TransitCompleted;
 import io.legacyfighter.cabs.invocing.InvoiceGenerator;
@@ -315,12 +318,12 @@ public class TransitService {
                             carClasses.addAll(activeCarClasses);
                         }
 
-                        List<Driver> drivers = driversAvgPositions.stream().map(DriverPositionDTOV2::getDriver).collect(toList());
+                        List<Long> drivers = driversAvgPositions.stream().map(pos -> pos.getDriver().getId()).collect(toList());
 
-                        List<Long> activeDriverIdsInSpecificCar = driverSessionRepository.findAllByLoggedOutAtNullAndDriverInAndCarClassIn(drivers, carClasses)
+                        List<Long> activeDriverIdsInSpecificCar = driverSessionRepository.findAllByLoggedOutAtNullAndDriverIdInAndCarClassIn(drivers, carClasses)
 
                                 .stream()
-                                .map(ds -> ds.getDriver().getId()).collect(toList());
+                                .map(DriverSession::getDriverId).collect(toList());
 
                         driversAvgPositions = driversAvgPositions
                                 .stream()

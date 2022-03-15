@@ -1,14 +1,11 @@
-package io.legacyfighter.cabs.entity;
+package io.legacyfighter.cabs.driverfleet;
 
 import javax.persistence.*;
 
 @Entity
-public class DriverAttribute {
+public
+class DriverAttribute {
 
-
-    public enum DriverAttributeName {
-        PENALTY_POINTS, NATIONALITY, YEARS_OF_EXPERIENCE, MEDICAL_EXAMINATION_EXPIRATION_DATE , MEDICAL_EXAMINATION_REMARKS, EMAIL, BIRTHPLACE, COMPANY_NAME
-    }
 
     @Id
     @GeneratedValue
@@ -25,7 +22,7 @@ public class DriverAttribute {
     @JoinColumn(name = "DRIVER_ID")
     private Driver driver;
 
-    public DriverAttribute() {
+    DriverAttribute() {
 
     }
 
@@ -35,27 +32,27 @@ public class DriverAttribute {
         this.name = attr;
     }
 
-    public DriverAttributeName getName() {
+    DriverAttributeName getName() {
         return name;
     }
 
-    public void setName(DriverAttributeName name) {
+    void setName(DriverAttributeName name) {
         this.name = name;
     }
 
-    public String getValue() {
+    String getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    void setValue(String value) {
         this.value = value;
     }
 
-    public Driver getDriver() {
+    Driver getDriver() {
         return driver;
     }
 
-    public void setDriver(Driver driver) {
+    void setDriver(Driver driver) {
         this.driver = driver;
     }
 }

@@ -1,6 +1,7 @@
 package io.legacyfighter.cabs.entity;
 
 import io.legacyfighter.cabs.distance.Distance;
+import io.legacyfighter.cabs.driverfleet.Driver;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
