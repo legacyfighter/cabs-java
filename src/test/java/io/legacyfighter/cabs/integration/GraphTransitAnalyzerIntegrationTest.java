@@ -1,11 +1,9 @@
 package io.legacyfighter.cabs.integration;
 
 import io.legacyfighter.cabs.common.TestWithGraphDB;
-import io.legacyfighter.cabs.dto.AddressDTO;
-import io.legacyfighter.cabs.transitanalyzer.GraphTransitAnalyzer;
+import io.legacyfighter.cabs.crm.transitanalyzer.GraphTransitAnalyzer;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.Instant;
 import java.util.List;

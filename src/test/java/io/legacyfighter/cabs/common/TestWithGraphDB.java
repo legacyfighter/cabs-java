@@ -2,7 +2,7 @@ package io.legacyfighter.cabs.common;
 
 
 import io.legacyfighter.cabs.CabsApplication;
-import io.legacyfighter.cabs.transitanalyzer.GraphTransitAnalyzer;
+import io.legacyfighter.cabs.crm.transitanalyzer.GraphTransitAnalyzer;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.springframework.beans.factory.annotation.Value;

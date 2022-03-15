@@ -1,5 +1,6 @@
 package io.legacyfighter.cabs.transitdetails;
 
+import io.legacyfighter.cabs.entity.Transit;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -14,5 +15,8 @@ interface TransitDetailsRepository extends JpaRepository<TransitDetails, Long> {
 
     @Query("select TD from TransitDetails TD where TD.driverId = ?1 and TD.dateTime between ?2 and ?3")
     List<TransitDetails> findAllByDriverAndDateTimeBetween(Long driverID, Instant from, Instant to);
+
+    List<TransitDetails> findByStatus(Transit.Status completed);
+
 
 }
