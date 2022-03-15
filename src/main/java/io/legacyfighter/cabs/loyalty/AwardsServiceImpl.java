@@ -1,15 +1,12 @@
-package io.legacyfighter.cabs.service;
+package io.legacyfighter.cabs.loyalty;
 
 import io.legacyfighter.cabs.config.AppProperties;
 import io.legacyfighter.cabs.crm.claims.ClaimService;
-import io.legacyfighter.cabs.dto.AwardsAccountDTO;
 import io.legacyfighter.cabs.dto.ClientDTO;
 import io.legacyfighter.cabs.entity.Client;
 import io.legacyfighter.cabs.entity.Transit;
-import io.legacyfighter.cabs.entity.miles.AwardedMiles;
-import io.legacyfighter.cabs.entity.miles.AwardsAccount;
-import io.legacyfighter.cabs.repository.AwardsAccountRepository;
 import io.legacyfighter.cabs.repository.TransitRepository;
+import io.legacyfighter.cabs.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +19,7 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 
-import static io.legacyfighter.cabs.entity.miles.AwardsAccount.notActiveAccount;
+import static io.legacyfighter.cabs.loyalty.AwardsAccount.notActiveAccount;
 
 
 @Service

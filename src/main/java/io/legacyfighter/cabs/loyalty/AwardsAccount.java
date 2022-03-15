@@ -1,4 +1,4 @@
-package io.legacyfighter.cabs.entity.miles;
+package io.legacyfighter.cabs.loyalty;
 
 import io.legacyfighter.cabs.common.BaseEntity;
 import org.hibernate.annotations.Fetch;
@@ -11,8 +11,8 @@ import javax.persistence.OneToMany;
 import java.time.Instant;
 import java.util.*;
 
-import static io.legacyfighter.cabs.entity.miles.ConstantUntil.constantUntil;
-import static io.legacyfighter.cabs.entity.miles.ConstantUntil.constantUntilForever;
+import static io.legacyfighter.cabs.loyalty.ConstantUntil.constantUntil;
+import static io.legacyfighter.cabs.loyalty.ConstantUntil.constantUntilForever;
 
 @Entity
 public class AwardsAccount extends BaseEntity {

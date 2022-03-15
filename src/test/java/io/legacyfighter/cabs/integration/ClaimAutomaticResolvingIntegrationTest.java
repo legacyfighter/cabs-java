@@ -9,7 +9,7 @@ import io.legacyfighter.cabs.entity.Address;
 import io.legacyfighter.cabs.entity.Client;
 import io.legacyfighter.cabs.driverfleet.Driver;
 import io.legacyfighter.cabs.entity.Transit;
-import io.legacyfighter.cabs.service.AwardsService;
+import io.legacyfighter.cabs.loyalty.AwardsService;
 import io.legacyfighter.cabs.notification.ClientNotificationService;
 import io.legacyfighter.cabs.notification.DriverNotificationService;
 import io.legacyfighter.cabs.service.GeocodingService;

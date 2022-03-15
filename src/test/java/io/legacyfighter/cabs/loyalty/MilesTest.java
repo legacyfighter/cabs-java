@@ -1,4 +1,4 @@
-package io.legacyfighter.cabs.entity.miles;
+package io.legacyfighter.cabs.loyalty;
 
 import org.junit.jupiter.api.Test;
 
@@ -7,10 +7,10 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 
-import static io.legacyfighter.cabs.entity.miles.ConstantUntil.constantUntil;
-import static io.legacyfighter.cabs.entity.miles.ConstantUntil.constantUntilForever;
+import static io.legacyfighter.cabs.loyalty.ConstantUntil.constantUntil;
+import static io.legacyfighter.cabs.loyalty.ConstantUntil.constantUntilForever;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MilesTest {
 

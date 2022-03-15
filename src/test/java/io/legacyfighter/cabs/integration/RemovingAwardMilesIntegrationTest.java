@@ -2,12 +2,10 @@ package io.legacyfighter.cabs.integration;
 
 import io.legacyfighter.cabs.common.Fixtures;
 import io.legacyfighter.cabs.config.AppProperties;
-import io.legacyfighter.cabs.entity.miles.AwardedMiles;
+import io.legacyfighter.cabs.loyalty.AwardedMiles;
 import io.legacyfighter.cabs.entity.Client;
-import io.legacyfighter.cabs.entity.Transit;
-import io.legacyfighter.cabs.money.Money;
-import io.legacyfighter.cabs.repository.AwardsAccountRepository;
-import io.legacyfighter.cabs.service.AwardsService;
+import io.legacyfighter.cabs.loyalty.AwardsAccountRepository;
+import io.legacyfighter.cabs.loyalty.AwardsService;
 import io.legacyfighter.cabs.service.GeocodingService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

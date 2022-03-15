@@ -1,13 +1,11 @@
 package io.legacyfighter.cabs.integration;
 
 import io.legacyfighter.cabs.common.Fixtures;
-import io.legacyfighter.cabs.dto.AwardsAccountDTO;
-import io.legacyfighter.cabs.entity.miles.AwardedMiles;
+import io.legacyfighter.cabs.loyalty.AwardsAccountDTO;
+import io.legacyfighter.cabs.loyalty.AwardedMiles;
 import io.legacyfighter.cabs.entity.Client;
-import io.legacyfighter.cabs.entity.Transit;
-import io.legacyfighter.cabs.money.Money;
-import io.legacyfighter.cabs.repository.AwardsAccountRepository;
-import io.legacyfighter.cabs.service.AwardsService;
+import io.legacyfighter.cabs.loyalty.AwardsAccountRepository;
+import io.legacyfighter.cabs.loyalty.AwardsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +19,6 @@ import java.time.ZoneOffset;
 import java.util.List;
 
 import static io.legacyfighter.cabs.entity.Client.Type.NORMAL;
-import static io.legacyfighter.cabs.entity.Client.Type.VIP;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
