@@ -1,7 +1,5 @@
-package io.legacyfighter.cabs.service;
+package io.legacyfighter.cabs.invocing;
 
-import io.legacyfighter.cabs.entity.Invoice;
-import io.legacyfighter.cabs.repository.InvoiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
