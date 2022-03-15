@@ -1,4 +1,4 @@
-package io.legacyfighter.cabs.dto;
+package io.legacyfighter.cabs.crm.transitanalyzer;
 
 import io.legacyfighter.cabs.geolocation.address.AddressDTO;
 
