@@ -152,8 +152,9 @@ class TransitDetails extends BaseEntity {
         this.distance = newDistance;
     }
 
-    void destinationChangedTo(Address newAddress) {
+    void destinationChangedTo(Address newAddress, Distance newDistance) {
         this.to = newAddress;
+        this.distance = newDistance;
     }
 
     Money getDriversFee() {

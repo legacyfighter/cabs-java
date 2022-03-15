@@ -4,7 +4,6 @@ package io.legacyfighter.cabs.ride.details;
 import io.legacyfighter.cabs.assignment.InvolvedDriversSummary;
 import io.legacyfighter.cabs.carfleet.CarClass;
 import io.legacyfighter.cabs.crm.Client;
-import io.legacyfighter.cabs.driverfleet.DriverService;
 import io.legacyfighter.cabs.geolocation.Distance;
 import io.legacyfighter.cabs.geolocation.address.Address;
 import io.legacyfighter.cabs.money.Money;
@@ -46,9 +45,9 @@ public class TransitDetailsFacade {
     }
 
     @Transactional
-    public void destinationChanged(UUID requestId, Address newAddress) {
+    public void destinationChanged(UUID requestId, Address newAddress, Distance newDistance) {
         TransitDetails details = load(requestId);
-        details.destinationChangedTo(newAddress);
+        details.destinationChangedTo(newAddress, newDistance);
     }
 
     @Transactional
