@@ -1,10 +1,6 @@
 package io.legacyfighter.cabs.integration;
 
-import io.legacyfighter.cabs.dto.ContractAttachmentDTO;
-import io.legacyfighter.cabs.dto.ContractDTO;
-import io.legacyfighter.cabs.entity.Contract;
-import io.legacyfighter.cabs.entity.ContractAttachment;
-import io.legacyfighter.cabs.service.ContractService;
+import io.legacyfighter.cabs.agreements.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,7 +27,7 @@ class ContractLifecycleIntegrationTest {
         assertEquals("partnerNameVeryUnique", loaded.getPartnerName());
         assertEquals("umowa o cenę", loaded.getSubject());
         assertEquals("C/1/partnerNameVeryUnique", loaded.getContractNo());
-        assertEquals(Contract.Status.NEGOTIATIONS_IN_PROGRESS, loaded.getStatus());
+        assertEquals(ContractStatus.NEGOTIATIONS_IN_PROGRESS, loaded.getStatus());
         assertNotNull(loaded.getId());
         assertNotNull(loaded.getCreationDate());
         assertNotNull(loaded.getCreationDate());
@@ -68,7 +64,7 @@ class ContractLifecycleIntegrationTest {
         ContractDTO loaded = loadContract(created.getId());
         assertEquals(1, loaded.getAttachments().size());
         assertTrue(Arrays.equals("content".getBytes(), loaded.getAttachments().get(0).getData()));
-        assertEquals(ContractAttachment.Status.PROPOSED, loaded.getAttachments().get(0).getStatus());
+        assertEquals(ContractAttachmentStatus.PROPOSED, loaded.getAttachments().get(0).getStatus());
     }
 
     @Test
@@ -99,7 +95,7 @@ class ContractLifecycleIntegrationTest {
         //then
         ContractDTO loaded = loadContract(created.getId());
         assertEquals(1, loaded.getAttachments().size());
-        assertEquals(ContractAttachment.Status.ACCEPTED_BY_ONE_SIDE, loaded.getAttachments().get(0).getStatus());
+        assertEquals(ContractAttachmentStatus.ACCEPTED_BY_ONE_SIDE, loaded.getAttachments().get(0).getStatus());
     }
 
     @Test
@@ -117,7 +113,7 @@ class ContractLifecycleIntegrationTest {
         //then
         ContractDTO loaded = loadContract(created.getId());
         assertEquals(1, loaded.getAttachments().size());
-        assertEquals(ContractAttachment.Status.ACCEPTED_BY_BOTH_SIDES, loaded.getAttachments().get(0).getStatus());
+        assertEquals(ContractAttachmentStatus.ACCEPTED_BY_BOTH_SIDES, loaded.getAttachments().get(0).getStatus());
     }
 
     @Test
@@ -133,7 +129,7 @@ class ContractLifecycleIntegrationTest {
         //then
         ContractDTO loaded = loadContract(created.getId());
         assertEquals(1, loaded.getAttachments().size());
-        assertEquals(ContractAttachment.Status.REJECTED, loaded.getAttachments().get(0).getStatus());
+        assertEquals(ContractAttachmentStatus.REJECTED, loaded.getAttachments().get(0).getStatus());
     }
 
     @Test
@@ -151,7 +147,7 @@ class ContractLifecycleIntegrationTest {
 
         //then
         ContractDTO loaded = loadContract(created.getId());
-        assertEquals(Contract.Status.ACCEPTED, loaded.getStatus());
+        assertEquals(ContractStatus.ACCEPTED, loaded.getStatus());
     }
 
     @Test
@@ -169,7 +165,7 @@ class ContractLifecycleIntegrationTest {
 
         //then
         ContractDTO loaded = loadContract(created.getId());
-        assertEquals(Contract.Status.REJECTED, loaded.getStatus());
+        assertEquals(ContractStatus.REJECTED, loaded.getStatus());
     }
 
     @Test
@@ -184,7 +180,7 @@ class ContractLifecycleIntegrationTest {
         //expect
         assertThrows(IllegalStateException.class, () -> acceptContract(created));
         ContractDTO loaded = loadContract(created.getId());
-        assertNotEquals(Contract.Status.ACCEPTED, loaded.getStatus());
+        assertNotEquals(ContractStatus.ACCEPTED, loaded.getStatus());
     }
 
     ContractDTO loadContract(Long id) {
@@ -195,8 +191,7 @@ class ContractLifecycleIntegrationTest {
         ContractDTO dto = new ContractDTO();
         dto.setPartnerName(partnerName);
         dto.setSubject(subject);
-        Contract contract = contractService.createContract(dto);
-        return loadContract(contract.getId());
+        return contractService.createContract(dto);
     }
 
     ContractAttachmentDTO addAttachmentToContract(ContractDTO created, String content) {

@@ -1,11 +1,5 @@
-package io.legacyfighter.cabs.service;
+package io.legacyfighter.cabs.agreements;
 
-import io.legacyfighter.cabs.dto.ContractAttachmentDTO;
-import io.legacyfighter.cabs.dto.ContractDTO;
-import io.legacyfighter.cabs.entity.Contract;
-import io.legacyfighter.cabs.entity.ContractAttachmentData;
-import io.legacyfighter.cabs.repository.ContractAttachmentDataRepository;
-import io.legacyfighter.cabs.repository.ContractRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,10 +16,10 @@ public class ContractService {
     private ContractAttachmentDataRepository contractAttachmentDataRepository;
 
     @Transactional
-    public Contract createContract(ContractDTO contractDTO) {
+    public ContractDTO createContract(ContractDTO contractDTO) {
         int partnerContractsCount = contractRepository.findByPartnerName(contractDTO.getPartnerName()).size() + 1;
         Contract contract = new Contract(contractDTO.getPartnerName(), contractDTO.getSubject(), "C/" + partnerContractsCount + "/" + contractDTO.getPartnerName());
-        return contractRepository.save(contract);
+        return findDto(contractRepository.save(contract).getId());
     }
 
     @Transactional

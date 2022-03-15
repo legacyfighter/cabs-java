@@ -1,4 +1,4 @@
-package io.legacyfighter.cabs.entity;
+package io.legacyfighter.cabs.agreements;
 
 import io.legacyfighter.cabs.common.BaseEntity;
 
@@ -7,7 +7,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-public class ContractAttachmentData extends BaseEntity {
+class ContractAttachmentData extends BaseEntity {
 
     @Column(nullable = false)
     private UUID contractAttachmentNo;
@@ -19,23 +19,23 @@ public class ContractAttachmentData extends BaseEntity {
     @Column(nullable = false)
     private Instant creationDate = Instant.now();
 
-    public ContractAttachmentData() {
+    ContractAttachmentData() {
     }
 
-    public ContractAttachmentData(UUID contractAttachmentId, byte[] data) {
+    ContractAttachmentData(UUID contractAttachmentId, byte[] data) {
         this.contractAttachmentNo = contractAttachmentId;
         this.data = data;
     }
 
-    public byte[] getData() {
+    byte[] getData() {
         return data;
     }
 
-    public Instant getCreationDate() {
+    Instant getCreationDate() {
         return creationDate;
     }
 
-    public UUID getContractAttachmentNo() {
+    UUID getContractAttachmentNo() {
         return contractAttachmentNo;
     }
 
