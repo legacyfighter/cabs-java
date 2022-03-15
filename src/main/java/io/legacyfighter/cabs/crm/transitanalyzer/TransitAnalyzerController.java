@@ -1,7 +1,6 @@
 package io.legacyfighter.cabs.crm.transitanalyzer;
 
 import io.legacyfighter.cabs.geolocation.address.AddressDTO;
-import io.legacyfighter.cabs.dto.AnalyzedAddressesDTO;
 import io.legacyfighter.cabs.geolocation.address.AddressRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
